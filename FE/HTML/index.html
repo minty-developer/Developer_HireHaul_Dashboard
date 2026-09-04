@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="title">Developer HireHaul Dashboard</title>
+    <link rel="stylesheet" href="/FE/CSS/index.css">
+</head>
+<body>
+    <header>
+        <a class="homeLink" href="/FE/HTML/index.html"><span class="mainIcon">D<span class="mainIconLine">-</span></span></a>
+        <h2 class="mainTitle"><a class="homeLink" href="/FE/HTML/index.html">Developer HaireHaul</a></h2>
+    </header>
+    <hr class="divideLine">
+    <nav>
+        <div class="buttonBox">
+            <a href="/FE/HTML/index.html">Home</a>
+            <a href="#">Test</a>
+        </div>
+        <div class="searchBox">
+            <input type="text" id="searchInput" autocomplete="off"><button id="searchButton">검색</button>
+        </div>
+    </nav>
+    <hr class="divideLine">
+    <main>
+        <section id="cards">
+            <div id="searchAction" class="hide">검색 중입니다.</div>
+            <div id="searchFailed" class="hide">검색에 실패 했습니다.</div>
+        </section>
+        <aside></aside>
+    </main>
+    <script src="/FE/JS/index.js"></script>
+</body>
+</html>
+
+<!--
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ┌ header                               ┃
+┃ │  ├ .mainTitle                        ┃
+┃ │  │  └ .homeLink                      ┃
+┃ │  └ .homeLink                         ┃
+┃ │    └ .mainIcon                       ┃
+┃ │      └ .mainIcon span                ┃
+┃ ├ nav                                  ┃
+┃ │  ├ .buttonBox                        ┃
+┃ │  │  ├ a                              ┃
+┃ │  │  ├ a                              ┃
+┃ │  │  ├ a                              ┃
+┃ │  │  └ a                              ┃
+┃ │  └ .searchBox                        ┃
+┃ │     ├ #searchInput                   ┃
+┃ │     └ #searchButton                  ┃
+┃ ├ main                                 ┃
+┃ │  ├ section                           ┃
+┃ │  └ aside                             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+-->
