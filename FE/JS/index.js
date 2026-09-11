@@ -4,7 +4,7 @@
 //   - JS 변수
 
 // 서버 위치
-var ServerDefaultUrl = ``;
+var ServerDefaultUrl = `https://developer-hirehaul-dashboard.onrender.com/`;
 
 // 요소들
 var searchButton = document.getElementById('searchButton');
@@ -14,8 +14,16 @@ var searchFailed = document.getElementById('searchFailed');
 
 var cards = document.getElementById('cards');
 
+var tagButtons = document.querySelectorAll('.tag');
+var tagBox = document.getElementById('tagBox');
+
+// 필터를 저장하는 리스트
+var tagClicked = [];
+
 // 데이터를 받아두는 리스트
 var cardList = [{id: 0, name: "Test Kaisya", text: "Test text"}];
+
+var isInited = false;
 
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
@@ -27,20 +35,21 @@ var cardList = [{id: 0, name: "Test Kaisya", text: "Test text"}];
 //   - JS Util 함수
 
 /** 요소들이 JS에 잘 인식 되는지 확인하는 함수
- * @returns [void] 없음
+ * @returns {void} 없음
  */
 function checkElements() {
-    if(searchButton === null) console.warn("검색 버튼이 null입니다.");
-    if(searchInput === null) console.warn("검색 텍스트 박스가 null입니다.");
-    if(searchAction === null) console.warn("검색 중 액션이 null입니다.");
-    if(searchFailed === null) console.warn("검색 실패 박스가 null입니다.");
-    if(cards === null) console.warn("카드 리스트 박스가 null입니다.")
+    if(!searchButton) console.warn("검색 버튼이 null또는 undefined입니다.");
+    if(!searchInput) console.warn("검색 텍스트 박스가 null또는 undefined입니다.");
+    if(!searchAction) console.warn("검색 중 액션이 null또는 undefined입니다.");
+    if(!searchFailed) console.warn("검색 실패 박스가 null또는 undefined입니다.");
+    if(!cards) console.warn("카드 리스트 박스가 null또는 undefined입니다.");
+    if(!tagButtons) console.warn("태그 버튼들이 null또는 undefined입니다.");
     console.log("요소 검사에 성공했습니다.");
 }
 
 /** 검색어를 받아서 검색하는 함수
- * @param {*} input [string] 검색어
- * @returns [void] 없음
+ * @param {string} input 검색어
+ * @returns {void} 없음
  */
 function findWithTitle(input) {
     let isFound = false;
@@ -106,6 +115,32 @@ searchInput.addEventListener('keydown', (ev) => {
 });
 
 // 웹에 접속했을 때
-window.addEventListener('load', checkElements);
+window.addEventListener('load', () => {
+    checkElements();
+    if(isInited) return;
+    tagButtons.forEach((tagButton) => {
+        let id = tagButton.lastElementChild.innerHTML;
+        tagClicked[id] = false;
+        tagButton.addEventListener('click', () => {
+            let value = tagClicked[id];
+            tagClicked[id] = !value;
+            if (tagClicked[id]) {
+                tagButton.firstElementChild.classList.add('boxClicked');
+                tagButton.classList.add('tagClicked');
+                tagBox.prepend(tagButton);
+            } else {
+                tagButton.firstElementChild.classList.remove('boxClicked');
+                tagButton.classList.remove('tagClicked');
+                tagBox.appendChild(tagButton);
+            }
+        });
+    });
+    isInited = true;
+
+    // Dev
+    const response = fetch(`${ServerDefaultUrl}/api/jobs`);
+    if(!response.ok) { console.warn("정보 못 가져옴"); }
+    console.log(response);
+});
 
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛

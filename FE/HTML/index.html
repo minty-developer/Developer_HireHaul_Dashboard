@@ -9,7 +9,7 @@
 <body>
     <header>
         <a class="homeLink" href="/FE/HTML/index.html"><span class="mainIcon">D<span class="mainIconLine">-</span></span></a>
-        <h2 class="mainTitle"><a class="homeLink" href="/FE/HTML/index.html">Developer HaireHaul</a></h2>
+        <h2 class="mainTitle"><a class="homeLink" href="/FE/HTML/index.html">Developer HireHaul</a></h2>
     </header>
     <hr class="divideLine">
     <nav>
@@ -27,7 +27,15 @@
             <div id="searchAction" class="hide">검색 중입니다.</div>
             <div id="searchFailed" class="hide">검색에 실패 했습니다.</div>
         </section>
-        <aside></aside>
+        <aside>
+            <h2 class="tagTitle">Tag filter</h2>
+            <hr class="divideLine">
+            <div id="tagBox">
+                <button class="tag"><div class="checkBox"></div>Front End</button>
+                <button class="tag"><div class="checkBox"></div>Back End</button>
+                <button class="tag"><div class="checkBox"></div>AI</button>
+            </div>
+        </aside>
     </main>
     <script src="/FE/JS/index.js"></script>
 </body>
@@ -35,25 +43,34 @@
 
 <!--
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ ┌ header                               ┃
-┃ │  ├ .mainTitle                        ┃
-┃ │  │  └ .homeLink                      ┃
-┃ │  └ .homeLink                         ┃
-┃ │    └ .mainIcon                       ┃
-┃ │      └ .mainIcon span                ┃
-┃ ├ nav                                  ┃
-┃ │  ├ .buttonBox                        ┃
-┃ │  │  ├ a                              ┃
-┃ │  │  ├ a                              ┃
-┃ │  │  ├ a                              ┃
-┃ │  │  └ a                              ┃
-┃ │  └ .searchBox                        ┃
-┃ │     ├ #searchInput                   ┃
-┃ │     └ #searchButton                  ┃
-┃ ├ main                                 ┃
-┃ │  ├ section                           ┃
-┃ │  └ aside                             ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ┌ header                                         ┃
+┃ │  ├ .mainTitle                                  ┃
+┃ │  │  └ .homeLink                                ┃
+┃ │  └ .homeLink                                   ┃
+┃ │    └ .mainIcon                                 ┃
+┃ │      └ .mainIcon span                          ┃
+┃ ├ nav                                            ┃
+┃ │  ├ .buttonBox                                  ┃
+┃ │  │  ├ a                                        ┃
+┃ │  │  ├ a                                        ┃
+┃ │  │  ├ a                                        ┃
+┃ │  │  └ a                                        ┃
+┃ │  └ .searchBox                                  ┃
+┃ │     ├ #searchInput                             ┃
+┃ │     └ #searchButton                            ┃
+┃ └ main                                           ┃
+┃    ├ section                                     ┃
+┃    │  ├ #searchAction(hide)                      ┃
+┃    │  ├ #searchFailed(hide)                      ┃
+┃    │  └ .card(Dynamic)                           ┃
+┃    │    ├ .cardTitleBox                          ┃
+┃    │    │  └ .cardTitle                          ┃
+┃    │    └ .cardTextBox                           ┃
+┃    └ aside                                       ┃
+┃       ├ .tagTitle                                ┃
+┃       └ .tag | .tagClicked(Dynamic)              ┃
+┃         └ .checkBox | boxClicked(Dynamic)        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 -->
