@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Python: 가상환경 만들기",
+      "type": "shell",
+      "command": "python -m venv .venv",
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: 패키지 설치",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe -m pip install -r requirements.txt",
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: 테스트",
+      "type": "shell",
+      "command": ".venv\\Scripts\\python.exe -m unittest discover -s tests -v",
+      "group": {"kind": "test", "isDefault": true},
+      "problemMatcher": []
+    }
+  ]
+}
