@@ -18,9 +18,6 @@ def create_app(test_config: dict | None = None) -> Flask:
         template_folder=None,
     )
 
-    # 프론트엔드와 API 통신 허용
-    CORS(app)
-
     # 프로젝트 루트 경로
     root = Path(__file__).resolve().parent.parent
 
@@ -38,11 +35,21 @@ def create_app(test_config: dict | None = None) -> Flask:
             "DEFAULT_KEYWORDS",
             "Python,백엔드,프론트엔드,데이터"
         ),
+        SYNC_API_KEY=os.getenv("SYNC_API_KEY", ""),
+        CORS_ORIGINS=os.getenv("CORS_ORIGINS", "http://localhost:3000"),
     )
 
     # 테스트용 설정이 있으면 덮어쓰기
     if test_config:
         app.config.update(test_config)
+
+    # API 경로에만 CORS를 적용하고 허용할 프론트엔드를 설정으로 제한한다.
+    origins = [
+        origin.strip()
+        for origin in app.config["CORS_ORIGINS"].split(",")
+        if origin.strip()
+    ]
+    CORS(app, resources={r"/api/*": {"origins": origins}})
 
     # DB 폴더가 없으면 생성
     Path(

@@ -11,12 +11,22 @@ def jobs():
     location = request.args.get("location", "").strip()
     source = request.args.get("source", "").strip()
 
-    limit = min(
-        max(request.args.get("limit", 50, type=int), 1),
-        200
-    )
+    try:
+        limit = int(request.args.get("limit", 50))
+        offset = int(request.args.get("offset", 0))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "limit과 offset은 정수여야 합니다."}), 400
 
-    clauses = ["active = 1"]
+    if not 1 <= limit <= 200 or offset < 0:
+        return jsonify({
+            "ok": False,
+            "error": "limit은 1~200, offset은 0 이상이어야 합니다."
+        }), 400
+
+    clauses = [
+        "active = 1",
+        "(expires_at IS NULL OR expires_at = '' OR datetime(expires_at) >= datetime('now'))"
+    ]
     values = []
 
     if keyword:
@@ -43,19 +53,27 @@ def jobs():
         FROM jobs
         WHERE {' AND '.join(clauses)}
         ORDER BY posted_at DESC
-        LIMIT ?
+        LIMIT ? OFFSET ?
     """
 
-    values.append(limit)
+    query_values = [*values, limit, offset]
 
     with connect(current_app.config["DATABASE_PATH"]) as db:
 
+        total = db.execute(
+            f"SELECT COUNT(*) FROM jobs WHERE {' AND '.join(clauses)}",
+            values
+        ).fetchone()[0]
+
         rows = [
             dict(row)
-            for row in db.execute(sql, values).fetchall()
+            for row in db.execute(sql, query_values).fetchall()
         ]
 
     return jsonify({
         "count": len(rows),
+        "total": total,
+        "limit": limit,
+        "offset": offset,
         "jobs": rows
     })

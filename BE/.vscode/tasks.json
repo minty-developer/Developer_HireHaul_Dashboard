@@ -17,6 +17,7 @@
       "label": "Python: 테스트",
       "type": "shell",
       "command": ".venv\\Scripts\\python.exe -m unittest discover -s tests -v",
+      "options": {"cwd": "${workspaceFolder}"},
       "group": {"kind": "test", "isDefault": true},
       "problemMatcher": []
     }
