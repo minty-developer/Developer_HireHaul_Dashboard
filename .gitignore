@@ -4,3 +4,9 @@ tests
 .venv/
 __pycache__/
 *.pyc
+*.log
+*.db
+*.db-shm
+*.db-wal
+.coverage
+.pytest_cache/

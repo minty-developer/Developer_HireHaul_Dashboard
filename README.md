@@ -13,6 +13,7 @@ Python/Flask로 만든 백엔드 전용 JSON API 서버입니다. 외부 채용 
 
 ```powershell
 cd job_dashboard
+cd BE
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -47,5 +48,6 @@ python run.py
 ## 테스트
 
 ```powershell
+cd BE
 python -m unittest discover -s tests -v
 ```
