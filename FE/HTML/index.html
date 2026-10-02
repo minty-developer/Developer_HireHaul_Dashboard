@@ -1,76 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="title">Developer HireHaul Dashboard</title>
-    <link rel="stylesheet" href="/FE/CSS/index.css">
+    <link rel="stylesheet" href="../CSS/index.css">
 </head>
 <body>
     <header>
-        <a class="homeLink" href="/FE/HTML/index.html"><span class="mainIcon">D<span class="mainIconLine">-</span></span></a>
-        <h2 class="mainTitle"><a class="homeLink" href="/FE/HTML/index.html">Developer HireHaul</a></h2>
-    </header>
-    <hr class="divideLine">
-    <nav>
-        <div class="buttonBox">
-            <a href="/FE/HTML/index.html">Home</a>
-            <a href="#">Test</a>
+        <div class="brand">
+            <a class="homeLink" href="index.html" aria-label="Developer HireHaul 홈"><span class="mainIcon" aria-hidden="true">D<span class="mainIconLine">-</span></span></a>
+            <h1 class="mainTitle"><a class="homeLink" href="index.html">Developer HireHaul</a></h1>
         </div>
-        <div class="searchBox">
-            <input type="text" id="searchInput" autocomplete="off"><button id="searchButton">검색</button>
+        <div class="searchBox" role="search">
+            <input type="search" id="searchInput" autocomplete="off" aria-label="공고 검색" placeholder="회사명 또는 공고내용 검색...">
+        </div>
+    </header>
+    <nav aria-label="주 메뉴">
+        <div class="buttonBox">
+            <a href="index.html" aria-current="page">Home</a>
         </div>
     </nav>
-    <hr class="divideLine">
     <main>
-        <section id="cards">
-            <div id="searchAction" class="hide">검색 중입니다.</div>
-            <div id="searchFailed" class="hide">검색에 실패 했습니다.</div>
+        <section id="cards" aria-label="채용 공고 목록">
+            <p id="resultCount" aria-live="polite"></p>
+            <div id="searchAction" class="hide" role="status">검색 중입니다.</div>
+            <div id="searchFailed" class="hide" role="alert">검색에 실패 했습니다. <button type="button" id="retryButton">다시 시도</button></div>
+            <div id="searchEmpty" class="hide" role="status">검색 결과가 없습니다. 다른 검색어나 필터를 선택해 보세요.</div>
         </section>
-        <aside>
-            <h2 class="tagTitle">Tag filter</h2>
-            <hr class="divideLine">
-            <div id="tagBox">
-                <button class="tag"><div class="checkBox"></div>Front End</button>
-                <button class="tag"><div class="checkBox"></div>Back End</button>
-                <button class="tag"><div class="checkBox"></div>AI</button>
+        <aside aria-label="필터와 통계">
+            <h2 class="tagTitle">Filter</h2>
+            <div class="filterBox">
+                <label for="locationSelect">지역</label>
+                <select id="locationSelect"><option value="">전체</option></select>
+                <label for="sourceSelect">출처</label>
+                <select id="sourceSelect"><option value="">전체</option></select>
             </div>
+            <h2 class="tagTitle" id="tagTitle">Tag filter</h2>
+            <div id="tagBox">
+                <button type="button" class="tag" aria-pressed="false">Front End</button>
+                <button type="button" class="tag" aria-pressed="false">Back End</button>
+                <button type="button" class="tag" aria-pressed="false">AI</button>
+            </div>
+            <h2 class="tagTitle">Overview</h2>
+            <div id="statsBox" class="hide"></div>
         </aside>
     </main>
-    <script src="/FE/JS/index.js"></script>
+    <dialog id="jobDialog" aria-labelledby="dialogTitle">
+        <h3 id="dialogTitle"></h3>
+        <p id="dialogMeta"></p>
+        <p id="dialogText"></p>
+        <div class="dialogActions">
+            <a id="dialogLink" class="dialogLink hide" href="#" target="_blank" rel="noopener noreferrer">공고 원문 보기</a>
+            <button type="button" id="dialogClose">닫기</button>
+        </div>
+    </dialog>
+    <script src="../JS/index.js"></script>
 </body>
 </html>
-
-<!--
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ ┌ header                                         ┃
-┃ │  ├ .mainTitle                                  ┃
-┃ │  │  └ .homeLink                                ┃
-┃ │  └ .homeLink                                   ┃
-┃ │    └ .mainIcon                                 ┃
-┃ │      └ .mainIcon span                          ┃
-┃ ├ nav                                            ┃
-┃ │  ├ .buttonBox                                  ┃
-┃ │  │  ├ a                                        ┃
-┃ │  │  ├ a                                        ┃
-┃ │  │  ├ a                                        ┃
-┃ │  │  └ a                                        ┃
-┃ │  └ .searchBox                                  ┃
-┃ │     ├ #searchInput                             ┃
-┃ │     └ #searchButton                            ┃
-┃ └ main                                           ┃
-┃    ├ section                                     ┃
-┃    │  ├ #searchAction(hide)                      ┃
-┃    │  ├ #searchFailed(hide)                      ┃
-┃    │  └ .card(Dynamic)                           ┃
-┃    │    ├ .cardTitleBox                          ┃
-┃    │    │  └ .cardTitle                          ┃
-┃    │    └ .cardTextBox                           ┃
-┃    └ aside                                       ┃
-┃       ├ .tagTitle                                ┃
-┃       └ .tag | .tagClicked(Dynamic)              ┃
-┃         └ .checkBox | boxClicked(Dynamic)        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
--->
