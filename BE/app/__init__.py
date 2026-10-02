@@ -23,6 +23,7 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     # 기본 설정
     app.config.from_mapping(
+        APP_ENV=os.getenv("APP_ENV", "development").lower(),
         SECRET_KEY=os.getenv(
             "SECRET_KEY",
             "dev-only-change-me"
@@ -42,6 +43,14 @@ def create_app(test_config: dict | None = None) -> Flask:
     # 테스트용 설정이 있으면 덮어쓰기
     if test_config:
         app.config.update(test_config)
+
+    if app.config["APP_ENV"] == "production":
+        if app.config["SECRET_KEY"] in {"", "dev-only-change-me", "change-me"}:
+            raise RuntimeError("Production requires a secure SECRET_KEY.")
+        if not app.config["SYNC_API_KEY"]:
+            raise RuntimeError("Production requires SYNC_API_KEY.")
+        if not app.config["CORS_ORIGINS"]:
+            raise RuntimeError("Production requires CORS_ORIGINS.")
 
     # API 경로에만 CORS를 적용하고 허용할 프론트엔드를 설정으로 제한한다.
     origins = [

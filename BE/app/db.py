@@ -45,10 +45,12 @@ ON jobs(source);
 # SQLite DB 연결
 @contextmanager
 def connect(path: str):
-    connection = sqlite3.connect(path)
+    connection = sqlite3.connect(path, timeout=10)
 
     # 조회 결과를 dict처럼 사용할 수 있게 설정
     connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA foreign_keys = ON")
+    connection.execute("PRAGMA busy_timeout = 10000")
 
     try:
         yield connection
@@ -61,6 +63,7 @@ def connect(path: str):
 # DB 및 테이블 초기화
 def init_db(path: str) -> None:
     with connect(path) as db:
+        db.execute("PRAGMA journal_mode = WAL")
         db.executescript(SCHEMA)
 
 

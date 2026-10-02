@@ -12,6 +12,7 @@ class AppTest(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.app = create_app({
             "TESTING": True,
+            "APP_ENV": "testing",
             "DATABASE_PATH": str(Path(self.temp.name) / "test.db"),
             "SYNC_API_KEY": "test-key",
             "CORS_ORIGINS": "http://localhost:3000",
@@ -25,6 +26,7 @@ class AppTest(unittest.TestCase):
     def test_health_and_sample_sync(self):
         self.assertEqual(self.client.get("/").status_code, 200)
         self.assertEqual(self.client.get("/api/health").json["status"], "ok")
+        self.assertEqual(self.client.get("/api/health").json["database"], "ok")
         result = self.client.post("/api/sync", json={}, headers=self.auth)
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result.json["source"], "sample")
@@ -82,6 +84,15 @@ class AppTest(unittest.TestCase):
 
         self.assertEqual(self.client.get("/api/jobs").json["total"], 0)
         self.assertEqual(self.client.get("/api/stats").json["total"], 0)
+
+    def test_production_requires_secure_configuration(self):
+        with self.assertRaises(RuntimeError):
+            create_app({
+                "APP_ENV": "production",
+                "DATABASE_PATH": str(Path(self.temp.name) / "production.db"),
+                "SECRET_KEY": "change-me",
+                "SYNC_API_KEY": "",
+            })
 
 
 if __name__ == "__main__":
