@@ -1,10 +1,10 @@
 import tempfile
 import unittest
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from app import create_app
-from app.db import upsert_jobs
+from app.db import connect, upsert_articles, upsert_blog
+from app.seed_blogs import DEFAULT_BLOGS, seed_default_blogs
 
 
 class AppTest(unittest.TestCase):
@@ -14,76 +14,107 @@ class AppTest(unittest.TestCase):
             "TESTING": True,
             "APP_ENV": "testing",
             "DATABASE_PATH": str(Path(self.temp.name) / "test.db"),
-            "SYNC_API_KEY": "test-key",
+            "ADMIN_API_KEY": "test-admin-key",
             "CORS_ORIGINS": "http://localhost:3000",
         })
         self.client = self.app.test_client()
-        self.auth = {"X-API-Key": "test-key"}
 
     def tearDown(self):
         self.temp.cleanup()
 
-    def test_health_and_sample_sync(self):
-        self.assertEqual(self.client.get("/").status_code, 200)
-        self.assertEqual(self.client.get("/api/health").json["status"], "ok")
-        self.assertEqual(self.client.get("/api/health").json["database"], "ok")
-        result = self.client.post("/api/sync", json={}, headers=self.auth)
-        self.assertEqual(result.status_code, 200)
-        self.assertEqual(result.json["source"], "sample")
-        self.assertEqual(self.client.get("/api/jobs").json["count"], 3)
+    def test_home(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Tech Blog Aggregator", response.data)
 
-    def test_search(self):
-        self.client.post("/api/sync", json={}, headers=self.auth)
-        data = self.client.get("/api/jobs?q=Flask").json
-        self.assertEqual(data["count"], 1)
-        self.assertEqual(data["total"], 1)
+    def test_health(self):
+        response = self.client.get("/api/health")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {"status": "ok", "database": "ok"})
 
-    def test_sync_requires_auth_when_key_is_configured(self):
-        response = self.client.post("/api/sync", json={})
-        self.assertEqual(response.status_code, 401)
+    def test_database_schema_is_created(self):
+        with connect(self.app.config["DATABASE_PATH"]) as db:
+            tables = {
+                row["name"]
+                for row in db.execute(
+                    "SELECT name FROM sqlite_master WHERE type = 'table'"
+                ).fetchall()
+            }
 
-    def test_sync_validates_body_and_count(self):
-        for body in ([], {"count": 0}, {"count": 201}, {"count": "invalid"}):
-            with self.subTest(body=body):
-                response = self.client.post("/api/sync", json=body, headers=self.auth)
-                self.assertEqual(response.status_code, 400)
+        self.assertTrue({"blogs", "articles"}.issubset(tables))
 
-    def test_jobs_validates_pagination(self):
-        for query in ("limit=0", "limit=201", "limit=invalid", "offset=-1"):
-            with self.subTest(query=query):
-                response = self.client.get(f"/api/jobs?{query}")
-                self.assertEqual(response.status_code, 400)
+    def test_blog_and_article_upsert(self):
+        database_path = self.app.config["DATABASE_PATH"]
+        blog_id = upsert_blog(database_path, {
+            "name": "Engineering Blog",
+            "company": "Example",
+            "feed_url": "https://example.com/feed.xml",
+            "site_url": "https://example.com/tech",
+        })
+        same_blog_id = upsert_blog(database_path, {
+            "name": "Updated Engineering Blog",
+            "company": "Example",
+            "feed_url": "https://example.com/feed.xml",
+            "site_url": "https://example.com/engineering",
+        })
+        article = {
+            "blog_id": blog_id,
+            "entry_key": "article-1",
+            "title": "First title",
+            "url": "https://example.com/tech/article-1",
+            "fetched_at": "2026-10-06T12:00:00+09:00",
+        }
 
-    def test_jobs_pagination(self):
-        self.client.post("/api/sync", json={}, headers=self.auth)
-        first_page = self.client.get("/api/jobs?limit=2&offset=0").json
-        second_page = self.client.get("/api/jobs?limit=2&offset=2").json
-        self.assertEqual(first_page["count"], 2)
-        self.assertEqual(first_page["total"], 3)
-        self.assertEqual(second_page["count"], 1)
+        self.assertEqual(blog_id, same_blog_id)
+        self.assertEqual(upsert_articles(database_path, [article]), 1)
+        self.assertEqual(
+            upsert_articles(database_path, [{**article, "title": "Updated title"}]),
+            1,
+        )
 
-    def test_expired_jobs_are_excluded_from_jobs_and_stats(self):
-        now = datetime.now(timezone.utc)
-        upsert_jobs(self.app.config["DATABASE_PATH"], [{
-            "source": "test",
-            "external_id": "expired-1",
-            "title": "Expired job",
-            "company": "Test company",
-            "location": "Seoul",
-            "experience": "",
-            "education": "",
-            "employment_type": "",
-            "salary": "",
-            "url": "https://example.com/expired-1",
-            "posted_at": (now - timedelta(days=2)).isoformat(),
-            "expires_at": (now - timedelta(days=1)).isoformat(),
-            "keywords": "test",
-            "active": 1,
-            "fetched_at": now.isoformat(),
+        with connect(database_path) as db:
+            blog = db.execute("SELECT * FROM blogs").fetchone()
+            saved_article = db.execute("SELECT * FROM articles").fetchone()
+
+        self.assertEqual(blog["name"], "Updated Engineering Blog")
+        self.assertEqual(saved_article["title"], "Updated title")
+        self.assertEqual(saved_article["blog_id"], blog_id)
+
+    def test_deleting_blog_deletes_its_articles(self):
+        database_path = self.app.config["DATABASE_PATH"]
+        blog_id = upsert_blog(database_path, {
+            "name": "Engineering Blog",
+            "company": "Example",
+            "feed_url": "https://example.com/feed.xml",
+            "site_url": "https://example.com/tech",
+        })
+        upsert_articles(database_path, [{
+            "blog_id": blog_id,
+            "entry_key": "article-1",
+            "title": "Article",
+            "url": "https://example.com/article-1",
+            "fetched_at": "2026-10-06T12:00:00+09:00",
         }])
 
-        self.assertEqual(self.client.get("/api/jobs").json["total"], 0)
-        self.assertEqual(self.client.get("/api/stats").json["total"], 0)
+        with connect(database_path) as db:
+            db.execute("DELETE FROM blogs WHERE id = ?", (blog_id,))
+
+        with connect(database_path) as db:
+            count = db.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
+
+        self.assertEqual(count, 0)
+
+    def test_seed_default_blogs_is_repeatable(self):
+        database_path = self.app.config["DATABASE_PATH"]
+
+        self.assertEqual(seed_default_blogs(database_path), len(DEFAULT_BLOGS))
+        self.assertEqual(seed_default_blogs(database_path), len(DEFAULT_BLOGS))
+
+        with connect(database_path) as db:
+            blogs = db.execute("SELECT * FROM blogs ORDER BY id").fetchall()
+
+        self.assertEqual(len(blogs), len(DEFAULT_BLOGS))
+        self.assertTrue(all(blog["active"] == 1 for blog in blogs))
 
     def test_production_requires_secure_configuration(self):
         with self.assertRaises(RuntimeError):
@@ -91,7 +122,17 @@ class AppTest(unittest.TestCase):
                 "APP_ENV": "production",
                 "DATABASE_PATH": str(Path(self.temp.name) / "production.db"),
                 "SECRET_KEY": "change-me",
-                "SYNC_API_KEY": "",
+                "ADMIN_API_KEY": "test-admin-key",
+                "CORS_ORIGINS": "https://example.com",
+            })
+
+        with self.assertRaises(RuntimeError):
+            create_app({
+                "APP_ENV": "production",
+                "DATABASE_PATH": str(Path(self.temp.name) / "production.db"),
+                "SECRET_KEY": "a-secure-production-secret",
+                "ADMIN_API_KEY": "",
+                "CORS_ORIGINS": "https://example.com",
             })
 
 

@@ -7,18 +7,14 @@ def home():
     <html>
         <head>
             <meta charset="UTF-8">
-            <title>HireHaul Dashboard</title>
+            <title>Tech Blog Aggregator</title>
         </head>
 
         <body style="font-family: Arial; text-align: center; margin-top: 100px;">
-            <h1>HireHaul 채용공고 대시보드</h1>
+            <h1>Tech Blog Aggregator API</h1>
 
             <p>
-                현재 개발 중인 개인 프로젝트입니다.
-            </p>
-
-            <p>
-                채용공고 API를 활용하여 채용정보를 수집하고 제공할 예정입니다.
+                국내 IT 기업 기술 블로그의 글을 모아 제공하는 서비스입니다.
             </p>
         </body>
     </html>

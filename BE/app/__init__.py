@@ -8,6 +8,7 @@ from flask_cors import CORS
 
 from .db import init_db
 from .routes import bp
+from .seed_blogs import seed_default_blogs
 
 
 def create_app(test_config: dict | None = None) -> Flask:
@@ -30,13 +31,9 @@ def create_app(test_config: dict | None = None) -> Flask:
         ),
         DATABASE_PATH=os.getenv(
             "DATABASE_PATH",
-            str(root / "data" / "jobs.db")
+            str(root / "data" / "tech_blog.db")
         ),
-        DEFAULT_KEYWORDS=os.getenv(
-            "DEFAULT_KEYWORDS",
-            "Python,백엔드,프론트엔드,데이터"
-        ),
-        SYNC_API_KEY=os.getenv("SYNC_API_KEY", ""),
+        ADMIN_API_KEY=os.getenv("ADMIN_API_KEY", ""),
         CORS_ORIGINS=os.getenv("CORS_ORIGINS", "http://localhost:3000"),
     )
 
@@ -47,8 +44,8 @@ def create_app(test_config: dict | None = None) -> Flask:
     if app.config["APP_ENV"] == "production":
         if app.config["SECRET_KEY"] in {"", "dev-only-change-me", "change-me"}:
             raise RuntimeError("Production requires a secure SECRET_KEY.")
-        if not app.config["SYNC_API_KEY"]:
-            raise RuntimeError("Production requires SYNC_API_KEY.")
+        if not app.config["ADMIN_API_KEY"]:
+            raise RuntimeError("Production requires ADMIN_API_KEY.")
         if not app.config["CORS_ORIGINS"]:
             raise RuntimeError("Production requires CORS_ORIGINS.")
 
@@ -75,5 +72,10 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     # routes 폴더 안의 API 등록
     app.register_blueprint(bp)
+
+    @app.cli.command("seed-blogs")
+    def seed_blogs_command() -> None:
+        count = seed_default_blogs(app.config["DATABASE_PATH"])
+        print(f"기본 기술 블로그 {count}개를 등록했습니다.")
 
     return app

@@ -1,35 +1,36 @@
-# HireHaul Backend
+# Tech Blog Aggregator Backend
 
-Flask와 SQLite로 구성된 HireHaul API 서버입니다. 현재는 외부 채용 API 대신 샘플 Provider를 사용합니다.
+Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니다.
 
-## 로컬 실행
+현재는 애플리케이션 초기화, RSS 블로그·게시글 데이터 구조, CORS, 헬스체크를 제공합니다. RSS 네트워크 수집과 사용자 기능은 이후 단계에서 추가합니다.
 
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-$env:APP_ENV = "development"
-$env:SECRET_KEY = "local-development-key"
-python run.py
-```
+## 데이터 구조
 
-`run.py`는 로컬 개발용입니다. 운영 환경에서는 `gunicorn run:app`을 사용하고 `APP_ENV=production`으로 설정합니다.
+- `blogs`: 블로그·회사·RSS 주소와 활성 상태, 조건부 요청용 ETag, 최근 수집 상태
+- `articles`: 블로그별 RSS 항목 식별자, 제목, 원문 주소, 작성자, 요약·본문, 게시·수집 시각
+
+게시글은 `blog_id + entry_key` 조합으로 중복 저장을 막습니다. RSS의 GUID를 `entry_key`로 사용하고, GUID가 없다면 원문 URL을 사용합니다.
 
 ## 환경변수
 
 - `APP_ENV`: `development`, `testing`, `production`
-- `SECRET_KEY`: Flask 비밀 키. 운영 환경에서 안전한 무작위 값 필수
-- `DATABASE_PATH`: SQLite DB 경로
-- `DEFAULT_KEYWORDS`: 기본 검색어
-- `SYNC_API_KEY`: `/api/sync` 요청의 `X-API-Key` 값. 운영 환경에서 필수
+- `SECRET_KEY`: Flask 비밀키. 운영 환경에서는 안전한 무작위 값 필수
+- `DATABASE_PATH`: SQLite 데이터베이스 경로
+- `ADMIN_API_KEY`: 관리자 수집 API의 `X-API-Key` 값
 - `CORS_ORIGINS`: 허용할 프론트엔드 Origin. 여러 개면 쉼표로 구분
 
 ## API
 
-- `GET /api/health`: 서버와 DB 상태
-- `GET /api/jobs`: `q`, `location`, `source`, `limit`, `offset` 지원
-- `GET /api/stats`: 활성 공고 통계
-- `POST /api/sync`: 공고 동기화. `SYNC_API_KEY` 설정 시 `X-API-Key` 헤더 필수
+- `GET /`: 서비스 안내
+- `GET /api/health`: 서버 및 데이터베이스 상태
+- `GET /api/articles`: 게시글 목록 및 검색
+- `GET /api/articles/{article_id}`: 게시글 상세 조회
+- `GET /api/blogs`: 활성 기술 블로그 목록
+- `GET /api/blogs/{blog_id}`: 기술 블로그 상세 조회
+- `POST /api/admin/sync`: 활성 블로그 전체 수집
+- `POST /api/admin/sync/{blog_id}`: 특정 블로그 수집
+
+게시글 목록은 `q`, `blog_id`, `from`, `to`, `limit`, `offset` 쿼리를 지원합니다. 날짜는 `YYYY-MM-DD` 형식입니다.
 
 ## 테스트
 
@@ -37,6 +38,29 @@ python run.py
 .venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-`.env.example`은 필요한 값의 예시이며 자동으로 로드되지 않습니다. 실행 환경이나 배포 서비스에 환경변수를 설정하세요.
+## 기본 기술 블로그 등록
 
-DB, WAL 파일, 로그, `.env`, 가상환경은 Git에 포함되지 않습니다.
+```powershell
+$env:FLASK_APP = "run.py"
+.venv\Scripts\python.exe -m flask seed-blogs
+```
+
+카카오 Tech, NAVER D2, LY Corporation 한국어 기술 블로그를 중복 없이 등록합니다.
+
+## RSS 수집 실행
+
+모든 관리자 수집 요청에는 `X-API-Key` 헤더가 필요합니다.
+
+```powershell
+$env:ADMIN_API_KEY = "local-admin-key"
+python run.py
+```
+
+다른 터미널에서 전체 또는 특정 블로그를 수집할 수 있습니다.
+
+```powershell
+curl.exe -X POST -H "X-API-Key: local-admin-key" http://127.0.0.1:5000/api/admin/sync
+curl.exe -X POST -H "X-API-Key: local-admin-key" http://127.0.0.1:5000/api/admin/sync/1
+```
+
+전체 수집은 한 블로그가 실패해도 나머지 블로그를 계속 처리합니다. 피드 서버가 ETag 또는 Last-Modified를 제공하면 다음 수집부터 조건부 요청에 사용합니다.
