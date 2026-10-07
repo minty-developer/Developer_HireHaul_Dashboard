@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: ./BE
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      SECRET_KEY: ${SECRET_KEY:-dev-only-change-me}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-local-admin-key}
+      DATABASE_PATH: /app/data/tech_blog.db
+      AUTH_TOKEN_TTL_SECONDS: ${AUTH_TOKEN_TTL_SECONDS:-604800}
+      AUTH_LOGIN_MAX_ATTEMPTS: ${AUTH_LOGIN_MAX_ATTEMPTS:-5}
+      AUTH_LOGIN_WINDOW_SECONDS: ${AUTH_LOGIN_WINDOW_SECONDS:-300}
+      MAX_CONTENT_LENGTH: ${MAX_CONTENT_LENGTH:-1048576}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      PORT: 5000
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+    volumes:
+      - backend_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  backend_data:

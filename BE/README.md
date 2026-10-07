@@ -87,3 +87,17 @@ $env:FLASK_APP = "run.py"
 .venv\Scripts\python.exe -m flask prune-auth-tokens
 .venv\Scripts\python.exe -m flask prune-login-attempts
 ```
+
+## Docker 실행
+
+저장소 루트에서 다음 명령을 실행합니다.
+
+```powershell
+docker compose up --build -d
+docker compose exec backend python -m flask seed-blogs
+docker compose exec backend python -m flask collect-feeds
+```
+
+API는 기본적으로 `http://127.0.0.1:5000`에서 열립니다. SQLite 데이터는
+`backend_data` 볼륨에 보존됩니다. 운영 환경에서는 `APP_ENV=production`과 함께
+안전한 `SECRET_KEY`, `ADMIN_API_KEY`, 실제 `CORS_ORIGINS`를 반드시 설정해야 합니다.
