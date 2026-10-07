@@ -40,6 +40,36 @@ CREATE TABLE IF NOT EXISTS articles (
     UNIQUE (blog_id, entry_key)
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    password_hash TEXT NOT NULL,
+    display_name TEXT NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS auth_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    keyword TEXT NOT NULL COLLATE NOCASE,
+    active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (user_id, keyword)
+);
+
 CREATE INDEX IF NOT EXISTS idx_blogs_active
 ON blogs(active);
 
@@ -48,7 +78,33 @@ ON articles(blog_id, published_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_articles_published
 ON articles(published_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_auth_tokens_user
+ON auth_tokens(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_auth_tokens_expires
+ON auth_tokens(expires_at);
+
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user
+ON subscriptions(user_id, active);
+
 """
+
+LOGIN_ATTEMPTS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS login_attempts (
+    attempt_key TEXT PRIMARY KEY,
+    attempts INTEGER NOT NULL,
+    window_started_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_login_attempts_window
+ON login_attempts(window_started_at);
+"""
+
+MIGRATIONS = (
+    (1, "initial_schema", SCHEMA),
+    (2, "login_attempts", LOGIN_ATTEMPTS_SCHEMA),
+)
 
 
 @contextmanager
@@ -70,7 +126,28 @@ def connect(path: str):
 def init_db(path: str) -> None:
     with connect(path) as db:
         db.execute("PRAGMA journal_mode = WAL")
-        db.executescript(SCHEMA)
+        db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS schema_migrations (
+                version INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+        applied = {
+            row["version"]
+            for row in db.execute("SELECT version FROM schema_migrations").fetchall()
+        }
+        for version, name, sql in MIGRATIONS:
+            if version in applied:
+                continue
+            safe_name = name.replace("'", "''")
+            db.executescript(
+                f"BEGIN IMMEDIATE;\n{sql}\n"
+                f"INSERT INTO schema_migrations (version, name) "
+                f"VALUES ({version}, '{safe_name}');\nCOMMIT;"
+            )
 
 
 def upsert_blog(path: str, blog: dict) -> int:

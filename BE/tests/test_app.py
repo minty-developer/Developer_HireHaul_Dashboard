@@ -32,6 +32,21 @@ class AppTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"status": "ok", "database": "ok"})
 
+    def test_api_errors_and_security_headers(self):
+        missing = self.client.get("/api/does-not-exist")
+        self.assertEqual(missing.status_code, 404)
+        self.assertEqual(missing.content_type, "application/json")
+
+        wrong_method = self.client.put("/api/health")
+        self.assertEqual(wrong_method.status_code, 405)
+        self.assertEqual(wrong_method.content_type, "application/json")
+
+        auth = self.client.post("/api/auth/login", json={})
+        self.assertEqual(auth.headers["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(auth.headers["X-Frame-Options"], "DENY")
+        self.assertEqual(auth.headers["Referrer-Policy"], "no-referrer")
+        self.assertEqual(auth.headers["Cache-Control"], "no-store")
+
     def test_database_schema_is_created(self):
         with connect(self.app.config["DATABASE_PATH"]) as db:
             tables = {
@@ -41,7 +56,20 @@ class AppTest(unittest.TestCase):
                 ).fetchall()
             }
 
-        self.assertTrue({"blogs", "articles"}.issubset(tables))
+        self.assertTrue(
+            {
+                "blogs", "articles", "users", "auth_tokens", "subscriptions",
+                "schema_migrations", "login_attempts",
+            }.issubset(tables)
+        )
+        with connect(self.app.config["DATABASE_PATH"]) as db:
+            versions = [
+                row["version"]
+                for row in db.execute(
+                    "SELECT version FROM schema_migrations ORDER BY version"
+                ).fetchall()
+            ]
+        self.assertEqual(versions, [1, 2])
 
     def test_blog_and_article_upsert(self):
         database_path = self.app.config["DATABASE_PATH"]

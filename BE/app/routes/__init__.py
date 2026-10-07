@@ -7,3 +7,6 @@ from . import health
 from . import admin_sync
 from . import articles
 from . import blogs
+from . import auth
+from . import subscriptions
+from . import admin_blogs

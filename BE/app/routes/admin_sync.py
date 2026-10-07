@@ -1,20 +1,13 @@
-import hmac
-
-from flask import current_app, jsonify, request
+from flask import current_app, jsonify
 
 from . import bp
+from ..admin_auth import admin_authorized
 from ..feed_collector import CollectionError, collect_all, collect_blog
-
-
-def _authorized() -> bool:
-    expected = current_app.config.get("ADMIN_API_KEY", "")
-    supplied = request.headers.get("X-API-Key", "")
-    return bool(expected) and hmac.compare_digest(supplied, expected)
 
 
 @bp.post("/api/admin/sync")
 def sync_all_blogs():
-    if not _authorized():
+    if not admin_authorized():
         return jsonify({"ok": False, "error": "인증에 실패했습니다."}), 401
 
     result = collect_all(current_app.config["DATABASE_PATH"])
@@ -23,7 +16,7 @@ def sync_all_blogs():
 
 @bp.post("/api/admin/sync/<int:blog_id>")
 def sync_one_blog(blog_id: int):
-    if not _authorized():
+    if not admin_authorized():
         return jsonify({"ok": False, "error": "인증에 실패했습니다."}), 401
 
     try:

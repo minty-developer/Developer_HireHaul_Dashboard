@@ -27,8 +27,22 @@ Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니�
 - `GET /api/articles/{article_id}`: 게시글 상세 조회
 - `GET /api/blogs`: 활성 기술 블로그 목록
 - `GET /api/blogs/{blog_id}`: 기술 블로그 상세 조회
+- `POST /api/auth/register`: 회원가입
+- `POST /api/auth/login`: 로그인 및 Bearer 토큰 발급
+- `GET /api/auth/me`: 로그인 사용자 조회
+- `PATCH /api/auth/me`: 표시 이름 수정
+- `PUT /api/auth/password`: 비밀번호 변경 및 기존 토큰 폐기
+- `DELETE /api/auth/me`: 회원 탈퇴
+- `POST /api/auth/logout`: 현재 토큰 폐기
+- `GET /api/subscriptions`: 내 키워드 구독 목록
+- `POST /api/subscriptions`: 키워드 구독 추가
+- `DELETE /api/subscriptions/{subscription_id}`: 키워드 구독 삭제
 - `POST /api/admin/sync`: 활성 블로그 전체 수집
 - `POST /api/admin/sync/{blog_id}`: 특정 블로그 수집
+- `GET /api/admin/blogs`: 전체 블로그 관리 목록
+- `POST /api/admin/blogs`: 블로그 등록
+- `PATCH /api/admin/blogs/{blog_id}`: 블로그 수정·재활성화
+- `DELETE /api/admin/blogs/{blog_id}`: 블로그 비활성화
 
 게시글 목록은 `q`, `blog_id`, `from`, `to`, `limit`, `offset` 쿼리를 지원합니다. 날짜는 `YYYY-MM-DD` 형식입니다.
 
@@ -64,3 +78,12 @@ curl.exe -X POST -H "X-API-Key: local-admin-key" http://127.0.0.1:5000/api/admin
 ```
 
 전체 수집은 한 블로그가 실패해도 나머지 블로그를 계속 처리합니다. 피드 서버가 ETag 또는 Last-Modified를 제공하면 다음 수집부터 조건부 요청에 사용합니다.
+
+작업 스케줄러나 cron에서는 HTTP 요청 대신 CLI를 사용할 수 있습니다.
+
+```powershell
+$env:FLASK_APP = "run.py"
+.venv\Scripts\python.exe -m flask collect-feeds
+.venv\Scripts\python.exe -m flask prune-auth-tokens
+.venv\Scripts\python.exe -m flask prune-login-attempts
+```
