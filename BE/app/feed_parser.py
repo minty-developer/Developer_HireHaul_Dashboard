@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import calendar
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from time import struct_time
 
 import feedparser
@@ -9,6 +10,29 @@ import feedparser
 
 class FeedParseError(ValueError):
     pass
+
+
+class _TextExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts = []
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+    def handle_starttag(self, tag: str, _attrs) -> None:
+        if tag in {"br", "p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6"}:
+            self.parts.append(" ")
+
+    def text(self) -> str:
+        return " ".join("".join(self.parts).split())
+
+
+def plain_text(value: str) -> str:
+    parser = _TextExtractor()
+    parser.feed(value or "")
+    parser.close()
+    return parser.text()
 
 
 def _iso_datetime(value: struct_time | None) -> str | None:
@@ -59,8 +83,8 @@ def parse_feed(
             "title": title,
             "url": url,
             "author": entry.get("author", "").strip(),
-            "summary": entry.get("summary", ""),
-            "content": _content(entry),
+            "summary": plain_text(entry.get("summary", "")),
+            "content": plain_text(_content(entry)),
             "published_at": _iso_datetime(published),
             "feed_updated_at": _iso_datetime(updated),
             "fetched_at": collected_at,

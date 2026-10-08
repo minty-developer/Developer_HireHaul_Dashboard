@@ -23,6 +23,7 @@ Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니�
 
 - `GET /`: 서비스 안내
 - `GET /api/health`: 서버 및 데이터베이스 상태
+- `GET /api/openapi.json`: OpenAPI 3.1 명세
 - `GET /api/articles`: 게시글 목록 및 검색
 - `GET /api/articles/{article_id}`: 게시글 상세 조회
 - `GET /api/blogs`: 활성 기술 블로그 목록
@@ -34,6 +35,10 @@ Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니�
 - `PUT /api/auth/password`: 비밀번호 변경 및 기존 토큰 폐기
 - `DELETE /api/auth/me`: 회원 탈퇴
 - `POST /api/auth/logout`: 현재 토큰 폐기
+- `POST /api/auth/email/verification/request`: 이메일 인증 메일 재요청
+- `POST /api/auth/email/verification/confirm`: 이메일 인증 확정
+- `POST /api/auth/password/reset/request`: 비밀번호 재설정 메일 요청
+- `POST /api/auth/password/reset/confirm`: 비밀번호 재설정 확정
 - `GET /api/subscriptions`: 내 키워드 구독 목록
 - `POST /api/subscriptions`: 키워드 구독 추가
 - `DELETE /api/subscriptions/{subscription_id}`: 키워드 구독 삭제
@@ -43,6 +48,7 @@ Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니�
 - `POST /api/admin/blogs`: 블로그 등록
 - `PATCH /api/admin/blogs/{blog_id}`: 블로그 수정·재활성화
 - `DELETE /api/admin/blogs/{blog_id}`: 블로그 비활성화
+- `GET /api/admin/status`: DB·수집 운영 상태
 
 게시글 목록은 `q`, `blog_id`, `from`, `to`, `limit`, `offset` 쿼리를 지원합니다. 날짜는 `YYYY-MM-DD` 형식입니다.
 
@@ -86,7 +92,18 @@ $env:FLASK_APP = "run.py"
 .venv\Scripts\python.exe -m flask collect-feeds
 .venv\Scripts\python.exe -m flask prune-auth-tokens
 .venv\Scripts\python.exe -m flask prune-login-attempts
+.venv\Scripts\python.exe -m flask backup-db
+.venv\Scripts\python.exe -m flask restore-db data\backups\tech_blog_YYYYMMDDTHHMMSSZ.db --yes
+.venv\Scripts\python.exe -m flask run-scheduler
 ```
+
+`run-scheduler`는 설정된 간격으로 RSS를 수집하고 하루 한 번 DB 백업을 생성합니다.
+복원할 때는 API와 스케줄러를 먼저 중지해야 합니다. Docker Compose에서는 `scheduler`
+서비스가 자동 수집을 담당하며 백업은 SQLite 데이터 볼륨의 `backups` 폴더에 저장됩니다.
+
+이메일 인증과 비밀번호 재설정을 실제 발송하려면 `SMTP_HOST`, `SMTP_PORT`,
+`MAIL_FROM`을 설정합니다. 인증을 로그인 필수 조건으로 만들려면
+`REQUIRE_EMAIL_VERIFICATION=true`를 사용합니다.
 
 ## Docker 실행
 

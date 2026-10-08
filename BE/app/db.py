@@ -101,9 +101,32 @@ CREATE INDEX IF NOT EXISTS idx_login_attempts_window
 ON login_attempts(window_started_at);
 """
 
+EMAIL_AUTH_SCHEMA = """
+ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0
+    CHECK (email_verified IN (0, 1));
+
+CREATE TABLE auth_action_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    purpose TEXT NOT NULL CHECK (purpose IN ('verify_email', 'reset_password')),
+    token_hash TEXT NOT NULL UNIQUE,
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_auth_action_tokens_user_purpose
+ON auth_action_tokens(user_id, purpose, used_at);
+
+CREATE INDEX idx_auth_action_tokens_expires
+ON auth_action_tokens(expires_at);
+"""
+
 MIGRATIONS = (
     (1, "initial_schema", SCHEMA),
     (2, "login_attempts", LOGIN_ATTEMPTS_SCHEMA),
+    (3, "email_auth", EMAIL_AUTH_SCHEMA),
 )
 
 

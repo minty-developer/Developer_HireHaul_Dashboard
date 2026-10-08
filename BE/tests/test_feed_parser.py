@@ -50,7 +50,7 @@ class FeedParserTest(unittest.TestCase):
 
         self.assertEqual(article["entry_key"], "tag:example.com,2026:atom-1")
         self.assertEqual(article["author"], "플랫폼팀")
-        self.assertEqual(article["content"], "<p>Atom 본문</p>")
+        self.assertEqual(article["content"], "Atom 본문")
         self.assertEqual(article["feed_updated_at"], "2026-10-06T03:00:00+00:00")
 
     def test_uses_url_when_guid_is_missing(self):
@@ -62,6 +62,15 @@ class FeedParserTest(unittest.TestCase):
     def test_rejects_invalid_feed(self):
         with self.assertRaises(FeedParseError):
             parse_feed("not xml", blog_id=1)
+
+    def test_strips_html_and_script_markup(self):
+        feed = RSS.replace(
+            "<p>RSS 요약</p>",
+            "<p>안전한 내용</p><script>alert('xss')</script>",
+        )
+        article = parse_feed(feed, blog_id=1)[0]
+        self.assertNotIn("<script", article["summary"])
+        self.assertNotIn("</script>", article["summary"])
 
 
 if __name__ == "__main__":

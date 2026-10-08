@@ -77,6 +77,13 @@ class AdminBlogsApiTest(unittest.TestCase):
             404,
         )
 
+    def test_returns_operational_status(self):
+        response = self.client.get("/api/admin/status", headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["status"], "ok")
+        self.assertIn("articles", response.json["counts"])
+        self.assertGreater(response.json["database_size_bytes"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,5 @@
 .env
 .vscode
-tests
 .venv/
 __pycache__/
 *.pyc

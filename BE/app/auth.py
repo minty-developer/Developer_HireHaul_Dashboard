@@ -84,7 +84,7 @@ def create_user(database_path: str, email: str, password: str, display_name: str
         )
         user_id = cursor.lastrowid
         row = db.execute(
-            "SELECT id, email, display_name, created_at FROM users WHERE id = ?",
+            "SELECT id, email, display_name, email_verified, created_at FROM users WHERE id = ?",
             (user_id,),
         ).fetchone()
     return dict(row)
@@ -117,7 +117,7 @@ def update_display_name(database_path: str, user_id: int, display_name: str) -> 
             (display_name, user_id),
         )
         row = db.execute(
-            "SELECT id, email, display_name, created_at FROM users WHERE id = ?",
+            "SELECT id, email, display_name, email_verified, created_at FROM users WHERE id = ?",
             (user_id,),
         ).fetchone()
     return dict(row)
@@ -142,6 +142,67 @@ def issue_token(database_path: str, user_id: int, ttl_seconds: int) -> tuple[str
     return token, expires_at
 
 
+def issue_action_token(
+    database_path: str, user_id: int, purpose: str, ttl_seconds: int
+) -> tuple[str, str]:
+    token = secrets.token_urlsafe(32)
+    token_hash = _token_hash(token)
+    expires_at = (
+        datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
+    ).isoformat()
+    with connect(database_path) as db:
+        db.execute(
+            "DELETE FROM auth_action_tokens WHERE user_id = ? AND purpose = ? AND used_at IS NULL",
+            (user_id, purpose),
+        )
+        db.execute(
+            """
+            INSERT INTO auth_action_tokens (user_id, purpose, token_hash, expires_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (user_id, purpose, token_hash, expires_at),
+        )
+    return token, expires_at
+
+
+def consume_action_token(database_path: str, token: str, purpose: str) -> int | None:
+    now = datetime.now(timezone.utc).isoformat()
+    with connect(database_path) as db:
+        row = db.execute(
+            """
+            SELECT id, user_id FROM auth_action_tokens
+            WHERE token_hash = ? AND purpose = ? AND used_at IS NULL AND expires_at > ?
+            """,
+            (_token_hash(token), purpose, now),
+        ).fetchone()
+        if row is None:
+            return None
+        cursor = db.execute(
+            "UPDATE auth_action_tokens SET used_at = ? WHERE id = ? AND used_at IS NULL",
+            (now, row["id"]),
+        )
+        if cursor.rowcount != 1:
+            return None
+    return int(row["user_id"])
+
+
+def find_user_by_email(database_path: str, email: str) -> dict | None:
+    with connect(database_path) as db:
+        row = db.execute(
+            "SELECT * FROM users WHERE email = ? COLLATE NOCASE AND active = 1",
+            (normalize_email(email),),
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def mark_email_verified(database_path: str, user_id: int) -> None:
+    with connect(database_path) as db:
+        db.execute(
+            "UPDATE users SET email_verified = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (user_id,),
+        )
+
+
 def revoke_token(database_path: str, token: str) -> None:
     with connect(database_path) as db:
         db.execute("DELETE FROM auth_tokens WHERE token_hash = ?", (_token_hash(token),))
@@ -152,7 +213,8 @@ def get_user_for_token(database_path: str, token: str) -> dict | None:
     with connect(database_path) as db:
         row = db.execute(
             """
-            SELECT users.id, users.email, users.display_name, users.created_at
+            SELECT users.id, users.email, users.display_name,
+                   users.email_verified, users.created_at
             FROM auth_tokens
             JOIN users ON users.id = auth_tokens.user_id
             WHERE auth_tokens.token_hash = ?

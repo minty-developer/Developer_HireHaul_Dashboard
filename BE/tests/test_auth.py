@@ -1,6 +1,8 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
 from app import create_app
 from app.db import connect
@@ -155,6 +157,55 @@ class AuthApiTest(unittest.TestCase):
         with connect(self.app.config["DATABASE_PATH"]) as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM users").fetchone()[0], 0)
             self.assertEqual(db.execute("SELECT COUNT(*) FROM subscriptions").fetchone()[0], 0)
+
+    @patch("app.routes.auth.send_email")
+    def test_verifies_email_and_can_require_verification(self, send_email_mock):
+        self.app.config.update({
+            "SMTP_HOST": "smtp.test",
+            "MAIL_FROM": "noreply@example.com",
+            "REQUIRE_EMAIL_VERIFICATION": True,
+        })
+        registered = self.register()
+        self.assertTrue(registered.json["verification_sent"])
+        self.assertEqual(self.login().status_code, 403)
+
+        body = send_email_mock.call_args.args[3]
+        url = body.splitlines()[-1]
+        token = parse_qs(urlparse(url).query)["token"][0]
+        confirmed = self.client.post(
+            "/api/auth/email/verification/confirm", json={"token": token}
+        )
+        self.assertEqual(confirmed.status_code, 204)
+        self.assertEqual(self.login().status_code, 200)
+        self.assertEqual(
+            self.client.post(
+                "/api/auth/email/verification/confirm", json={"token": token}
+            ).status_code,
+            400,
+        )
+
+    @patch("app.routes.auth.send_email")
+    def test_resets_password_without_revealing_unknown_email(self, send_email_mock):
+        self.register()
+        self.app.config.update({"SMTP_HOST": "smtp.test", "MAIL_FROM": "noreply@example.com"})
+        unknown = self.client.post(
+            "/api/auth/password/reset/request", json={"email": "missing@example.com"}
+        )
+        self.assertEqual(unknown.status_code, 202)
+
+        requested = self.client.post(
+            "/api/auth/password/reset/request", json={"email": "user@example.com"}
+        )
+        self.assertEqual(requested.status_code, 202)
+        body = send_email_mock.call_args.args[3]
+        token = parse_qs(urlparse(body.splitlines()[-1]).query)["token"][0]
+        reset = self.client.post(
+            "/api/auth/password/reset/confirm",
+            json={"token": token, "new_password": "reset-password123"},
+        )
+        self.assertEqual(reset.status_code, 204)
+        self.assertEqual(self.login().status_code, 401)
+        self.assertEqual(self.login(password="reset-password123").status_code, 200)
 
 
 if __name__ == "__main__":

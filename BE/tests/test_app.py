@@ -47,6 +47,12 @@ class AppTest(unittest.TestCase):
         self.assertEqual(auth.headers["Referrer-Policy"], "no-referrer")
         self.assertEqual(auth.headers["Cache-Control"], "no-store")
 
+    def test_serves_openapi_spec(self):
+        response = self.client.get("/api/openapi.json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["openapi"], "3.1.0")
+        self.assertIn("/api/articles", response.json["paths"])
+
     def test_database_schema_is_created(self):
         with connect(self.app.config["DATABASE_PATH"]) as db:
             tables = {
@@ -60,6 +66,7 @@ class AppTest(unittest.TestCase):
             {
                 "blogs", "articles", "users", "auth_tokens", "subscriptions",
                 "schema_migrations", "login_attempts",
+                "auth_action_tokens",
             }.issubset(tables)
         )
         with connect(self.app.config["DATABASE_PATH"]) as db:
@@ -69,7 +76,7 @@ class AppTest(unittest.TestCase):
                     "SELECT version FROM schema_migrations ORDER BY version"
                 ).fetchall()
             ]
-        self.assertEqual(versions, [1, 2])
+        self.assertEqual(versions, [1, 2, 3])
 
     def test_blog_and_article_upsert(self):
         database_path = self.app.config["DATABASE_PATH"]
