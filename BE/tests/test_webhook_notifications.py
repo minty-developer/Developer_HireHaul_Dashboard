@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from app import create_app
 from app.db import connect, upsert_articles, upsert_blog
-from app.discord_webhook import notify_subscription_webhooks
+from app.discord_webhook import notify_subscription_webhooks, retry_failed_webhooks
 
 
 class WebhookNotificationTest(unittest.TestCase):
@@ -74,6 +74,47 @@ class WebhookNotificationTest(unittest.TestCase):
         self.assertEqual(first, {"matched": 1, "sent": 1, "failed": 0})
         self.assertEqual(second, {"matched": 0, "sent": 0, "failed": 0})
         send_webhook.assert_called_once()
+
+    @patch("app.discord_webhook.send_webhook")
+    def test_retries_failed_delivery(self, send_webhook):
+        send_webhook.side_effect = [OSError("temporary failure"), None]
+        response = self.client.post(
+            "/api/subscriptions",
+            headers=self.headers,
+            json={
+                "keyword": "Flask",
+                "discord_webhook_url": "https://discord.com/api/webhooks/1/token",
+            },
+        )
+        subscription_id = response.json["subscription"]["id"]
+        blog_id = upsert_blog(self.database_path, {
+            "name": "테스트 블로그",
+            "company": "테스트",
+            "feed_url": "https://example.com/feed",
+            "site_url": "https://example.com",
+        })
+        upsert_articles(self.database_path, [{
+            "blog_id": blog_id,
+            "entry_key": "retry-1",
+            "title": "Flask 운영하기",
+            "url": "https://example.com/retry",
+            "fetched_at": "2026-01-01T00:00:00+00:00",
+        }])
+        with connect(self.database_path) as db:
+            article_id = db.execute("SELECT id FROM articles").fetchone()["id"]
+
+        first = notify_subscription_webhooks(self.database_path, [article_id])
+        retried = retry_failed_webhooks(self.database_path)
+
+        self.assertEqual(first["failed"], 1)
+        self.assertEqual(retried["sent"], 1)
+        with connect(self.database_path) as db:
+            delivery = db.execute(
+                "SELECT status, attempts FROM webhook_deliveries "
+                "WHERE subscription_id = ? AND article_id = ?",
+                (subscription_id, article_id),
+            ).fetchone()
+        self.assertEqual(dict(delivery), {"status": "sent", "attempts": 2})
 
 
 if __name__ == "__main__":

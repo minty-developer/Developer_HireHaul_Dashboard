@@ -88,21 +88,49 @@ def notify_subscription_webhooks(database_path: str, article_ids: list[int]) -> 
             continue
 
         result["matched"] += 1
-        try:
-            send_webhook(match["discord_webhook_url"], match, match["keyword"])
-        except Exception as exc:
-            status, error, sent_at = "failed", str(exc)[:1000], None
-            result["failed"] += 1
-        else:
-            status, error = "sent", None
-            sent_at = datetime.now(timezone.utc).isoformat()
-            result["sent"] += 1
-        with connect(database_path) as db:
-            db.execute(
-                """
-                UPDATE webhook_deliveries SET status = ?, error = ?, sent_at = ?
-                WHERE subscription_id = ? AND article_id = ?
-                """,
-                (status, error, sent_at, match["subscription_id"], match["article_id"]),
-            )
+        _deliver(database_path, match, result)
     return result
+
+
+def retry_failed_webhooks(database_path: str, max_attempts: int = 3) -> dict:
+    result = {"matched": 0, "sent": 0, "failed": 0}
+    with connect(database_path) as db:
+        rows = db.execute(
+            """
+            SELECT wd.subscription_id, wd.article_id, s.keyword,
+                   s.discord_webhook_url, a.title, a.url, b.name AS blog_name
+            FROM webhook_deliveries wd
+            JOIN subscriptions s ON s.id = wd.subscription_id
+            JOIN articles a ON a.id = wd.article_id
+            JOIN blogs b ON b.id = a.blog_id
+            WHERE wd.status = 'failed' AND wd.attempts < ?
+              AND s.active = 1 AND s.discord_webhook_url IS NOT NULL
+            ORDER BY wd.created_at, wd.id
+            """,
+            (max_attempts,),
+        ).fetchall()
+    for row in rows:
+        result["matched"] += 1
+        _deliver(database_path, dict(row), result)
+    return result
+
+
+def _deliver(database_path: str, match: dict, result: dict) -> None:
+    try:
+        send_webhook(match["discord_webhook_url"], match, match["keyword"])
+    except Exception as exc:
+        status, error, sent_at = "failed", str(exc)[:1000], None
+        result["failed"] += 1
+    else:
+        status, error = "sent", None
+        sent_at = datetime.now(timezone.utc).isoformat()
+        result["sent"] += 1
+    with connect(database_path) as db:
+        db.execute(
+            """
+            UPDATE webhook_deliveries
+            SET status = ?, error = ?, sent_at = ?, attempts = attempts + 1
+            WHERE subscription_id = ? AND article_id = ?
+            """,
+            (status, error, sent_at, match["subscription_id"], match["article_id"]),
+        )

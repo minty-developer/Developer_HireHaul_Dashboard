@@ -12,7 +12,7 @@ from .db import (
     upsert_articles,
 )
 from .discord_bot import notify_new_articles
-from .discord_webhook import notify_subscription_webhooks
+from .discord_webhook import notify_subscription_webhooks, retry_failed_webhooks
 from .feed_parser import FeedParseError, parse_feed
 
 
@@ -161,10 +161,12 @@ def collect_all(
             }
         results.append(result)
 
+    webhook_retries = retry_failed_webhooks(database_path)
     return {
         "total": len(results),
         "succeeded": len(results) - failed,
         "failed": failed,
         "saved": saved,
+        "webhook_retries": webhook_retries,
         "results": results,
     }

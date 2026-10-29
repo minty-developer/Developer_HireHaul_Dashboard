@@ -185,12 +185,17 @@ CREATE INDEX idx_webhook_deliveries_status
 ON webhook_deliveries(status, created_at);
 """
 
+WEBHOOK_RETRY_SCHEMA = """
+ALTER TABLE webhook_deliveries ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0;
+"""
+
 MIGRATIONS = (
     (1, "initial_schema", SCHEMA),
     (2, "login_attempts", LOGIN_ATTEMPTS_SCHEMA),
     (3, "email_auth", EMAIL_AUTH_SCHEMA),
     (4, "discord_bot", DISCORD_SCHEMA),
     (5, "subscription_webhooks", WEBHOOK_SCHEMA),
+    (6, "webhook_delivery_retries", WEBHOOK_RETRY_SCHEMA),
 )
 
 
