@@ -65,6 +65,43 @@ def create_subscription():
     return jsonify({"subscription": dict(row)}), 201
 
 
+@bp.patch("/api/subscriptions/<int:subscription_id>")
+def update_subscription(subscription_id: int):
+    user, error = require_user()
+    if error:
+        return jsonify(error[0]), error[1]
+
+    body = request.get_json(silent=True)
+    if not isinstance(body, dict) or "discord_webhook_url" not in body:
+        return jsonify({"error": "discord_webhook_url이 필요합니다."}), 400
+    supplied_url = body["discord_webhook_url"]
+    if supplied_url is not None and not isinstance(supplied_url, str):
+        return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
+    webhook_url = supplied_url.strip() if supplied_url else None
+    if webhook_url and not valid_discord_webhook_url(webhook_url):
+        return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
+
+    with connect(current_app.config["DATABASE_PATH"]) as db:
+        cursor = db.execute(
+            """
+            UPDATE subscriptions
+            SET discord_webhook_url = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND user_id = ?
+            """,
+            (webhook_url, subscription_id, user["id"]),
+        )
+        if cursor.rowcount == 0:
+            return jsonify({"error": "구독을 찾을 수 없습니다."}), 404
+        row = db.execute(
+            """
+            SELECT id, keyword, discord_webhook_url, active, created_at, updated_at
+            FROM subscriptions WHERE id = ?
+            """,
+            (subscription_id,),
+        ).fetchone()
+    return jsonify({"subscription": dict(row)})
+
+
 @bp.delete("/api/subscriptions/<int:subscription_id>")
 def delete_subscription(subscription_id: int):
     user, error = require_user()

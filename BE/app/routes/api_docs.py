@@ -23,7 +23,10 @@ ENDPOINTS = {
     "/api/auth/password/reset/request": {"post": "비밀번호 재설정 요청"},
     "/api/auth/password/reset/confirm": {"post": "비밀번호 재설정 확정"},
     "/api/subscriptions": {"get": "키워드 구독 목록", "post": "키워드 구독 추가"},
-    "/api/subscriptions/{subscription_id}": {"delete": "키워드 구독 삭제"},
+    "/api/subscriptions/{subscription_id}": {
+        "patch": "Discord 웹훅 주소 변경",
+        "delete": "키워드 구독 삭제",
+    },
     "/api/admin/blogs": {"get": "블로그 관리 목록", "post": "블로그 등록"},
     "/api/admin/blogs/{blog_id}": {
         "patch": "블로그 수정",

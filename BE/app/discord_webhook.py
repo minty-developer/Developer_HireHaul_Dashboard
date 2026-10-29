@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from urllib.error import HTTPError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
@@ -12,14 +13,22 @@ def valid_discord_webhook_url(value: str) -> bool:
     """Only allow Discord's HTTPS webhook endpoints."""
     try:
         parsed = urlsplit(value)
+        port = parsed.port
     except ValueError:
         return False
+    segments = parsed.path.split("/")
     return (
         parsed.scheme == "https"
         and parsed.hostname in {"discord.com", "discordapp.com"}
-        and parsed.path.startswith("/api/webhooks/")
+        and port in (None, 443)
+        and len(segments) == 5
+        and segments[:3] == ["", "api", "webhooks"]
+        and segments[3].isdigit()
+        and bool(segments[4])
         and parsed.username is None
         and parsed.password is None
+        and not parsed.query
+        and not parsed.fragment
     )
 
 
@@ -119,7 +128,8 @@ def _deliver(database_path: str, match: dict, result: dict) -> None:
     try:
         send_webhook(match["discord_webhook_url"], match, match["keyword"])
     except Exception as exc:
-        status, error, sent_at = "failed", str(exc)[:1000], None
+        error = f"HTTP {exc.code}" if isinstance(exc, HTTPError) else type(exc).__name__
+        status, sent_at = "failed", None
         result["failed"] += 1
     else:
         status, error = "sent", None

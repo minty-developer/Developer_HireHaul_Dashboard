@@ -42,6 +42,7 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 - `POST /api/auth/password/reset/confirm`: 비밀번호 재설정 확정
 - `GET /api/subscriptions`: 내 키워드 구독 목록
 - `POST /api/subscriptions`: 키워드 구독 추가
+- `PATCH /api/subscriptions/{subscription_id}`: Discord 웹훅 주소 변경 또는 해제
 - `DELETE /api/subscriptions/{subscription_id}`: 키워드 구독 삭제
 - `POST /api/admin/sync`: 활성 블로그 전체 수집
 - `POST /api/admin/sync/{blog_id}`: 특정 블로그 수집
@@ -55,6 +56,8 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 키워드 구독 생성 시 선택적으로 `discord_webhook_url`을 전달하면, 새로 수집된 글의
 제목·요약·본문에 키워드가 포함될 때 Discord로 한 번만 알림을 보냅니다. 일시적인
 발송 실패는 이후 수집 주기에 최대 3회까지 자동 재시도합니다.
+구독 후 웹훅을 추가하거나 교체할 때는 `PATCH` 본문에 `discord_webhook_url`을
+전달합니다. 알림을 끄려면 `null`을 전달합니다.
 
 ## 테스트
 

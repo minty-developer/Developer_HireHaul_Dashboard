@@ -122,7 +122,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
-        if request.path.startswith(("/api/auth", "/api/admin")):
+        if request.path.startswith(("/api/auth", "/api/admin", "/api/subscriptions")):
             response.headers.setdefault("Cache-Control", "no-store")
         started = g.get("request_started")
         if started is not None:

@@ -116,6 +116,43 @@ class WebhookNotificationTest(unittest.TestCase):
             ).fetchone()
         self.assertEqual(dict(delivery), {"status": "sent", "attempts": 2})
 
+    @patch("app.discord_webhook.send_webhook")
+    def test_delivery_error_does_not_store_webhook_token(self, send_webhook):
+        send_webhook.side_effect = OSError(
+            "request to https://discord.com/api/webhooks/1/private-token failed"
+        )
+        response = self.client.post(
+            "/api/subscriptions",
+            headers=self.headers,
+            json={
+                "keyword": "Python",
+                "discord_webhook_url": "https://discord.com/api/webhooks/1/private-token",
+            },
+        )
+        blog_id = upsert_blog(self.database_path, {
+            "name": "테스트 블로그",
+            "company": "테스트",
+            "feed_url": "https://example.com/secret-feed",
+            "site_url": "https://example.com",
+        })
+        upsert_articles(self.database_path, [{
+            "blog_id": blog_id,
+            "entry_key": "secret-1",
+            "title": "Python",
+            "url": "https://example.com/secret-1",
+            "fetched_at": "2026-01-01T00:00:00+00:00",
+        }])
+        with connect(self.database_path) as db:
+            article_id = db.execute("SELECT id FROM articles").fetchone()["id"]
+
+        self.assertEqual(notify_subscription_webhooks(self.database_path, [article_id])["failed"], 1)
+        with connect(self.database_path) as db:
+            error = db.execute(
+                "SELECT error FROM webhook_deliveries WHERE subscription_id = ?",
+                (response.json["subscription"]["id"],),
+            ).fetchone()["error"]
+        self.assertEqual(error, "OSError")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -96,6 +96,45 @@ class SubscriptionApiTest(unittest.TestCase):
             404,
         )
 
+    def test_updates_own_webhook_and_can_disable_it(self):
+        created = self.client.post(
+            "/api/subscriptions", headers=self.first_headers, json={"keyword": "Flask"}
+        )
+        subscription_id = created.json["subscription"]["id"]
+        endpoint = f"/api/subscriptions/{subscription_id}"
+        webhook_url = "https://discord.com/api/webhooks/123/secret-token"
+
+        self.assertEqual(
+            self.client.patch(
+                endpoint,
+                headers=self.second_headers,
+                json={"discord_webhook_url": webhook_url},
+            ).status_code,
+            404,
+        )
+        updated = self.client.patch(
+            endpoint,
+            headers=self.first_headers,
+            json={"discord_webhook_url": webhook_url},
+        )
+        self.assertEqual(updated.status_code, 200)
+        self.assertEqual(updated.json["subscription"]["discord_webhook_url"], webhook_url)
+        self.assertEqual(
+            self.client.patch(
+                endpoint,
+                headers=self.first_headers,
+                json={"discord_webhook_url": "https://discord.com:444/api/webhooks/1/x"},
+            ).status_code,
+            400,
+        )
+        disabled = self.client.patch(
+            endpoint,
+            headers=self.first_headers,
+            json={"discord_webhook_url": None},
+        )
+        self.assertEqual(disabled.status_code, 200)
+        self.assertIsNone(disabled.json["subscription"]["discord_webhook_url"])
+
 
 if __name__ == "__main__":
     unittest.main()

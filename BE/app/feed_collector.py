@@ -140,6 +140,7 @@ def collect_all(
     results = []
     failed = 0
     saved = 0
+    webhook_retries = retry_failed_webhooks(database_path)
 
     for blog in get_active_blogs(database_path):
         try:
@@ -161,7 +162,6 @@ def collect_all(
             }
         results.append(result)
 
-    webhook_retries = retry_failed_webhooks(database_path)
     return {
         "total": len(results),
         "succeeded": len(results) - failed,
