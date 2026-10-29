@@ -67,6 +67,8 @@ class AppTest(unittest.TestCase):
                 "blogs", "articles", "users", "auth_tokens", "subscriptions",
                 "schema_migrations", "login_attempts",
                 "auth_action_tokens",
+                "discord_guilds", "discord_subscriptions", "discord_deliveries",
+                "webhook_deliveries",
             }.issubset(tables)
         )
         with connect(self.app.config["DATABASE_PATH"]) as db:
@@ -76,7 +78,7 @@ class AppTest(unittest.TestCase):
                     "SELECT version FROM schema_migrations ORDER BY version"
                 ).fetchall()
             ]
-        self.assertEqual(versions, [1, 2, 3])
+        self.assertEqual(versions, [1, 2, 3, 4, 5])
 
     def test_blog_and_article_upsert(self):
         database_path = self.app.config["DATABASE_PATH"]

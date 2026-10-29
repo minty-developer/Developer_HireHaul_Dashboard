@@ -35,7 +35,9 @@ class CliTest(unittest.TestCase):
         result = self.runner.invoke(args=["collect-feeds", "--timeout", "5"])
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(json.loads(result.output)["saved"], 3)
-        collect_all_mock.assert_called_once_with(self.app.config["DATABASE_PATH"], timeout=5)
+        collect_all_mock.assert_called_once_with(
+            self.app.config["DATABASE_PATH"], timeout=5, discord_bot_token=""
+        )
 
     @patch("app.collect_all")
     def test_collect_feeds_command_fails_when_a_feed_fails(self, collect_all_mock):

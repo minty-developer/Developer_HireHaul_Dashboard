@@ -32,6 +32,7 @@ ENDPOINTS = {
     "/api/admin/sync": {"post": "전체 피드 수집"},
     "/api/admin/sync/{blog_id}": {"post": "개별 피드 수집"},
     "/api/admin/status": {"get": "운영 상태 조회"},
+    "/api/discord/interactions": {"post": "Discord Interaction 수신"},
 }
 
 

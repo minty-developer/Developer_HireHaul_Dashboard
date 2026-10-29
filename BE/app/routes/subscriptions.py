@@ -6,6 +6,7 @@ from flask import current_app, jsonify, request
 
 from app.auth import require_user
 from app.db import connect
+from app.discord_webhook import valid_discord_webhook_url
 
 from . import bp
 
@@ -19,7 +20,7 @@ def subscriptions():
     with connect(current_app.config["DATABASE_PATH"]) as db:
         rows = db.execute(
             """
-            SELECT id, keyword, active, created_at, updated_at
+            SELECT id, keyword, discord_webhook_url, active, created_at, updated_at
             FROM subscriptions
             WHERE user_id = ?
             ORDER BY keyword COLLATE NOCASE, id
@@ -41,16 +42,20 @@ def create_subscription():
     keyword = " ".join(str(body.get("keyword", "")).split())
     if not keyword or len(keyword) > 100:
         return jsonify({"error": "키워드는 1~100자여야 합니다."}), 400
+    webhook_url = str(body.get("discord_webhook_url", "")).strip() or None
+    if webhook_url and not valid_discord_webhook_url(webhook_url):
+        return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
 
     try:
         with connect(current_app.config["DATABASE_PATH"]) as db:
             cursor = db.execute(
-                "INSERT INTO subscriptions (user_id, keyword) VALUES (?, ?)",
-                (user["id"], keyword),
+                """INSERT INTO subscriptions
+                    (user_id, keyword, discord_webhook_url) VALUES (?, ?, ?)""",
+                (user["id"], keyword, webhook_url),
             )
             row = db.execute(
                 """
-                SELECT id, keyword, active, created_at, updated_at
+                SELECT id, keyword, discord_webhook_url, active, created_at, updated_at
                 FROM subscriptions WHERE id = ?
                 """,
                 (cursor.lastrowid,),

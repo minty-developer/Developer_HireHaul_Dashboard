@@ -10,7 +10,10 @@ def sync_all_blogs():
     if not admin_authorized():
         return jsonify({"ok": False, "error": "인증에 실패했습니다."}), 401
 
-    result = collect_all(current_app.config["DATABASE_PATH"])
+    result = collect_all(
+        current_app.config["DATABASE_PATH"],
+        discord_bot_token=current_app.config["DISCORD_BOT_TOKEN"],
+    )
     return jsonify({"ok": result["failed"] == 0, **result})
 
 
@@ -20,7 +23,11 @@ def sync_one_blog(blog_id: int):
         return jsonify({"ok": False, "error": "인증에 실패했습니다."}), 401
 
     try:
-        result = collect_blog(current_app.config["DATABASE_PATH"], blog_id)
+        result = collect_blog(
+            current_app.config["DATABASE_PATH"],
+            blog_id,
+            discord_bot_token=current_app.config["DISCORD_BOT_TOKEN"],
+        )
     except LookupError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 404
     except CollectionError as exc:

@@ -13,6 +13,7 @@ from flask_cors import CORS
 
 from .db import connect, init_db
 from .feed_collector import collect_all
+from .discord_bot import register_commands
 from .logging_config import configure_logging
 from .maintenance import backup_database, prune_backups, restore_database, run_scheduler
 from .routes import bp
@@ -62,6 +63,10 @@ def create_app(test_config: dict | None = None) -> Flask:
         SMTP_PASSWORD=os.getenv("SMTP_PASSWORD", ""),
         SMTP_USE_TLS=os.getenv("SMTP_USE_TLS", "true").lower() == "true",
         SMTP_USE_SSL=os.getenv("SMTP_USE_SSL", "false").lower() == "true",
+        DISCORD_APPLICATION_ID=os.getenv("DISCORD_APPLICATION_ID", ""),
+        DISCORD_PUBLIC_KEY=os.getenv("DISCORD_PUBLIC_KEY", ""),
+        DISCORD_BOT_TOKEN=os.getenv("DISCORD_BOT_TOKEN", ""),
+        DISCORD_TEST_GUILD_ID=os.getenv("DISCORD_TEST_GUILD_ID", ""),
         CORS_ORIGINS=os.getenv("CORS_ORIGINS", "http://localhost:3000"),
     )
 
@@ -158,7 +163,11 @@ def create_app(test_config: dict | None = None) -> Flask:
     @click.option("--timeout", type=click.IntRange(1, 120), default=20, show_default=True)
     def collect_feeds_command(timeout: int) -> None:
         """Collect every active blog feed once."""
-        result = collect_all(app.config["DATABASE_PATH"], timeout=timeout)
+        result = collect_all(
+            app.config["DATABASE_PATH"],
+            timeout=timeout,
+            discord_bot_token=app.config["DISCORD_BOT_TOKEN"],
+        )
         click.echo(json.dumps(result, ensure_ascii=False))
         if result["failed"]:
             raise click.ClickException(
@@ -224,8 +233,15 @@ def create_app(test_config: dict | None = None) -> Flask:
                 },
             )
 
+        def collect_with_discord(database_path: str, timeout: int) -> dict:
+            return collect_all(
+                database_path,
+                timeout=timeout,
+                discord_bot_token=app.config["DISCORD_BOT_TOKEN"],
+            )
+
         run_scheduler(
-            collect_all,
+            collect_with_discord,
             app.config["DATABASE_PATH"],
             app.config["BACKUP_DIRECTORY"],
             app.config["FEED_COLLECTION_INTERVAL_SECONDS"],
@@ -233,5 +249,23 @@ def create_app(test_config: dict | None = None) -> Flask:
             app.config["BACKUP_RETENTION_DAYS"],
             report,
         )
+
+    @app.cli.command("register-discord-commands")
+    def register_discord_commands_command() -> None:
+        application_id = app.config["DISCORD_APPLICATION_ID"]
+        bot_token = app.config["DISCORD_BOT_TOKEN"]
+        if not application_id or not bot_token:
+            raise click.ClickException(
+                "DISCORD_APPLICATION_ID와 DISCORD_BOT_TOKEN이 필요합니다."
+            )
+        commands = register_commands(
+            application_id, bot_token, app.config["DISCORD_TEST_GUILD_ID"]
+        )
+        scope = (
+            f"서버 {app.config['DISCORD_TEST_GUILD_ID']}"
+            if app.config["DISCORD_TEST_GUILD_ID"]
+            else "전역"
+        )
+        click.echo(f"{scope} Discord 명령 {len(commands)}개를 등록했습니다.")
 
     return app

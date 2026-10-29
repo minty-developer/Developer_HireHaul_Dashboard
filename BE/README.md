@@ -2,7 +2,7 @@
 
 Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니다.
 
-현재는 애플리케이션 초기화, RSS 블로그·게시글 데이터 구조, CORS, 헬스체크를 제공합니다. RSS 네트워크 수집과 사용자 기능은 이후 단계에서 추가합니다.
+RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄러와 Docker 배포 구성을 제공합니다.
 
 ## 데이터 구조
 
@@ -24,6 +24,7 @@ Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니�
 - `GET /`: 서비스 안내
 - `GET /api/health`: 서버 및 데이터베이스 상태
 - `GET /api/openapi.json`: OpenAPI 3.1 명세
+- `POST /api/discord/interactions`: Discord Slash Command 수신
 - `GET /api/articles`: 게시글 목록 및 검색
 - `GET /api/articles/{article_id}`: 게시글 상세 조회
 - `GET /api/blogs`: 활성 기술 블로그 목록
@@ -51,6 +52,8 @@ Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니�
 - `GET /api/admin/status`: DB·수집 운영 상태
 
 게시글 목록은 `q`, `blog_id`, `from`, `to`, `limit`, `offset` 쿼리를 지원합니다. 날짜는 `YYYY-MM-DD` 형식입니다.
+키워드 구독 생성 시 선택적으로 `discord_webhook_url`을 전달하면, 새로 수집된 글의
+제목·요약·본문에 키워드가 포함될 때 Discord로 한 번만 알림을 보냅니다.
 
 ## 테스트
 
@@ -104,6 +107,29 @@ $env:FLASK_APP = "run.py"
 이메일 인증과 비밀번호 재설정을 실제 발송하려면 `SMTP_HOST`, `SMTP_PORT`,
 `MAIL_FROM`을 설정합니다. 인증을 로그인 필수 조건으로 만들려면
 `REQUIRE_EMAIL_VERIFICATION=true`를 사용합니다.
+
+## Discord 봇
+
+Discord Developer Portal에서 애플리케이션을 만든 뒤 `.env`에 다음 값을 설정합니다.
+
+```env
+DISCORD_APPLICATION_ID=애플리케이션_ID
+DISCORD_PUBLIC_KEY=공개키
+DISCORD_BOT_TOKEN=봇_토큰
+DISCORD_TEST_GUILD_ID=개발용_서버_ID
+```
+
+개발 서버 명령은 즉시 반영되며, `DISCORD_TEST_GUILD_ID`를 비우면 전역 명령으로
+등록됩니다.
+
+```powershell
+.venv\Scripts\python.exe -m flask register-discord-commands
+```
+
+Interaction Endpoint URL에는 공개 HTTPS 주소의
+`/api/discord/interactions`를 등록합니다. 봇은 `/알림채널`, `/구독추가`,
+`/구독목록`, `/구독삭제`, `/최신글`, `/검색` 명령을 제공합니다. 새 게시글이
+Discord 구독 키워드와 일치하면 설정된 채널로 한 번만 전송합니다.
 
 ## Docker 실행
 

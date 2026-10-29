@@ -123,10 +123,74 @@ CREATE INDEX idx_auth_action_tokens_expires
 ON auth_action_tokens(expires_at);
 """
 
+DISCORD_SCHEMA = """
+CREATE TABLE discord_guilds (
+    guild_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT '',
+    channel_id TEXT,
+    configured_by TEXT,
+    active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE discord_subscriptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id TEXT NOT NULL,
+    channel_id TEXT NOT NULL,
+    keyword TEXT NOT NULL COLLATE NOCASE,
+    created_by TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (guild_id) REFERENCES discord_guilds(guild_id) ON DELETE CASCADE,
+    UNIQUE (guild_id, channel_id, keyword)
+);
+
+CREATE TABLE discord_deliveries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    subscription_id INTEGER NOT NULL,
+    article_id INTEGER NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('pending', 'sent', 'failed')),
+    error TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at TEXT,
+    FOREIGN KEY (subscription_id) REFERENCES discord_subscriptions(id) ON DELETE CASCADE,
+    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
+    UNIQUE (subscription_id, article_id)
+);
+
+CREATE INDEX idx_discord_subscriptions_guild
+ON discord_subscriptions(guild_id, channel_id);
+
+CREATE INDEX idx_discord_deliveries_status
+ON discord_deliveries(status, created_at);
+"""
+
+WEBHOOK_SCHEMA = """
+ALTER TABLE subscriptions ADD COLUMN discord_webhook_url TEXT;
+
+CREATE TABLE webhook_deliveries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    subscription_id INTEGER NOT NULL,
+    article_id INTEGER NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('pending', 'sent', 'failed')),
+    error TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at TEXT,
+    FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE CASCADE,
+    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
+    UNIQUE (subscription_id, article_id)
+);
+
+CREATE INDEX idx_webhook_deliveries_status
+ON webhook_deliveries(status, created_at);
+"""
+
 MIGRATIONS = (
     (1, "initial_schema", SCHEMA),
     (2, "login_attempts", LOGIN_ATTEMPTS_SCHEMA),
     (3, "email_auth", EMAIL_AUTH_SCHEMA),
+    (4, "discord_bot", DISCORD_SCHEMA),
+    (5, "subscription_webhooks", WEBHOOK_SCHEMA),
 )
 
 
