@@ -72,23 +72,34 @@ def update_subscription(subscription_id: int):
         return jsonify(error[0]), error[1]
 
     body = request.get_json(silent=True)
-    if not isinstance(body, dict) or "discord_webhook_url" not in body:
-        return jsonify({"error": "discord_webhook_url이 필요합니다."}), 400
-    supplied_url = body["discord_webhook_url"]
-    if supplied_url is not None and not isinstance(supplied_url, str):
-        return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
-    webhook_url = supplied_url.strip() if supplied_url else None
-    if webhook_url and not valid_discord_webhook_url(webhook_url):
-        return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
+    if not isinstance(body, dict) or not ({"discord_webhook_url", "active"} & body.keys()):
+        return jsonify({"error": "discord_webhook_url 또는 active가 필요합니다."}), 400
+
+    updates = []
+    values = []
+    if "discord_webhook_url" in body:
+        supplied_url = body["discord_webhook_url"]
+        if supplied_url is not None and not isinstance(supplied_url, str):
+            return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
+        webhook_url = supplied_url.strip() if supplied_url else None
+        if webhook_url and not valid_discord_webhook_url(webhook_url):
+            return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
+        updates.append("discord_webhook_url = ?")
+        values.append(webhook_url)
+    if "active" in body:
+        if not isinstance(body["active"], bool):
+            return jsonify({"error": "active는 boolean이어야 합니다."}), 400
+        updates.append("active = ?")
+        values.append(int(body["active"]))
 
     with connect(current_app.config["DATABASE_PATH"]) as db:
         cursor = db.execute(
-            """
+            f"""
             UPDATE subscriptions
-            SET discord_webhook_url = ?, updated_at = CURRENT_TIMESTAMP
+            SET {', '.join(updates)}, updated_at = CURRENT_TIMESTAMP
             WHERE id = ? AND user_id = ?
             """,
-            (webhook_url, subscription_id, user["id"]),
+            (*values, subscription_id, user["id"]),
         )
         if cursor.rowcount == 0:
             return jsonify({"error": "구독을 찾을 수 없습니다."}), 404

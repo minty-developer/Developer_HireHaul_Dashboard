@@ -11,7 +11,7 @@ from .db import (
     update_blog_sync_status,
     upsert_articles,
 )
-from .discord_bot import notify_new_articles
+from .discord_bot import notify_new_articles, retry_failed_messages
 from .discord_webhook import notify_subscription_webhooks, retry_failed_webhooks
 from .feed_parser import FeedParseError, parse_feed
 
@@ -140,6 +140,7 @@ def collect_all(
     results = []
     failed = 0
     saved = 0
+    discord_retries = retry_failed_messages(database_path, discord_bot_token)
     webhook_retries = retry_failed_webhooks(database_path)
 
     for blog in get_active_blogs(database_path):
@@ -167,6 +168,7 @@ def collect_all(
         "succeeded": len(results) - failed,
         "failed": failed,
         "saved": saved,
+        "discord_retries": discord_retries,
         "webhook_retries": webhook_retries,
         "results": results,
     }

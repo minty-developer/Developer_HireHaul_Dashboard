@@ -8,7 +8,7 @@ from nacl.signing import SigningKey
 
 from app import create_app
 from app.db import connect, upsert_articles, upsert_blog
-from app.discord_bot import notify_new_articles
+from app.discord_bot import notify_new_articles, retry_failed_messages
 
 
 class DiscordInteractionTest(unittest.TestCase):
@@ -115,6 +115,62 @@ class DiscordInteractionTest(unittest.TestCase):
         self.assertEqual(first["sent"], 1)
         self.assertEqual(second["sent"], 0)
         send_message.assert_called_once()
+
+    @patch("app.discord_bot.send_channel_message")
+    def test_retries_failed_channel_notification(self, send_message):
+        send_message.side_effect = [OSError("temporary failure"), None]
+        self.post_interaction(self.command(
+            "알림채널", [{"name": "channel", "value": "alerts-1"}]
+        ))
+        self.post_interaction(self.command(
+            "구독추가", [{"name": "keyword", "value": "Python"}]
+        ))
+
+        first = notify_new_articles(
+            self.app.config["DATABASE_PATH"], [self.article_id], "bot-token"
+        )
+        retried = retry_failed_messages(
+            self.app.config["DATABASE_PATH"], "bot-token"
+        )
+        again = retry_failed_messages(
+            self.app.config["DATABASE_PATH"], "bot-token"
+        )
+
+        self.assertEqual(first["failed"], 1)
+        self.assertEqual(retried["sent"], 1)
+        self.assertEqual(again["matched"], 0)
+        self.assertEqual(send_message.call_count, 2)
+        with connect(self.app.config["DATABASE_PATH"]) as db:
+            delivery = db.execute(
+                "SELECT status, attempts FROM discord_deliveries"
+            ).fetchone()
+        self.assertEqual(dict(delivery), {"status": "sent", "attempts": 2})
+
+    @patch("app.discord_bot.send_channel_message", side_effect=OSError("offline"))
+    def test_stops_retrying_channel_notification_after_three_attempts(self, send_message):
+        self.post_interaction(self.command(
+            "알림채널", [{"name": "channel", "value": "alerts-1"}]
+        ))
+        self.post_interaction(self.command(
+            "구독추가", [{"name": "keyword", "value": "Python"}]
+        ))
+
+        notify_new_articles(
+            self.app.config["DATABASE_PATH"], [self.article_id], "bot-token"
+        )
+        retry_failed_messages(self.app.config["DATABASE_PATH"], "bot-token")
+        retry_failed_messages(self.app.config["DATABASE_PATH"], "bot-token")
+        final_retry = retry_failed_messages(
+            self.app.config["DATABASE_PATH"], "bot-token"
+        )
+
+        self.assertEqual(final_retry["matched"], 0)
+        self.assertEqual(send_message.call_count, 3)
+        with connect(self.app.config["DATABASE_PATH"]) as db:
+            attempts = db.execute(
+                "SELECT attempts FROM discord_deliveries"
+            ).fetchone()["attempts"]
+        self.assertEqual(attempts, 3)
 
 
 if __name__ == "__main__":

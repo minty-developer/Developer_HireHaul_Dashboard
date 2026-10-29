@@ -42,7 +42,7 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 - `POST /api/auth/password/reset/confirm`: 비밀번호 재설정 확정
 - `GET /api/subscriptions`: 내 키워드 구독 목록
 - `POST /api/subscriptions`: 키워드 구독 추가
-- `PATCH /api/subscriptions/{subscription_id}`: Discord 웹훅 주소 변경 또는 해제
+- `PATCH /api/subscriptions/{subscription_id}`: Discord 웹훅 주소 및 활성 상태 변경
 - `DELETE /api/subscriptions/{subscription_id}`: 키워드 구독 삭제
 - `POST /api/admin/sync`: 활성 블로그 전체 수집
 - `POST /api/admin/sync/{blog_id}`: 특정 블로그 수집
@@ -58,6 +58,8 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 발송 실패는 이후 수집 주기에 최대 3회까지 자동 재시도합니다.
 구독 후 웹훅을 추가하거나 교체할 때는 `PATCH` 본문에 `discord_webhook_url`을
 전달합니다. 알림을 끄려면 `null`을 전달합니다.
+구독을 일시 중지하거나 다시 켜려면 같은 `PATCH` 본문에 `active: false` 또는
+`active: true`를 전달합니다. 두 필드는 한 요청에서 함께 변경할 수 있습니다.
 
 ## 테스트
 
@@ -134,6 +136,7 @@ Interaction Endpoint URL에는 공개 HTTPS 주소의
 `/api/discord/interactions`를 등록합니다. 봇은 `/알림채널`, `/구독추가`,
 `/구독목록`, `/구독삭제`, `/최신글`, `/검색` 명령을 제공합니다. 새 게시글이
 Discord 구독 키워드와 일치하면 설정된 채널로 한 번만 전송합니다.
+일시적인 채널 전송 실패는 이후 수집 주기에 최대 3회까지 자동 재시도합니다.
 
 ## Docker 실행
 
@@ -148,3 +151,11 @@ docker compose exec backend python -m flask collect-feeds
 API는 기본적으로 `http://127.0.0.1:5000`에서 열립니다. SQLite 데이터는
 `backend_data` 볼륨에 보존됩니다. 운영 환경에서는 `APP_ENV=production`과 함께
 안전한 `SECRET_KEY`, `ADMIN_API_KEY`, 실제 `CORS_ORIGINS`를 반드시 설정해야 합니다.
+
+## 배포 초기화 확인
+
+새 데이터베이스로 배포하면 블로그와 게시글 목록은 비어 있습니다. 배포 환경의
+영구 저장소에 `DATABASE_PATH`를 연결한 뒤 `flask seed-blogs`와
+`flask collect-feeds`를 한 번 실행합니다. 이후 `flask run-scheduler`를 별도
+프로세스로 실행해야 주기적 수집과 백업이 계속됩니다. 공개 API의
+`/api/blogs`, `/api/articles`에서 데이터가 반환되는지 확인합니다.

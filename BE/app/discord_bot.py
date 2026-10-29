@@ -247,28 +247,58 @@ def notify_new_articles(database_path: str, article_ids: list[int], bot_token: s
         if not claimed:
             continue
         result["matched"] += 1
-        content = (
-            f"🔔 **{match['keyword']}** 키워드 새 글\n"
-            f"**{match['title']}** · {match['blog_name']}\n{match['url']}"
-        )
-        try:
-            send_channel_message(bot_token, match["channel_id"], content)
-        except Exception as exc:
-            status, error, sent_at = "failed", str(exc)[:1000], None
-            result["failed"] += 1
-        else:
-            status, error = "sent", None
-            sent_at = datetime.now(timezone.utc).isoformat()
-            result["sent"] += 1
-        with connect(database_path) as db:
-            db.execute(
-                """
-                UPDATE discord_deliveries SET status = ?, error = ?, sent_at = ?
-                WHERE subscription_id = ? AND article_id = ?
-                """,
-                (status, error, sent_at, match["subscription_id"], match["article_id"]),
-            )
+        _deliver(database_path, dict(match), bot_token, result)
     return result
+
+
+def retry_failed_messages(database_path: str, bot_token: str, max_attempts: int = 3) -> dict:
+    result = {"matched": 0, "sent": 0, "failed": 0}
+    if not bot_token:
+        return result
+    with connect(database_path) as db:
+        matches = db.execute(
+            """
+            SELECT dd.subscription_id, dd.article_id, ds.keyword, ds.channel_id,
+                   a.title, a.url, b.name AS blog_name
+            FROM discord_deliveries dd
+            JOIN discord_subscriptions ds ON ds.id = dd.subscription_id
+            JOIN discord_guilds dg ON dg.guild_id = ds.guild_id AND dg.active = 1
+            JOIN articles a ON a.id = dd.article_id
+            JOIN blogs b ON b.id = a.blog_id
+            WHERE dd.status = 'failed' AND dd.attempts < ?
+            ORDER BY dd.created_at, dd.id
+            """,
+            (max_attempts,),
+        ).fetchall()
+    for match in matches:
+        result["matched"] += 1
+        _deliver(database_path, dict(match), bot_token, result)
+    return result
+
+
+def _deliver(database_path: str, match: dict, bot_token: str, result: dict) -> None:
+    content = (
+        f"🔔 **{match['keyword']}** 키워드 새 글\n"
+        f"**{match['title']}** · {match['blog_name']}\n{match['url']}"
+    )
+    try:
+        send_channel_message(bot_token, match["channel_id"], content)
+    except Exception as exc:
+        status, error, sent_at = "failed", str(exc)[:1000], None
+        result["failed"] += 1
+    else:
+        status, error = "sent", None
+        sent_at = datetime.now(timezone.utc).isoformat()
+        result["sent"] += 1
+    with connect(database_path) as db:
+        db.execute(
+            """
+            UPDATE discord_deliveries
+            SET status = ?, error = ?, sent_at = ?, attempts = attempts + 1
+            WHERE subscription_id = ? AND article_id = ?
+            """,
+            (status, error, sent_at, match["subscription_id"], match["article_id"]),
+        )
 
 
 def _discord_request(url: str, bot_token: str, *, method: str, payload) -> dict | list:

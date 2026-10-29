@@ -135,6 +135,34 @@ class SubscriptionApiTest(unittest.TestCase):
         self.assertEqual(disabled.status_code, 200)
         self.assertIsNone(disabled.json["subscription"]["discord_webhook_url"])
 
+    def test_toggles_only_own_subscription_and_validates_active(self):
+        created = self.client.post(
+            "/api/subscriptions", headers=self.first_headers, json={"keyword": "Flask"}
+        )
+        endpoint = f"/api/subscriptions/{created.json['subscription']['id']}"
+        self.assertEqual(created.json["subscription"]["active"], 1)
+
+        self.assertEqual(self.client.patch(
+            endpoint, headers=self.second_headers, json={"active": False}
+        ).status_code, 404)
+        self.assertEqual(self.client.patch(
+            endpoint, headers=self.first_headers, json={"active": 0}
+        ).status_code, 400)
+        self.assertEqual(self.client.patch(
+            endpoint, headers=self.first_headers, json={}
+        ).status_code, 400)
+
+        paused = self.client.patch(
+            endpoint, headers=self.first_headers, json={"active": False}
+        )
+        self.assertEqual(paused.status_code, 200)
+        self.assertEqual(paused.json["subscription"]["active"], 0)
+        resumed = self.client.patch(
+            endpoint, headers=self.first_headers, json={"active": True}
+        )
+        self.assertEqual(resumed.status_code, 200)
+        self.assertEqual(resumed.json["subscription"]["active"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
