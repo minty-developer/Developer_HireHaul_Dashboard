@@ -1,0 +1,422 @@
+[
+    {
+        "title": "AI 시대의 개발자를 꿈꾸는 학생 개발자에게",
+        "link": "https://d2.naver.com/helloworld/1975819",
+        "published": "2026-10-29T01:24:17+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.15.2, 3.14.10, 3.13.18, 3.12.16 and 3.11.18 are out",
+        "link": "https://blog.python.org/2026/10/python-3152-31410-31318-31216-31118/",
+        "published": "2026-10-26T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "2026년과 이후 JavaScript의 동향 - 브라우저 밖의 JavaScript",
+        "link": "https://d2.naver.com/helloworld/1443473",
+        "published": "2026-10-21T03:38:48+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.15.1, 3.14.9 and 3.13.17 are out",
+        "link": "https://blog.python.org/2026/10/python-3151-3149-31317/",
+        "published": "2026-10-21T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "2026년과 이후 JavaScript의 동향 - JavaScript(ECMAScript)",
+        "link": "https://d2.naver.com/helloworld/2675915",
+        "published": "2026-10-20T05:51:56+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.16.0 alpha 1 is now available",
+        "link": "https://blog.python.org/2026/10/python-3160-alpha-1-is-now-available/",
+        "published": "2026-10-13T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 (final) is here!",
+        "link": "https://blog.python.org/2026/10/python-3150-final-is-here/",
+        "published": "2026-10-09T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python의 GC가 멀티프로세싱과 만나면 생기는 일 - Python과 Airflow, 그리고 관련된 문제 해결기 2편",
+        "link": "https://d2.naver.com/helloworld/4149925",
+        "published": "2026-10-08T06:44:57+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python의 멀티프로세싱과 Airflow의 task 동작 방식 - Python과 Airflow, 그리고 관련된 문제 해결기 1편",
+        "link": "https://d2.naver.com/helloworld/4452165",
+        "published": "2026-10-08T06:43:18+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "D2Coding 폰트 1.4.0 릴리즈 소식을 전합니다.",
+        "link": "https://d2.naver.com/news/7193556",
+        "published": "2026-10-07T08:47:28+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "FE News 26년 10월 소식을 전해드립니다.",
+        "link": "https://d2.naver.com/news/8711937",
+        "published": "2026-10-07T08:43:28+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.15.0 candidate 3 is here!",
+        "link": "https://blog.python.org/2026/10/python-3150-rc3/",
+        "published": "2026-10-02T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "에이전트, 개념부터 같이 정리해봐요 - 워크플로우 · 하네스 · Context/Memory · MCP/A2A",
+        "link": "https://d2.naver.com/helloworld/8118359",
+        "published": "2026-10-01T02:40:01+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.10.22, 3.11.17, 3.12.15, 3.13.16 and 3.14.8 are now available!",
+        "link": "https://blog.python.org/2026/10/python-31022-31117/",
+        "published": "2026-10-01T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python Language Summit 2026",
+        "link": "https://blog.python.org/2026/09/language-summit-2026/",
+        "published": "2026-09-30T12:00:11+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Lightning Talks (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-lightning-talks/",
+        "published": "2026-09-30T12:00:10+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "PEP 827: Type Manipulation (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-pep-827-type-manipulation/",
+        "published": "2026-09-30T12:00:09+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Free-Threaded Python Post-Era (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-free-threading-post-era/",
+        "published": "2026-09-30T12:00:08+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Developer-in-Residence Update & Future (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-developer-in-residence-update-and-future/",
+        "published": "2026-09-30T12:00:07+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Spicycrab (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-spicycrab/",
+        "published": "2026-09-30T12:00:06+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Rust for CPython (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-rust-for-cpython/",
+        "published": "2026-09-30T12:00:05+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Memory Snapshots for CPython (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-memory-snapshots/",
+        "published": "2026-09-30T12:00:04+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Memory Buffer Protocol (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-memory-buffer-protocol/",
+        "published": "2026-09-30T12:00:03+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Garbage Collection: Generational? Incremental? Both! (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-garbage-collection-generational-incremental-both/",
+        "published": "2026-09-30T12:00:02+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "macOS and Python (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-macos-python/",
+        "published": "2026-09-30T12:00:01+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "One namespace to namespace them all (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-namespaces/",
+        "published": "2026-09-30T12:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Hive는 잊으려 했지만, Spark는 기억하고 있었다: 사라진 get_table RPC 복원기",
+        "link": "https://d2.naver.com/helloworld/7314597",
+        "published": "2026-09-29T08:39:50+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "The Python documentation is now available in German",
+        "link": "https://blog.python.org/2026/09/python-docs-in-german/",
+        "published": "2026-09-26T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "The Python documentation is now available in Persian",
+        "link": "https://blog.python.org/2026/09/the-python-documentation-is-now-available-in-persian/",
+        "published": "2026-09-23T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "FE News 26년 9월 소식을 전해드립니다.",
+        "link": "https://d2.naver.com/news/7360495",
+        "published": "2026-09-03T05:29:14+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "[네이버피셜] 네이버 개발자라면 꼭 만나게 됩니다",
+        "link": "https://d2.naver.com/news/3092933",
+        "published": "2026-09-02T05:51:41+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.15.0 candidate 2 is here!",
+        "link": "https://blog.python.org/2026/09/python-3150-rc2/",
+        "published": "2026-09-01T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "RISC-V is now officially supported by CPython!",
+        "link": "https://blog.python.org/2026/08/riscv-now-officially-supported/",
+        "published": "2026-08-24T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "The Python documentation is now available in Russian!",
+        "link": "https://blog.python.org/2026/08/the-python-documentation-is-now-available-in-russian/",
+        "published": "2026-08-22T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Announcing the Packaging Council Election Candidates for 2026!",
+        "link": "https://blog.python.org/2026/08/2026-packaging-council-nominees/",
+        "published": "2026-08-13T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.12.14, 3.11.16 and 3.10.21 are now available!",
+        "link": "https://blog.python.org/2026/08/python-31214-31116-31021/",
+        "published": "2026-08-12T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "우리 팀만의 vLLM 플러그인 만들기 2편 - 모델 변환부터 배포까지 AI-native로 자동화하기",
+        "link": "https://d2.naver.com/helloworld/7337586",
+        "published": "2026-08-10T16:39:52+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "우리 팀만의 vLLM 플러그인 만들기 1편 - 검색 AI 모델 서빙 성능 극대화하기",
+        "link": "https://d2.naver.com/helloworld/0525182",
+        "published": "2026-08-10T16:39:25+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "FE News 26년 8월 소식을 전해드립니다.",
+        "link": "https://d2.naver.com/news/1783497",
+        "published": "2026-08-05T14:12:35+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.14.7 and 3.13.15 are now available!",
+        "link": "https://blog.python.org/2026/08/python-3147-31315/",
+        "published": "2026-08-05T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 candidate 1 is here!",
+        "link": "https://blog.python.org/2026/08/python-3150-rc1/",
+        "published": "2026-08-04T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "[AI 해커톤 후기] AI 해커톤 1위 팀이 AI에게 맡기지 않은 것",
+        "link": "https://d2.naver.com/helloworld/4821538",
+        "published": "2026-07-24T15:25:33+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Get Ready: 2026 Python Packaging Council Nominations Opening Soon!",
+        "link": "https://blog.python.org/2026/07/2026-packaging-council-nominations/",
+        "published": "2026-07-23T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "VictoriaMetrics 운영기 2편 — 장비 증설 없이 리소스 위기를 해결한 3단계 최적화 전략",
+        "link": "https://d2.naver.com/helloworld/5788040",
+        "published": "2026-07-21T18:35:44+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.15.0 beta 4 is here!",
+        "link": "https://blog.python.org/2026/07/python-3150-beta-4/",
+        "published": "2026-07-18T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "[AI 해커톤 후기] AI 시대의 해커톤과 인간의 역할: AI의 계획과 사람의 전략",
+        "link": "https://d2.naver.com/helloworld/1883072",
+        "published": "2026-07-13T12:43:28+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "FE News 26년 7월 소식을 전해드립니다.",
+        "link": "https://d2.naver.com/news/7560502",
+        "published": "2026-07-08T17:52:20+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "[AI 해커톤 후기] 코드와 문서만 읽은 LLM은 어떻게 사람과 같은 팀을 1위로 골랐을까",
+        "link": "https://d2.naver.com/helloworld/2541696",
+        "published": "2026-07-06T14:44:16+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "AI 에이전트 회사 차리기: 설립부터 어디서든 동기화까지",
+        "link": "https://d2.naver.com/helloworld/3897377",
+        "published": "2026-06-30T11:00:48+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Packaging Council Inaugural Election Dates",
+        "link": "https://blog.python.org/2026/06/2026-packaging-council-election-dates/",
+        "published": "2026-06-28T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Mitigated API authentication bypass for python.org download metadata",
+        "link": "https://blog.python.org/2026/06/mitigated-api-bypass-for-download-metadata-python-dot-org/",
+        "published": "2026-06-23T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 beta 3 is here!",
+        "link": "https://blog.python.org/2026/06/python-3150-beta-3/",
+        "published": "2026-06-23T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.6 and 3.13.14 are now available!",
+        "link": "https://blog.python.org/2026/06/python-3146-31314/",
+        "published": "2026-06-10T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 beta 2 is here!",
+        "link": "https://blog.python.org/2026/06/python-3150-beta-2/",
+        "published": "2026-06-02T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.5 is out!",
+        "link": "https://blog.python.org/2026/05/python-3145-is-out/",
+        "published": "2026-05-10T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 beta 1 is here!",
+        "link": "https://blog.python.org/2026/05/python-3150-beta-1/",
+        "published": "2026-05-07T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.5 release candidate",
+        "link": "https://blog.python.org/2026/05/python-3145rc1/",
+        "published": "2026-05-04T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Rust for CPython Progress Update April 2026",
+        "link": "https://blog.python.org/2026/04/rust-for-cpython-2026-04/",
+        "published": "2026-04-08T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0a8, 3.14.4 and 3.13.13 are out!",
+        "link": "https://blog.python.org/2026/04/python-3150a8-3144-31313/",
+        "published": "2026-04-07T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15's JIT is now back on track",
+        "link": "https://blog.python.org/2026/03/jit-on-track/",
+        "published": "2026-03-23T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 7",
+        "link": "https://blog.python.org/2026/03/python-3150-alpha-7/",
+        "published": "2026-03-10T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "CPython: 36 Years of Source Code",
+        "link": "https://blog.python.org/2026/03/cpython-codebase-growth/",
+        "published": "2026-03-08T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.12.13, 3.11.15 and 3.10.20 are now available!",
+        "link": "https://blog.python.org/2026/03/python-31213-31115-31020/",
+        "published": "2026-03-03T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "The Python Insider Blog Has Moved!",
+        "link": "https://blog.python.org/2026/03/the-python-insider-blog-has-moved/",
+        "published": "2026-03-03T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Join the Python Security Response Team!",
+        "link": "https://blog.python.org/2026/02/join-the-python-security-response-team/",
+        "published": "2026-02-17T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 6",
+        "link": "https://blog.python.org/2026/02/python-3150-alpha-6/",
+        "published": "2026-02-11T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.3 and 3.13.12 are now available!",
+        "link": "https://blog.python.org/2026/02/python-3143-and-31312-are-now-available/",
+        "published": "2026-02-03T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 5 (yes, another alpha!)",
+        "link": "https://blog.python.org/2026/01/python-3150-alpha-5-yes-another-alpha/",
+        "published": "2026-01-14T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 4",
+        "link": "https://blog.python.org/2026/01/python-3150-alpha-4/",
+        "published": "2026-01-13T00:00:00+00:00",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 3",
+        "link": "https://blog.python.org/2025/12/python-3150-alpha-3/",
+        "published": "2025-12-16T00:00:00+00:00",
+        "blog": "Python Blog"
+    }
+]
