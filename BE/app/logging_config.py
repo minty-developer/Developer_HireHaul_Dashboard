@@ -4,6 +4,8 @@ import json
 import logging
 from datetime import datetime, timezone
 
+logger = logging.getLogger("app")
+
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
@@ -25,11 +27,12 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(payload, ensure_ascii=False)
 
 
-def configure_logging(app) -> None:
-    if app.config.get("TESTING"):
+def configure_logging(config: dict) -> None:
+    if config.get("TESTING"):
         return
     handler = logging.StreamHandler()
     handler.setFormatter(JsonFormatter())
-    app.logger.handlers.clear()
-    app.logger.addHandler(handler)
-    app.logger.setLevel(app.config.get("LOG_LEVEL", "INFO"))
+    logger.handlers.clear()
+    logger.addHandler(handler)
+    logger.setLevel(config.get("LOG_LEVEL", "INFO"))
+    logger.propagate = False

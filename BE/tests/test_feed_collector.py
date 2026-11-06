@@ -5,6 +5,8 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError, URLError
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 from app.db import connect, get_blog, upsert_blog
 from app.feed_collector import CollectionError, collect_blog
@@ -43,7 +45,7 @@ class FeedCollectorTest(unittest.TestCase):
             "ADMIN_API_KEY": "test-admin-key",
             "CORS_ORIGINS": "http://localhost:3000",
         })
-        self.client = self.app.test_client()
+        self.client = TestClient(self.app)
         self.blog_id = upsert_blog(self.database_path, {
             "name": "Test Blog",
             "company": "Test Company",
@@ -114,8 +116,8 @@ class FeedCollectorTest(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json["ok"])
-        self.assertEqual(response.json["saved"], 1)
+        self.assertTrue(response.json()["ok"])
+        self.assertEqual(response.json()["saved"], 1)
 
     def test_admin_sync_returns_404_for_unknown_blog(self):
         response = self.client.post(

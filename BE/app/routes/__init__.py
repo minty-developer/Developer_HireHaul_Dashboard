@@ -1,15 +1,21 @@
-from flask import Blueprint
+from fastapi import APIRouter
 
-bp = Blueprint("main", __name__)
+from . import (
+    admin_blogs,
+    admin_status,
+    admin_sync,
+    articles,
+    auth,
+    blogs,
+    discord,
+    health,
+    home,
+    subscriptions,
+)
 
-from . import home
-from . import health
-from . import admin_sync
-from . import articles
-from . import blogs
-from . import auth
-from . import subscriptions
-from . import admin_blogs
-from . import admin_status
-from . import api_docs
-from . import discord
+router = APIRouter()
+for module in (
+    home, health, articles, blogs, auth, subscriptions,
+    admin_blogs, admin_sync, admin_status, discord,
+):
+    router.include_router(module.router)

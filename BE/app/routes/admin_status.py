@@ -1,18 +1,15 @@
 from pathlib import Path
 
-from flask import current_app, jsonify
+from fastapi import APIRouter
 
-from app.admin_auth import admin_authorized
-from app.db import connect
+from ..db import connect
+from ..deps import AdminOnly, DatabasePath
 
-from . import bp
+router = APIRouter(tags=["admin"], dependencies=[AdminOnly])
 
 
-@bp.get("/api/admin/status")
-def admin_status():
-    if not admin_authorized():
-        return jsonify({"ok": False, "error": "관리자 인증에 실패했습니다."}), 401
-    database_path = current_app.config["DATABASE_PATH"]
+@router.get("/api/admin/status", summary="DB·수집 운영 상태")
+def admin_status(database_path: DatabasePath):
     with connect(database_path) as db:
         counts = {
             table: db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
@@ -26,9 +23,9 @@ def admin_status():
             FROM blogs
             """
         ).fetchone()
-    return jsonify({
+    return {
         "status": "ok",
         "database_size_bytes": Path(database_path).stat().st_size,
         "counts": counts,
         "sync": dict(sync),
-    })
+    }

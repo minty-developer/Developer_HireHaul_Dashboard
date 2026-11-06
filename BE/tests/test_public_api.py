@@ -2,6 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 from app.db import upsert_articles, upsert_blog
 
@@ -17,7 +19,7 @@ class PublicApiTest(unittest.TestCase):
             "ADMIN_API_KEY": "test-admin-key",
             "CORS_ORIGINS": "http://localhost:3000",
         })
-        self.client = self.app.test_client()
+        self.client = TestClient(self.app)
         self.blog_id = upsert_blog(self.database_path, {
             "name": "Example Tech",
             "company": "Example",
@@ -54,9 +56,9 @@ class PublicApiTest(unittest.TestCase):
         response = self.client.get("/api/articles?limit=1&offset=0")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["count"], 1)
-        self.assertEqual(response.json["total"], 2)
-        self.assertNotIn("content", response.json["articles"][0])
+        self.assertEqual(response.json()["count"], 1)
+        self.assertEqual(response.json()["total"], 2)
+        self.assertNotIn("content", response.json()["articles"][0])
 
     def test_searches_and_filters_articles(self):
         response = self.client.get(
@@ -64,15 +66,15 @@ class PublicApiTest(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["total"], 1)
-        self.assertEqual(response.json["articles"][0]["title"], "Python API 설계")
+        self.assertEqual(response.json()["total"], 1)
+        self.assertEqual(response.json()["articles"][0]["title"], "Python API 설계")
 
     def test_returns_article_detail(self):
-        article_id = self.client.get("/api/articles?q=Python").json["articles"][0]["id"]
+        article_id = self.client.get("/api/articles?q=Python").json()["articles"][0]["id"]
         response = self.client.get(f"/api/articles/{article_id}")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["article"]["content"], "REST API와 테스트")
+        self.assertEqual(response.json()["article"]["content"], "REST API와 테스트")
 
     def test_validates_article_query(self):
         queries = (
@@ -98,9 +100,9 @@ class PublicApiTest(unittest.TestCase):
         detail = self.client.get(f"/api/blogs/{self.blog_id}")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["blogs"][0]["article_count"], 2)
+        self.assertEqual(response.json()["blogs"][0]["article_count"], 2)
         self.assertEqual(detail.status_code, 200)
-        self.assertEqual(detail.json["blog"]["name"], "Example Tech")
+        self.assertEqual(detail.json()["blog"]["name"], "Example Tech")
 
     def test_returns_404_for_unknown_blog(self):
         response = self.client.get("/api/blogs/9999")

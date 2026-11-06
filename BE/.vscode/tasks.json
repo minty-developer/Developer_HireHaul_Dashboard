@@ -10,7 +10,7 @@
     {
       "label": "Python: 패키지 설치",
       "type": "shell",
-      "command": ".venv\\Scripts\\python.exe -m pip install -r requirements.txt",
+      "command": ".venv\\Scripts\\python.exe -m pip install -r requirements-dev.txt",
       "problemMatcher": []
     },
     {

@@ -1,6 +1,8 @@
 # Tech Blog Aggregator Backend
 
-Flask와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니다.
+FastAPI와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니다.
+
+서버를 실행한 뒤 `http://127.0.0.1:5000/api/docs`에서 Swagger UI로 모든 API를 바로 호출해 볼 수 있습니다.
 
 RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄러와 Docker 배포 구성을 제공합니다.
 
@@ -8,13 +10,14 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 
 - `blogs`: 블로그·회사·RSS 주소와 활성 상태, 조건부 요청용 ETag, 최근 수집 상태
 - `articles`: 블로그별 RSS 항목 식별자, 제목, 원문 주소, 작성자, 요약·본문, 게시·수집 시각
+- `articles_fts`: 게시글 제목·요약·본문·작성자의 FTS5(trigram) 전문 검색 색인. 트리거로 `articles`와 자동 동기화
 
 게시글은 `blog_id + entry_key` 조합으로 중복 저장을 막습니다. RSS의 GUID를 `entry_key`로 사용하고, GUID가 없다면 원문 URL을 사용합니다.
 
 ## 환경변수
 
 - `APP_ENV`: `development`, `testing`, `production`
-- `SECRET_KEY`: Flask 비밀키. 운영 환경에서는 안전한 무작위 값 필수
+- `SECRET_KEY`: 애플리케이션 비밀키. 운영 환경에서는 안전한 무작위 값 필수
 - `DATABASE_PATH`: SQLite 데이터베이스 경로
 - `ADMIN_API_KEY`: 관리자 수집 API의 `X-API-Key` 값
 - `CORS_ORIGINS`: 허용할 프론트엔드 Origin. 여러 개면 쉼표로 구분
@@ -23,7 +26,9 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 
 - `GET /`: 서비스 안내
 - `GET /api/health`: 서버 및 데이터베이스 상태
-- `GET /api/openapi.json`: OpenAPI 3.1 명세
+- `GET /api/docs`: Swagger UI (Authorize 버튼으로 Bearer 토큰·관리자 키 입력)
+- `GET /api/redoc`: ReDoc 문서
+- `GET /api/openapi.json`: OpenAPI 3.1 명세 (FastAPI가 자동 생성)
 - `POST /api/discord/interactions`: Discord Slash Command 수신
 - `GET /api/articles`: 게시글 목록 및 검색
 - `GET /api/articles/{article_id}`: 게시글 상세 조회
@@ -52,7 +57,25 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 - `DELETE /api/admin/blogs/{blog_id}`: 블로그 비활성화
 - `GET /api/admin/status`: DB·수집 운영 상태
 
-게시글 목록은 `q`, `blog_id`, `from`, `to`, `limit`, `offset` 쿼리를 지원합니다. 날짜는 `YYYY-MM-DD` 형식입니다.
+## 검색
+
+`GET /api/articles` 쿼리 파라미터:
+
+| 파라미터 | 설명 |
+| --- | --- |
+| `q` | 검색어(최대 200자). 공백으로 나눈 **모든 단어**가 제목·요약·본문·작성자 중 하나에 포함된 글 |
+| `blog_id` | 블로그 ID |
+| `company` | 회사명(정확히 일치, 예: `카카오`) |
+| `from`, `to` | 게시일 범위 `YYYY-MM-DD` |
+| `sort` | `latest`(기본, 최신순) 또는 `relevance`(검색 관련도순) |
+| `limit`, `offset` | 페이지네이션 (`limit` 1~100, 기본 20) |
+
+3글자 이상 단어는 FTS5 trigram 색인으로 찾아 한국어 부분 문자열도 빠르게 검색합니다.
+trigram은 3글자 미만을 색인할 수 없으므로 `AI`, `검색` 같은 1~2글자 단어는 LIKE로 찾습니다.
+관련도는 bm25 점수이며 제목 > 요약 > 작성자 > 본문 순으로 가중치를 둡니다.
+`%`, `_`, `"`, `AND` 같은 문자는 검색 문법이 아닌 일반 글자로 처리합니다.
+
+검증 실패는 `400 {"ok": false, "error": "<안내 메시지>"}` 형식으로 응답합니다.
 키워드 구독 생성 시 선택적으로 `discord_webhook_url`을 전달하면, 새로 수집된 글의
 제목·요약·본문에 키워드가 포함될 때 Discord로 한 번만 알림을 보냅니다. 일시적인
 발송 실패는 이후 수집 주기에 최대 3회까지 자동 재시도합니다.
@@ -64,14 +87,15 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 ## 테스트
 
 ```powershell
+uv venv --python 3.13 .venv   # 또는 python -m venv .venv
+uv pip install --python .venv -r requirements-dev.txt
 .venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
 ## 기본 기술 블로그 등록
 
 ```powershell
-$env:FLASK_APP = "run.py"
-.venv\Scripts\python.exe -m flask seed-blogs
+.venv\Scripts\python.exe -m app.cli seed-blogs
 ```
 
 카카오 Tech, NAVER D2, LY Corporation 한국어 기술 블로그를 중복 없이 등록합니다.
@@ -82,7 +106,7 @@ $env:FLASK_APP = "run.py"
 
 ```powershell
 $env:ADMIN_API_KEY = "local-admin-key"
-python run.py
+.venv\Scripts\python.exe run.py   # 개발 모드에서는 코드 변경 시 자동 재시작
 ```
 
 다른 터미널에서 전체 또는 특정 블로그를 수집할 수 있습니다.
@@ -97,13 +121,12 @@ curl.exe -X POST -H "X-API-Key: local-admin-key" http://127.0.0.1:5000/api/admin
 작업 스케줄러나 cron에서는 HTTP 요청 대신 CLI를 사용할 수 있습니다.
 
 ```powershell
-$env:FLASK_APP = "run.py"
-.venv\Scripts\python.exe -m flask collect-feeds
-.venv\Scripts\python.exe -m flask prune-auth-tokens
-.venv\Scripts\python.exe -m flask prune-login-attempts
-.venv\Scripts\python.exe -m flask backup-db
-.venv\Scripts\python.exe -m flask restore-db data\backups\tech_blog_YYYYMMDDTHHMMSSZ.db --yes
-.venv\Scripts\python.exe -m flask run-scheduler
+.venv\Scripts\python.exe -m app.cli collect-feeds
+.venv\Scripts\python.exe -m app.cli prune-auth-tokens
+.venv\Scripts\python.exe -m app.cli prune-login-attempts
+.venv\Scripts\python.exe -m app.cli backup-db
+.venv\Scripts\python.exe -m app.cli restore-db data\backups\tech_blog_YYYYMMDDTHHMMSSZ.db --yes
+.venv\Scripts\python.exe -m app.cli run-scheduler
 ```
 
 `run-scheduler`는 설정된 간격으로 RSS를 수집하고 하루 한 번 DB 백업을 생성합니다.
@@ -129,7 +152,7 @@ DISCORD_TEST_GUILD_ID=개발용_서버_ID
 등록됩니다.
 
 ```powershell
-.venv\Scripts\python.exe -m flask register-discord-commands
+.venv\Scripts\python.exe -m app.cli register-discord-commands
 ```
 
 Interaction Endpoint URL에는 공개 HTTPS 주소의
@@ -144,8 +167,8 @@ Discord 구독 키워드와 일치하면 설정된 채널로 한 번만 전송�
 
 ```powershell
 docker compose up --build -d
-docker compose exec backend python -m flask seed-blogs
-docker compose exec backend python -m flask collect-feeds
+docker compose exec backend python -m app.cli seed-blogs
+docker compose exec backend python -m app.cli collect-feeds
 ```
 
 API는 기본적으로 `http://127.0.0.1:5000`에서 열립니다. SQLite 데이터는
@@ -155,7 +178,7 @@ API는 기본적으로 `http://127.0.0.1:5000`에서 열립니다. SQLite 데이
 ## 배포 초기화 확인
 
 새 데이터베이스로 배포하면 블로그와 게시글 목록은 비어 있습니다. 배포 환경의
-영구 저장소에 `DATABASE_PATH`를 연결한 뒤 `flask seed-blogs`와
-`flask collect-feeds`를 한 번 실행합니다. 이후 `flask run-scheduler`를 별도
+영구 저장소에 `DATABASE_PATH`를 연결한 뒤 `python -m app.cli seed-blogs`와
+`python -m app.cli collect-feeds`를 한 번 실행합니다. 이후 `python -m app.cli run-scheduler`를 별도
 프로세스로 실행해야 주기적 수집과 백업이 계속됩니다. 공개 API의
 `/api/blogs`, `/api/articles`에서 데이터가 반환되는지 확인합니다.

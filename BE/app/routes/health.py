@@ -1,18 +1,21 @@
 import sqlite3
 
-from flask import current_app, jsonify
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 
-from . import bp
 from ..db import connect
+from ..deps import DatabasePath
+from ..logging_config import logger
+
+router = APIRouter(tags=["health"])
 
 
-@bp.get("/api/health")
-def health():
+@router.get("/api/health", summary="서버와 데이터베이스 상태 확인")
+def health(database_path: DatabasePath):
     try:
-        with connect(current_app.config["DATABASE_PATH"]) as db:
+        with connect(database_path) as db:
             db.execute("SELECT 1").fetchone()
     except sqlite3.Error:
-        current_app.logger.exception("Database health check failed")
-        return jsonify({"status": "error", "database": "unavailable"}), 503
-
-    return jsonify({"status": "ok", "database": "ok"})
+        logger.exception("Database health check failed")
+        return JSONResponse({"status": "error", "database": "unavailable"}, status_code=503)
+    return {"status": "ok", "database": "ok"}

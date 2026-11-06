@@ -5,10 +5,8 @@ import secrets
 import time
 from datetime import datetime, timedelta, timezone
 
-from flask import current_app, g, request
-from werkzeug.security import check_password_hash, generate_password_hash
-
 from .db import connect
+from .security import hash_password, verify_password
 
 
 def normalize_email(value: str) -> str:
@@ -80,7 +78,7 @@ def create_user(database_path: str, email: str, password: str, display_name: str
             INSERT INTO users (email, password_hash, display_name)
             VALUES (?, ?, ?)
             """,
-            (normalize_email(email), generate_password_hash(password), display_name.strip()),
+            (normalize_email(email), hash_password(password), display_name.strip()),
         )
         user_id = cursor.lastrowid
         row = db.execute(
@@ -96,7 +94,7 @@ def authenticate(database_path: str, email: str, password: str) -> dict | None:
             "SELECT * FROM users WHERE email = ? COLLATE NOCASE AND active = 1",
             (normalize_email(email),),
         ).fetchone()
-    if row is None or not check_password_hash(row["password_hash"], password):
+    if row is None or not verify_password(row["password_hash"], password):
         return None
     return dict(row)
 
@@ -105,7 +103,7 @@ def change_password(database_path: str, user_id: int, password: str) -> None:
     with connect(database_path) as db:
         db.execute(
             "UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-            (generate_password_hash(password), user_id),
+            (hash_password(password), user_id),
         )
         db.execute("DELETE FROM auth_tokens WHERE user_id = ?", (user_id,))
 
@@ -224,25 +222,6 @@ def get_user_for_token(database_path: str, token: str) -> dict | None:
             (_token_hash(token), now),
         ).fetchone()
     return dict(row) if row else None
-
-
-def bearer_token() -> str | None:
-    scheme, _, token = request.headers.get("Authorization", "").partition(" ")
-    if scheme.lower() != "bearer" or not token:
-        return None
-    return token.strip()
-
-
-def require_user() -> tuple[dict | None, tuple[dict, int] | None]:
-    token = bearer_token()
-    if token is None:
-        return None, ({"error": "인증 토큰이 필요합니다."}, 401)
-    user = get_user_for_token(current_app.config["DATABASE_PATH"], token)
-    if user is None:
-        return None, ({"error": "유효하지 않거나 만료된 인증 토큰입니다."}, 401)
-    g.auth_token = token
-    g.current_user = user
-    return user, None
 
 
 def _token_hash(token: str) -> str:

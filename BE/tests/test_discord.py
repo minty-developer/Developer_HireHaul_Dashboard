@@ -6,6 +6,8 @@ from unittest.mock import patch
 
 from nacl.signing import SigningKey
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 from app.db import connect, upsert_articles, upsert_blog
 from app.discord_bot import notify_new_articles, retry_failed_messages
@@ -23,14 +25,14 @@ class DiscordInteractionTest(unittest.TestCase):
             "CORS_ORIGINS": "http://localhost:3000",
             "DISCORD_PUBLIC_KEY": self.signing_key.verify_key.encode().hex(),
         })
-        self.client = self.app.test_client()
-        blog_id = upsert_blog(self.app.config["DATABASE_PATH"], {
+        self.client = TestClient(self.app)
+        blog_id = upsert_blog(self.app.state.config["DATABASE_PATH"], {
             "name": "Example Tech",
             "company": "Example",
             "feed_url": "https://example.com/feed.xml",
             "site_url": "https://example.com",
         })
-        upsert_articles(self.app.config["DATABASE_PATH"], [{
+        upsert_articles(self.app.state.config["DATABASE_PATH"], [{
             "blog_id": blog_id,
             "entry_key": "python-1",
             "title": "Python 서비스 운영기",
@@ -38,7 +40,7 @@ class DiscordInteractionTest(unittest.TestCase):
             "summary": "Flask 백엔드",
             "fetched_at": "2026-10-08T00:00:00+00:00",
         }])
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             self.article_id = db.execute("SELECT id FROM articles").fetchone()[0]
 
     def tearDown(self):
@@ -52,9 +54,9 @@ class DiscordInteractionTest(unittest.TestCase):
             signature = "00" * 64
         return self.client.post(
             "/api/discord/interactions",
-            data=body,
-            content_type="application/json",
+            content=body,
             headers={
+                "Content-Type": "application/json",
                 "X-Signature-Ed25519": signature,
                 "X-Signature-Timestamp": timestamp,
             },
@@ -72,31 +74,31 @@ class DiscordInteractionTest(unittest.TestCase):
     def test_verifies_signature_and_answers_ping(self):
         response = self.post_interaction({"type": 1})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {"type": 1})
+        self.assertEqual(response.json(), {"type": 1})
         self.assertEqual(self.post_interaction({"type": 1}, valid=False).status_code, 401)
 
     def test_configures_channel_and_manages_subscriptions(self):
         configured = self.post_interaction(self.command(
             "알림채널", [{"name": "channel", "value": "alerts-1"}]
         ))
-        self.assertIn("alerts-1", configured.json["data"]["content"])
+        self.assertIn("alerts-1", configured.json()["data"]["content"])
 
         added = self.post_interaction(self.command(
             "구독추가", [{"name": "keyword", "value": "Python"}]
         ))
-        self.assertIn("구독했습니다", added.json["data"]["content"])
+        self.assertIn("구독했습니다", added.json()["data"]["content"])
         listed = self.post_interaction(self.command("구독목록"))
-        self.assertIn("Python", listed.json["data"]["content"])
+        self.assertIn("Python", listed.json()["data"]["content"])
         deleted = self.post_interaction(self.command(
             "구독삭제", [{"name": "keyword", "value": "python"}]
         ))
-        self.assertIn("삭제했습니다", deleted.json["data"]["content"])
+        self.assertIn("삭제했습니다", deleted.json()["data"]["content"])
 
     def test_searches_articles(self):
         response = self.post_interaction(self.command(
             "검색", [{"name": "keyword", "value": "Flask"}]
         ))
-        self.assertIn("Python 서비스 운영기", response.json["data"]["content"])
+        self.assertIn("Python 서비스 운영기", response.json()["data"]["content"])
 
     @patch("app.discord_bot.send_channel_message")
     def test_sends_new_article_notification_only_once(self, send_message):
@@ -107,10 +109,10 @@ class DiscordInteractionTest(unittest.TestCase):
             "구독추가", [{"name": "keyword", "value": "Python"}]
         ))
         first = notify_new_articles(
-            self.app.config["DATABASE_PATH"], [self.article_id], "bot-token"
+            self.app.state.config["DATABASE_PATH"], [self.article_id], "bot-token"
         )
         second = notify_new_articles(
-            self.app.config["DATABASE_PATH"], [self.article_id], "bot-token"
+            self.app.state.config["DATABASE_PATH"], [self.article_id], "bot-token"
         )
         self.assertEqual(first["sent"], 1)
         self.assertEqual(second["sent"], 0)
@@ -127,20 +129,20 @@ class DiscordInteractionTest(unittest.TestCase):
         ))
 
         first = notify_new_articles(
-            self.app.config["DATABASE_PATH"], [self.article_id], "bot-token"
+            self.app.state.config["DATABASE_PATH"], [self.article_id], "bot-token"
         )
         retried = retry_failed_messages(
-            self.app.config["DATABASE_PATH"], "bot-token"
+            self.app.state.config["DATABASE_PATH"], "bot-token"
         )
         again = retry_failed_messages(
-            self.app.config["DATABASE_PATH"], "bot-token"
+            self.app.state.config["DATABASE_PATH"], "bot-token"
         )
 
         self.assertEqual(first["failed"], 1)
         self.assertEqual(retried["sent"], 1)
         self.assertEqual(again["matched"], 0)
         self.assertEqual(send_message.call_count, 2)
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             delivery = db.execute(
                 "SELECT status, attempts FROM discord_deliveries"
             ).fetchone()
@@ -156,17 +158,17 @@ class DiscordInteractionTest(unittest.TestCase):
         ))
 
         notify_new_articles(
-            self.app.config["DATABASE_PATH"], [self.article_id], "bot-token"
+            self.app.state.config["DATABASE_PATH"], [self.article_id], "bot-token"
         )
-        retry_failed_messages(self.app.config["DATABASE_PATH"], "bot-token")
-        retry_failed_messages(self.app.config["DATABASE_PATH"], "bot-token")
+        retry_failed_messages(self.app.state.config["DATABASE_PATH"], "bot-token")
+        retry_failed_messages(self.app.state.config["DATABASE_PATH"], "bot-token")
         final_retry = retry_failed_messages(
-            self.app.config["DATABASE_PATH"], "bot-token"
+            self.app.state.config["DATABASE_PATH"], "bot-token"
         )
 
         self.assertEqual(final_retry["matched"], 0)
         self.assertEqual(send_message.call_count, 3)
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             attempts = db.execute(
                 "SELECT attempts FROM discord_deliveries"
             ).fetchone()["attempts"]

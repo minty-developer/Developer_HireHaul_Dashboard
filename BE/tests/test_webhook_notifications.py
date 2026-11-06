@@ -3,6 +3,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 from app.db import connect, upsert_articles, upsert_blog
 from app.discord_webhook import notify_subscription_webhooks, retry_failed_webhooks
@@ -18,7 +20,7 @@ class WebhookNotificationTest(unittest.TestCase):
             "DATABASE_PATH": self.database_path,
             "SECRET_KEY": "test-secret",
         })
-        self.client = self.app.test_client()
+        self.client = TestClient(self.app)
         self.client.post("/api/auth/register", json={
             "email": "webhook@example.com",
             "password": "password123",
@@ -28,7 +30,7 @@ class WebhookNotificationTest(unittest.TestCase):
             "email": "webhook@example.com",
             "password": "password123",
         })
-        self.headers = {"Authorization": f"Bearer {response.json['token']}"}
+        self.headers = {"Authorization": f"Bearer {response.json()['token']}"}
 
     def tearDown(self):
         self.tempdir.cleanup()
@@ -86,7 +88,7 @@ class WebhookNotificationTest(unittest.TestCase):
                 "discord_webhook_url": "https://discord.com/api/webhooks/1/token",
             },
         )
-        subscription_id = response.json["subscription"]["id"]
+        subscription_id = response.json()["subscription"]["id"]
         blog_id = upsert_blog(self.database_path, {
             "name": "테스트 블로그",
             "company": "테스트",
@@ -149,7 +151,7 @@ class WebhookNotificationTest(unittest.TestCase):
         with connect(self.database_path) as db:
             error = db.execute(
                 "SELECT error FROM webhook_deliveries WHERE subscription_id = ?",
-                (response.json["subscription"]["id"],),
+                (response.json()["subscription"]["id"],),
             ).fetchone()["error"]
         self.assertEqual(error, "OSError")
 

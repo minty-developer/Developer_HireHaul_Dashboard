@@ -2,97 +2,76 @@ from __future__ import annotations
 
 import sqlite3
 
-from flask import current_app, jsonify, request
+from fastapi import APIRouter, Response
 
-from app.auth import require_user
-from app.db import connect
-from app.discord_webhook import valid_discord_webhook_url
+from ..db import connect
+from ..deps import CurrentUser, DatabasePath
+from ..errors import ApiError
+from ..schemas import SubscriptionCreateRequest, SubscriptionUpdateRequest
 
-from . import bp
+router = APIRouter(prefix="/api/subscriptions", tags=["subscriptions"])
+
+COLUMNS = "id, keyword, discord_webhook_url, active, created_at, updated_at"
 
 
-@bp.get("/api/subscriptions")
-def subscriptions():
-    user, error = require_user()
-    if error:
-        return jsonify(error[0]), error[1]
-
-    with connect(current_app.config["DATABASE_PATH"]) as db:
+@router.get("", summary="내 키워드 구독 목록")
+def list_subscriptions(user: CurrentUser, database_path: DatabasePath):
+    with connect(database_path) as db:
         rows = db.execute(
-            """
-            SELECT id, keyword, discord_webhook_url, active, created_at, updated_at
-            FROM subscriptions
+            f"""
+            SELECT {COLUMNS} FROM subscriptions
             WHERE user_id = ?
             ORDER BY keyword COLLATE NOCASE, id
             """,
             (user["id"],),
         ).fetchall()
-    return jsonify({"subscriptions": [dict(row) for row in rows]})
+    return {"subscriptions": [dict(row) for row in rows]}
 
 
-@bp.post("/api/subscriptions")
-def create_subscription():
-    user, error = require_user()
-    if error:
-        return jsonify(error[0]), error[1]
-
-    body = request.get_json(silent=True)
-    if not isinstance(body, dict):
-        return jsonify({"error": "JSON 요청 본문이 필요합니다."}), 400
-    keyword = " ".join(str(body.get("keyword", "")).split())
-    if not keyword or len(keyword) > 100:
-        return jsonify({"error": "키워드는 1~100자여야 합니다."}), 400
-    webhook_url = str(body.get("discord_webhook_url", "")).strip() or None
-    if webhook_url and not valid_discord_webhook_url(webhook_url):
-        return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
-
+@router.post("", status_code=201, summary="키워드 구독 추가")
+def create_subscription(
+    body: SubscriptionCreateRequest, user: CurrentUser, database_path: DatabasePath
+):
     try:
-        with connect(current_app.config["DATABASE_PATH"]) as db:
+        with connect(database_path) as db:
             cursor = db.execute(
-                """INSERT INTO subscriptions
-                    (user_id, keyword, discord_webhook_url) VALUES (?, ?, ?)""",
-                (user["id"], keyword, webhook_url),
+                "INSERT INTO subscriptions (user_id, keyword, discord_webhook_url) VALUES (?, ?, ?)",
+                (user["id"], body.keyword, body.discord_webhook_url),
             )
             row = db.execute(
-                """
-                SELECT id, keyword, discord_webhook_url, active, created_at, updated_at
-                FROM subscriptions WHERE id = ?
-                """,
-                (cursor.lastrowid,),
+                f"SELECT {COLUMNS} FROM subscriptions WHERE id = ?", (cursor.lastrowid,)
             ).fetchone()
     except sqlite3.IntegrityError:
-        return jsonify({"error": "이미 구독 중인 키워드입니다."}), 409
-    return jsonify({"subscription": dict(row)}), 201
+        raise ApiError(409, "이미 구독 중인 키워드입니다.") from None
+    return {"subscription": dict(row)}
 
 
-@bp.patch("/api/subscriptions/<int:subscription_id>")
-def update_subscription(subscription_id: int):
-    user, error = require_user()
-    if error:
-        return jsonify(error[0]), error[1]
+@router.patch(
+    "/{subscription_id}",
+    summary="Discord 웹훅 주소 및 활성 상태 변경",
+    description="보낸 필드만 변경합니다. `discord_webhook_url: null`은 알림을 끕니다.",
+)
+def update_subscription(
+    subscription_id: int,
+    body: SubscriptionUpdateRequest,
+    user: CurrentUser,
+    database_path: DatabasePath,
+):
+    provided = body.model_fields_set
+    if not provided & {"discord_webhook_url", "active"}:
+        raise ApiError(400, "discord_webhook_url 또는 active가 필요합니다.")
 
-    body = request.get_json(silent=True)
-    if not isinstance(body, dict) or not ({"discord_webhook_url", "active"} & body.keys()):
-        return jsonify({"error": "discord_webhook_url 또는 active가 필요합니다."}), 400
-
-    updates = []
-    values = []
-    if "discord_webhook_url" in body:
-        supplied_url = body["discord_webhook_url"]
-        if supplied_url is not None and not isinstance(supplied_url, str):
-            return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
-        webhook_url = supplied_url.strip() if supplied_url else None
-        if webhook_url and not valid_discord_webhook_url(webhook_url):
-            return jsonify({"error": "유효한 Discord 웹훅 URL이 아닙니다."}), 400
+    updates, values = [], []
+    if "discord_webhook_url" in provided:
         updates.append("discord_webhook_url = ?")
-        values.append(webhook_url)
-    if "active" in body:
-        if not isinstance(body["active"], bool):
-            return jsonify({"error": "active는 boolean이어야 합니다."}), 400
+        values.append(body.discord_webhook_url)
+    if "active" in provided:
+        if body.active is None:
+            raise ApiError(400, "active는 boolean이어야 합니다.")
         updates.append("active = ?")
-        values.append(int(body["active"]))
+        values.append(int(body.active))
 
-    with connect(current_app.config["DATABASE_PATH"]) as db:
+    with connect(database_path) as db:
         cursor = db.execute(
             f"""
             UPDATE subscriptions
@@ -102,28 +81,20 @@ def update_subscription(subscription_id: int):
             (*values, subscription_id, user["id"]),
         )
         if cursor.rowcount == 0:
-            return jsonify({"error": "구독을 찾을 수 없습니다."}), 404
+            raise ApiError(404, "구독을 찾을 수 없습니다.")
         row = db.execute(
-            """
-            SELECT id, keyword, discord_webhook_url, active, created_at, updated_at
-            FROM subscriptions WHERE id = ?
-            """,
-            (subscription_id,),
+            f"SELECT {COLUMNS} FROM subscriptions WHERE id = ?", (subscription_id,)
         ).fetchone()
-    return jsonify({"subscription": dict(row)})
+    return {"subscription": dict(row)}
 
 
-@bp.delete("/api/subscriptions/<int:subscription_id>")
-def delete_subscription(subscription_id: int):
-    user, error = require_user()
-    if error:
-        return jsonify(error[0]), error[1]
-
-    with connect(current_app.config["DATABASE_PATH"]) as db:
+@router.delete("/{subscription_id}", status_code=204, summary="키워드 구독 삭제")
+def delete_subscription(subscription_id: int, user: CurrentUser, database_path: DatabasePath):
+    with connect(database_path) as db:
         cursor = db.execute(
             "DELETE FROM subscriptions WHERE id = ? AND user_id = ?",
             (subscription_id, user["id"]),
         )
     if cursor.rowcount == 0:
-        return jsonify({"error": "구독을 찾을 수 없습니다."}), 404
-    return "", 204
+        raise ApiError(404, "구독을 찾을 수 없습니다.")
+    return Response(status_code=204)

@@ -1,21 +1,30 @@
-from flask import current_app, jsonify, request
+import json
 
-from app.discord_bot import interaction_response, verify_interaction
+from fastapi import APIRouter, Request
+from starlette.concurrency import run_in_threadpool
 
-from . import bp
+from ..deps import Config
+from ..discord_bot import interaction_response, verify_interaction
+from ..errors import ApiError
+
+router = APIRouter(tags=["discord"])
 
 
-@bp.post("/api/discord/interactions")
-def discord_interactions():
-    public_key = current_app.config["DISCORD_PUBLIC_KEY"]
+@router.post("/api/discord/interactions", summary="Discord Slash Command 수신")
+async def discord_interactions(request: Request, config: Config):
+    public_key = config["DISCORD_PUBLIC_KEY"]
     if not public_key:
-        return jsonify({"error": "Discord 봇이 설정되지 않았습니다."}), 503
+        raise ApiError(503, "Discord 봇이 설정되지 않았습니다.")
+    # 서명은 원본 바이트 기준으로 검증해야 하므로 본문을 직접 읽는다.
+    body = await request.body()
     signature = request.headers.get("X-Signature-Ed25519", "")
     timestamp = request.headers.get("X-Signature-Timestamp", "")
-    body = request.get_data(cache=True)
     if not verify_interaction(public_key, signature, timestamp, body):
-        return jsonify({"error": "유효하지 않은 Discord 서명입니다."}), 401
-    payload = request.get_json(silent=True)
+        raise ApiError(401, "유효하지 않은 Discord 서명입니다.")
+    try:
+        payload = json.loads(body)
+    except ValueError:
+        payload = None
     if not isinstance(payload, dict):
-        return jsonify({"error": "잘못된 Discord 요청입니다."}), 400
-    return jsonify(interaction_response(current_app.config["DATABASE_PATH"], payload))
+        raise ApiError(400, "잘못된 Discord 요청입니다.")
+    return await run_in_threadpool(interaction_response, config["DATABASE_PATH"], payload)

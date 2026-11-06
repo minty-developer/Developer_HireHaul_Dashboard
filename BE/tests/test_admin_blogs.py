@@ -2,6 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 
 
@@ -15,7 +17,7 @@ class AdminBlogsApiTest(unittest.TestCase):
             "ADMIN_API_KEY": "test-admin-key",
             "CORS_ORIGINS": "http://localhost:3000",
         })
-        self.client = self.app.test_client()
+        self.client = TestClient(self.app)
         self.headers = {"X-API-Key": "test-admin-key"}
         self.payload = {
             "name": "Example Tech",
@@ -35,7 +37,7 @@ class AdminBlogsApiTest(unittest.TestCase):
     def test_create_list_update_and_deactivate_blog(self):
         created = self.client.post("/api/admin/blogs", headers=self.headers, json=self.payload)
         self.assertEqual(created.status_code, 201)
-        blog_id = created.json["blog"]["id"]
+        blog_id = created.json()["blog"]["id"]
 
         updated = self.client.patch(
             f"/api/admin/blogs/{blog_id}",
@@ -43,14 +45,14 @@ class AdminBlogsApiTest(unittest.TestCase):
             json={"name": "Updated Tech", "active": True},
         )
         self.assertEqual(updated.status_code, 200)
-        self.assertEqual(updated.json["blog"]["name"], "Updated Tech")
+        self.assertEqual(updated.json()["blog"]["name"], "Updated Tech")
 
         deleted = self.client.delete(f"/api/admin/blogs/{blog_id}", headers=self.headers)
         self.assertEqual(deleted.status_code, 204)
         self.assertEqual(self.client.get(f"/api/blogs/{blog_id}").status_code, 404)
 
         listed = self.client.get("/api/admin/blogs", headers=self.headers)
-        self.assertEqual(listed.json["blogs"][0]["active"], 0)
+        self.assertEqual(listed.json()["blogs"][0]["active"], 0)
 
     def test_validates_payload_and_duplicate_feed(self):
         invalid = self.client.post(
@@ -80,9 +82,9 @@ class AdminBlogsApiTest(unittest.TestCase):
     def test_returns_operational_status(self):
         response = self.client.get("/api/admin/status", headers=self.headers)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["status"], "ok")
-        self.assertIn("articles", response.json["counts"])
-        self.assertGreater(response.json["database_size_bytes"], 0)
+        self.assertEqual(response.json()["status"], "ok")
+        self.assertIn("articles", response.json()["counts"])
+        self.assertGreater(response.json()["database_size_bytes"], 0)
 
 
 if __name__ == "__main__":

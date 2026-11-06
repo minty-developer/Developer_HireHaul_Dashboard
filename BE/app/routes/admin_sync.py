@@ -1,37 +1,30 @@
-from flask import current_app, jsonify
+from fastapi import APIRouter
 
-from . import bp
-from ..admin_auth import admin_authorized
+from ..deps import AdminOnly, Config
+from ..errors import ApiError
 from ..feed_collector import CollectionError, collect_all, collect_blog
+from ..logging_config import logger
+
+router = APIRouter(prefix="/api/admin/sync", tags=["admin"], dependencies=[AdminOnly])
 
 
-@bp.post("/api/admin/sync")
-def sync_all_blogs():
-    if not admin_authorized():
-        return jsonify({"ok": False, "error": "인증에 실패했습니다."}), 401
-
+@router.post("", summary="활성 블로그 전체 수집")
+def sync_all_blogs(config: Config):
     result = collect_all(
-        current_app.config["DATABASE_PATH"],
-        discord_bot_token=current_app.config["DISCORD_BOT_TOKEN"],
+        config["DATABASE_PATH"], discord_bot_token=config["DISCORD_BOT_TOKEN"]
     )
-    return jsonify({"ok": result["failed"] == 0, **result})
+    return {"ok": result["failed"] == 0, **result}
 
 
-@bp.post("/api/admin/sync/<int:blog_id>")
-def sync_one_blog(blog_id: int):
-    if not admin_authorized():
-        return jsonify({"ok": False, "error": "인증에 실패했습니다."}), 401
-
+@router.post("/{blog_id}", summary="특정 블로그 수집")
+def sync_one_blog(blog_id: int, config: Config):
     try:
         result = collect_blog(
-            current_app.config["DATABASE_PATH"],
-            blog_id,
-            discord_bot_token=current_app.config["DISCORD_BOT_TOKEN"],
+            config["DATABASE_PATH"], blog_id, discord_bot_token=config["DISCORD_BOT_TOKEN"]
         )
     except LookupError as exc:
-        return jsonify({"ok": False, "error": str(exc)}), 404
+        raise ApiError(404, str(exc), ok_field=True) from None
     except CollectionError as exc:
-        current_app.logger.warning("Blog collection failed: %s", exc)
-        return jsonify({"ok": False, "error": str(exc)}), 502
-
-    return jsonify({"ok": True, **result})
+        logger.warning("Blog collection failed: %s", exc)
+        raise ApiError(502, str(exc), ok_field=True) from None
+    return {"ok": True, **result}

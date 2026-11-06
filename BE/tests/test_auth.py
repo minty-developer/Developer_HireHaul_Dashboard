@@ -4,6 +4,8 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 from app.db import connect
 
@@ -21,7 +23,7 @@ class AuthApiTest(unittest.TestCase):
             "AUTH_LOGIN_WINDOW_SECONDS": 300,
             "CORS_ORIGINS": "http://localhost:3000",
         })
-        self.client = self.app.test_client()
+        self.client = TestClient(self.app)
 
     def tearDown(self):
         self.temp.cleanup()
@@ -47,9 +49,9 @@ class AuthApiTest(unittest.TestCase):
         response = self.register(email=" User@Example.com ")
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json["user"]["email"], "user@example.com")
-        self.assertNotIn("password_hash", response.json["user"])
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        self.assertEqual(response.json()["user"]["email"], "user@example.com")
+        self.assertNotIn("password_hash", response.json()["user"])
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             saved = db.execute("SELECT * FROM users").fetchone()
         self.assertNotEqual(saved["password_hash"], "password123")
 
@@ -68,11 +70,11 @@ class AuthApiTest(unittest.TestCase):
         login = self.login()
 
         self.assertEqual(login.status_code, 200)
-        token = login.json["token"]
+        token = login.json()["token"]
         headers = {"Authorization": f"Bearer {token}"}
         me = self.client.get("/api/auth/me", headers=headers)
         self.assertEqual(me.status_code, 200)
-        self.assertEqual(me.json["user"]["email"], "user@example.com")
+        self.assertEqual(me.json()["user"]["email"], "user@example.com")
 
         logout = self.client.post("/api/auth/logout", headers=headers)
         self.assertEqual(logout.status_code, 204)
@@ -100,26 +102,26 @@ class AuthApiTest(unittest.TestCase):
 
     def test_database_stores_only_token_hash(self):
         self.register()
-        token = self.login().json["token"]
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        token = self.login().json()["token"]
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             saved = db.execute("SELECT token_hash FROM auth_tokens").fetchone()
         self.assertNotEqual(saved["token_hash"], token)
         self.assertEqual(len(saved["token_hash"]), 64)
 
     def test_updates_display_name(self):
         self.register()
-        token = self.login().json["token"]
+        token = self.login().json()["token"]
         response = self.client.patch(
             "/api/auth/me",
             headers={"Authorization": f"Bearer {token}"},
             json={"display_name": "새 이름"},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["user"]["display_name"], "새 이름")
+        self.assertEqual(response.json()["user"]["display_name"], "새 이름")
 
     def test_changes_password_and_revokes_existing_tokens(self):
         self.register()
-        token = self.login().json["token"]
+        token = self.login().json()["token"]
         headers = {"Authorization": f"Bearer {token}"}
         wrong = self.client.put(
             "/api/auth/password",
@@ -140,33 +142,33 @@ class AuthApiTest(unittest.TestCase):
 
     def test_deletes_account_and_owned_data(self):
         self.register()
-        token = self.login().json["token"]
+        token = self.login().json()["token"]
         headers = {"Authorization": f"Bearer {token}"}
         self.client.post(
             "/api/subscriptions", headers=headers, json={"keyword": "Python"}
         )
-        denied = self.client.delete(
-            "/api/auth/me", headers=headers, json={"password": "wrong-password"}
+        denied = self.client.request(
+            "DELETE", "/api/auth/me", headers=headers, json={"password": "wrong-password"}
         )
         self.assertEqual(denied.status_code, 401)
 
-        deleted = self.client.delete(
-            "/api/auth/me", headers=headers, json={"password": "password123"}
+        deleted = self.client.request(
+            "DELETE", "/api/auth/me", headers=headers, json={"password": "password123"}
         )
         self.assertEqual(deleted.status_code, 204)
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM users").fetchone()[0], 0)
             self.assertEqual(db.execute("SELECT COUNT(*) FROM subscriptions").fetchone()[0], 0)
 
     @patch("app.routes.auth.send_email")
     def test_verifies_email_and_can_require_verification(self, send_email_mock):
-        self.app.config.update({
+        self.app.state.config.update({
             "SMTP_HOST": "smtp.test",
             "MAIL_FROM": "noreply@example.com",
             "REQUIRE_EMAIL_VERIFICATION": True,
         })
         registered = self.register()
-        self.assertTrue(registered.json["verification_sent"])
+        self.assertTrue(registered.json()["verification_sent"])
         self.assertEqual(self.login().status_code, 403)
 
         body = send_email_mock.call_args.args[3]
@@ -187,7 +189,7 @@ class AuthApiTest(unittest.TestCase):
     @patch("app.routes.auth.send_email")
     def test_resets_password_without_revealing_unknown_email(self, send_email_mock):
         self.register()
-        self.app.config.update({"SMTP_HOST": "smtp.test", "MAIL_FROM": "noreply@example.com"})
+        self.app.state.config.update({"SMTP_HOST": "smtp.test", "MAIL_FROM": "noreply@example.com"})
         unknown = self.client.post(
             "/api/auth/password/reset/request", json={"email": "missing@example.com"}
         )

@@ -37,7 +37,7 @@ services:
   scheduler:
     build:
       context: ./BE
-    command: python -m flask run-scheduler
+    command: python -m app.cli run-scheduler
     environment:
       APP_ENV: ${APP_ENV:-development}
       SECRET_KEY: ${SECRET_KEY:-dev-only-change-me}

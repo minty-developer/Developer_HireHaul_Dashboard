@@ -2,6 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 from app.db import connect, upsert_articles, upsert_blog
 from app.seed_blogs import DEFAULT_BLOGS, seed_default_blogs
@@ -17,7 +19,7 @@ class AppTest(unittest.TestCase):
             "ADMIN_API_KEY": "test-admin-key",
             "CORS_ORIGINS": "http://localhost:3000",
         })
-        self.client = self.app.test_client()
+        self.client = TestClient(self.app)
 
     def tearDown(self):
         self.temp.cleanup()
@@ -25,21 +27,21 @@ class AppTest(unittest.TestCase):
     def test_home(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Tech Blog Aggregator", response.data)
+        self.assertIn(b"Tech Blog Aggregator", response.content)
 
     def test_health(self):
         response = self.client.get("/api/health")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {"status": "ok", "database": "ok"})
+        self.assertEqual(response.json(), {"status": "ok", "database": "ok"})
 
     def test_api_errors_and_security_headers(self):
         missing = self.client.get("/api/does-not-exist")
         self.assertEqual(missing.status_code, 404)
-        self.assertEqual(missing.content_type, "application/json")
+        self.assertEqual(missing.headers["content-type"], "application/json")
 
         wrong_method = self.client.put("/api/health")
         self.assertEqual(wrong_method.status_code, 405)
-        self.assertEqual(wrong_method.content_type, "application/json")
+        self.assertEqual(wrong_method.headers["content-type"], "application/json")
 
         auth = self.client.post("/api/auth/login", json={})
         self.assertEqual(auth.headers["X-Content-Type-Options"], "nosniff")
@@ -50,11 +52,11 @@ class AppTest(unittest.TestCase):
     def test_serves_openapi_spec(self):
         response = self.client.get("/api/openapi.json")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["openapi"], "3.1.0")
-        self.assertIn("/api/articles", response.json["paths"])
+        self.assertEqual(response.json()["openapi"], "3.1.0")
+        self.assertIn("/api/articles", response.json()["paths"])
 
     def test_database_schema_is_created(self):
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             tables = {
                 row["name"]
                 for row in db.execute(
@@ -71,17 +73,17 @@ class AppTest(unittest.TestCase):
                 "webhook_deliveries",
             }.issubset(tables)
         )
-        with connect(self.app.config["DATABASE_PATH"]) as db:
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
             versions = [
                 row["version"]
                 for row in db.execute(
                     "SELECT version FROM schema_migrations ORDER BY version"
                 ).fetchall()
             ]
-        self.assertEqual(versions, [1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(versions, [1, 2, 3, 4, 5, 6, 7, 8])
 
     def test_blog_and_article_upsert(self):
-        database_path = self.app.config["DATABASE_PATH"]
+        database_path = self.app.state.config["DATABASE_PATH"]
         blog_id = upsert_blog(database_path, {
             "name": "Engineering Blog",
             "company": "Example",
@@ -118,7 +120,7 @@ class AppTest(unittest.TestCase):
         self.assertEqual(saved_article["blog_id"], blog_id)
 
     def test_deleting_blog_deletes_its_articles(self):
-        database_path = self.app.config["DATABASE_PATH"]
+        database_path = self.app.state.config["DATABASE_PATH"]
         blog_id = upsert_blog(database_path, {
             "name": "Engineering Blog",
             "company": "Example",
@@ -142,7 +144,7 @@ class AppTest(unittest.TestCase):
         self.assertEqual(count, 0)
 
     def test_seed_default_blogs_is_repeatable(self):
-        database_path = self.app.config["DATABASE_PATH"]
+        database_path = self.app.state.config["DATABASE_PATH"]
 
         self.assertEqual(seed_default_blogs(database_path), len(DEFAULT_BLOGS))
         self.assertEqual(seed_default_blogs(database_path), len(DEFAULT_BLOGS))

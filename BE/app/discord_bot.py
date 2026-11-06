@@ -9,6 +9,7 @@ from nacl.exceptions import BadSignatureError
 from nacl.signing import VerifyKey
 
 from .db import connect
+from .search import ArticleQuery, search_articles
 
 
 DISCORD_API = "https://discord.com/api/v10"
@@ -174,20 +175,11 @@ def interaction_response(database_path: str, payload: dict) -> dict:
 
     if command in {"최신글", "검색"}:
         count = min(max(int(options.get("count", 5)), 1), 10)
-        keyword = str(options.get("keyword", "")).strip()
-        sql = """
-            SELECT articles.title, articles.url, blogs.name AS blog_name
-            FROM articles JOIN blogs ON blogs.id = articles.blog_id
-        """
-        values = []
-        if command == "검색":
-            sql += " WHERE articles.title LIKE ? OR articles.summary LIKE ? OR articles.content LIKE ?"
-            pattern = f"%{keyword}%"
-            values.extend([pattern, pattern, pattern])
-        sql += " ORDER BY COALESCE(articles.published_at, articles.fetched_at) DESC, articles.id DESC LIMIT ?"
-        values.append(count)
-        with connect(database_path) as db:
-            rows = db.execute(sql, values).fetchall()
+        keyword = str(options.get("keyword", "")).strip()[:200]
+        _total, rows = search_articles(
+            database_path,
+            ArticleQuery(q=keyword if command == "검색" else "", limit=count),
+        )
         if not rows:
             return _message("조건에 맞는 게시글이 없습니다.")
         content = "\n".join(

@@ -2,6 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from fastapi.testclient import TestClient
+
 from app import create_app
 
 
@@ -16,7 +18,7 @@ class SubscriptionApiTest(unittest.TestCase):
             "AUTH_TOKEN_TTL_SECONDS": 3600,
             "CORS_ORIGINS": "http://localhost:3000",
         })
-        self.client = self.app.test_client()
+        self.client = TestClient(self.app)
         self.first_headers = self._register_and_login("first@example.com")
         self.second_headers = self._register_and_login("second@example.com")
 
@@ -33,7 +35,7 @@ class SubscriptionApiTest(unittest.TestCase):
             "email": email,
             "password": "password123",
         })
-        return {"Authorization": f"Bearer {response.json['token']}"}
+        return {"Authorization": f"Bearer {response.json()['token']}"}
 
     def test_requires_authentication(self):
         self.assertEqual(self.client.get("/api/subscriptions").status_code, 401)
@@ -55,10 +57,10 @@ class SubscriptionApiTest(unittest.TestCase):
         )
 
         self.assertEqual(created.status_code, 201)
-        self.assertEqual(created.json["subscription"]["keyword"], "Python Backend")
+        self.assertEqual(created.json()["subscription"]["keyword"], "Python Backend")
         listed = self.client.get("/api/subscriptions", headers=self.first_headers)
-        self.assertEqual(len(listed.json["subscriptions"]), 1)
-        self.assertEqual(listed.json["subscriptions"][0]["keyword"], "Python Backend")
+        self.assertEqual(len(listed.json()["subscriptions"]), 1)
+        self.assertEqual(listed.json()["subscriptions"][0]["keyword"], "Python Backend")
 
     def test_rejects_invalid_and_case_insensitive_duplicate_keyword(self):
         self.assertEqual(
@@ -79,7 +81,7 @@ class SubscriptionApiTest(unittest.TestCase):
         created = self.client.post(
             "/api/subscriptions", headers=self.first_headers, json={"keyword": "Flask"}
         )
-        subscription_id = created.json["subscription"]["id"]
+        subscription_id = created.json()["subscription"]["id"]
 
         denied = self.client.delete(
             f"/api/subscriptions/{subscription_id}", headers=self.second_headers
@@ -100,7 +102,7 @@ class SubscriptionApiTest(unittest.TestCase):
         created = self.client.post(
             "/api/subscriptions", headers=self.first_headers, json={"keyword": "Flask"}
         )
-        subscription_id = created.json["subscription"]["id"]
+        subscription_id = created.json()["subscription"]["id"]
         endpoint = f"/api/subscriptions/{subscription_id}"
         webhook_url = "https://discord.com/api/webhooks/123/secret-token"
 
@@ -118,7 +120,7 @@ class SubscriptionApiTest(unittest.TestCase):
             json={"discord_webhook_url": webhook_url},
         )
         self.assertEqual(updated.status_code, 200)
-        self.assertEqual(updated.json["subscription"]["discord_webhook_url"], webhook_url)
+        self.assertEqual(updated.json()["subscription"]["discord_webhook_url"], webhook_url)
         self.assertEqual(
             self.client.patch(
                 endpoint,
@@ -133,14 +135,14 @@ class SubscriptionApiTest(unittest.TestCase):
             json={"discord_webhook_url": None},
         )
         self.assertEqual(disabled.status_code, 200)
-        self.assertIsNone(disabled.json["subscription"]["discord_webhook_url"])
+        self.assertIsNone(disabled.json()["subscription"]["discord_webhook_url"])
 
     def test_toggles_only_own_subscription_and_validates_active(self):
         created = self.client.post(
             "/api/subscriptions", headers=self.first_headers, json={"keyword": "Flask"}
         )
-        endpoint = f"/api/subscriptions/{created.json['subscription']['id']}"
-        self.assertEqual(created.json["subscription"]["active"], 1)
+        endpoint = f"/api/subscriptions/{created.json()['subscription']['id']}"
+        self.assertEqual(created.json()["subscription"]["active"], 1)
 
         self.assertEqual(self.client.patch(
             endpoint, headers=self.second_headers, json={"active": False}
@@ -156,12 +158,12 @@ class SubscriptionApiTest(unittest.TestCase):
             endpoint, headers=self.first_headers, json={"active": False}
         )
         self.assertEqual(paused.status_code, 200)
-        self.assertEqual(paused.json["subscription"]["active"], 0)
+        self.assertEqual(paused.json()["subscription"]["active"], 0)
         resumed = self.client.patch(
             endpoint, headers=self.first_headers, json={"active": True}
         )
         self.assertEqual(resumed.status_code, 200)
-        self.assertEqual(resumed.json["subscription"]["active"], 1)
+        self.assertEqual(resumed.json()["subscription"]["active"], 1)
 
 
 if __name__ == "__main__":

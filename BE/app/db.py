@@ -193,6 +193,35 @@ DISCORD_RETRY_SCHEMA = """
 ALTER TABLE discord_deliveries ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0;
 """
 
+# trigram 토크나이저는 한국어처럼 띄어쓰기만으로 단어를 나누기 어려운 텍스트에서도
+# 3글자 이상의 부분 문자열 검색을 인덱스로 처리한다. 원본은 articles 테이블에 두고
+# 트리거로 색인만 동기화한다.
+ARTICLE_SEARCH_SCHEMA = """
+CREATE VIRTUAL TABLE articles_fts USING fts5(
+    title, summary, content, author,
+    content='articles', content_rowid='id', tokenize='trigram'
+);
+
+CREATE TRIGGER articles_fts_insert AFTER INSERT ON articles BEGIN
+    INSERT INTO articles_fts (rowid, title, summary, content, author)
+    VALUES (new.id, new.title, new.summary, new.content, new.author);
+END;
+
+CREATE TRIGGER articles_fts_delete AFTER DELETE ON articles BEGIN
+    INSERT INTO articles_fts (articles_fts, rowid, title, summary, content, author)
+    VALUES ('delete', old.id, old.title, old.summary, old.content, old.author);
+END;
+
+CREATE TRIGGER articles_fts_update AFTER UPDATE ON articles BEGIN
+    INSERT INTO articles_fts (articles_fts, rowid, title, summary, content, author)
+    VALUES ('delete', old.id, old.title, old.summary, old.content, old.author);
+    INSERT INTO articles_fts (rowid, title, summary, content, author)
+    VALUES (new.id, new.title, new.summary, new.content, new.author);
+END;
+
+INSERT INTO articles_fts (articles_fts) VALUES ('rebuild');
+"""
+
 MIGRATIONS = (
     (1, "initial_schema", SCHEMA),
     (2, "login_attempts", LOGIN_ATTEMPTS_SCHEMA),
@@ -201,6 +230,7 @@ MIGRATIONS = (
     (5, "subscription_webhooks", WEBHOOK_SCHEMA),
     (6, "webhook_delivery_retries", WEBHOOK_RETRY_SCHEMA),
     (7, "discord_delivery_retries", DISCORD_RETRY_SCHEMA),
+    (8, "article_full_text_search", ARTICLE_SEARCH_SCHEMA),
 )
 
 
