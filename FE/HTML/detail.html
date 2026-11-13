@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="description" content="기술블로그 정보와 최신 게시글을 확인하세요.">
+    <title>블로그 상세 — FEED</title>
+    <link rel="stylesheet" href="../CSS/detail.css">
+</head>
+<body>
+    <header class="siteHeader">
+        <a class="brand" href="index.html" aria-label="FEED 홈"><span class="brandMark">T<span>/</span></span><strong>FEED<span class="brandDot">.</span></strong></a>
+        <a class="backLink" href="index.html">← <span>아티클로 돌아가기</span></a>
+    </header>
+
+    <main>
+        <nav class="breadcrumb" aria-label="현재 위치"><a href="index.html">아티클</a><span aria-hidden="true">/</span><span id="breadcrumbBlog">블로그</span></nav>
+
+        <section id="blogLoading" class="statusMessage" role="status">블로그 정보를 불러오고 있습니다.</section>
+        <section id="blogError" class="statusMessage errorMessage hide" role="alert">
+            <p id="blogErrorText">블로그 정보를 불러오지 못했습니다.</p>
+            <button id="retryButton" class="textAction" type="button">다시 시도</button>
+        </section>
+
+        <section id="blogProfile" class="blogProfile hide" aria-labelledby="blogName">
+            <p class="eyebrow">TECH BLOG</p>
+            <p id="blogCompany" class="companyName"></p>
+            <h1 id="blogName"></h1>
+            <p id="blogDescription" class="blogDescription"></p>
+            <div class="profileMeta">
+                <span><strong id="articleCount">—</strong> articles</span>
+                <a id="siteLink" class="externalLink hide" href="#" target="_blank" rel="noopener noreferrer">블로그 방문 ↗</a>
+                <a id="feedLink" class="externalLink hide" href="#" target="_blank" rel="noopener noreferrer">RSS 피드 ↗</a>
+            </div>
+        </section>
+
+        <section id="articleSection" class="articleSection hide" aria-labelledby="articleHeading">
+            <div class="sectionHeading">
+                <div><p class="eyebrow">LATEST WRITING</p><h2 id="articleHeading">이 블로그의 글</h2></div>
+                <span id="articleTotal" class="articleTotal"></span>
+            </div>
+            <div id="articleLoading" class="statusMessage hide" role="status">게시글을 불러오고 있습니다.</div>
+            <div id="articleError" class="statusMessage errorMessage hide" role="alert">
+                <p id="articleErrorText">게시글을 불러오지 못했습니다.</p>
+                <button id="retryArticlesButton" class="textAction" type="button">다시 시도</button>
+            </div>
+            <p id="articleEmpty" class="statusMessage hide" role="status">아직 등록된 게시글이 없습니다.</p>
+            <div id="articleList" class="articleList"></div>
+            <div id="pagination" class="pagination hide">
+                <button id="prevPage" type="button">← 이전</button>
+                <span id="pageLabel"></span>
+                <button id="nextPage" type="button">다음 →</button>
+            </div>
+        </section>
+    </main>
+
+    <footer><span>FEED<span class="brandDot">.</span></span><span>국내 기술블로그 큐레이션</span></footer>
+    <script src="../JS/detail.js"></script>
+</body>
+</html>
