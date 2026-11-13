@@ -1,422 +1,1568 @@
 [
     {
-        "title": "AI 시대의 개발자를 꿈꾸는 학생 개발자에게",
-        "link": "https://d2.naver.com/helloworld/1975819",
-        "published": "2026-10-29T01:24:17+00:00",
+        "title": "Catch Go bugs that fuzzing misses with Gemini and a constraint solver",
+        "link": "https://developers.googleblog.com/catch-go-bugs-that-fuzzing-misses-with-gemini-and-a-constraint-solver/",
+        "published": "2026-11-12T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "How Agent Anomaly Detection scores on benchmarks we didn't write",
+        "link": "https://developers.googleblog.com/how-agent-anomaly-detection-scores-on-benchmarks-we-didnt-write/",
+        "published": "2026-11-12T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Validating GPU Platforms with Runtime AI Inventory via the NVIDIA DSX AI Factory",
+        "link": "https://developer.nvidia.com/blog/validating-gpu-platforms-with-runtime-ai-inventory-via-the-nvidia-dsx-ai-factory/",
+        "published": "2026-11-11T17:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Choosing QuePaxa, an unusual consensus algorithm",
+        "link": "https://blog.cloudflare.com/choosing-quepaxa/",
+        "published": "2026-11-11T14:24:46+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "컨테이너처럼 쓰고, VM처럼 격리하기",
+        "link": "https://d2.naver.com/helloworld/2265641",
+        "published": "2026-11-11T08:21:15+00:00",
         "blog": "NAVER D2"
     },
     {
-        "title": "Python 3.15.2, 3.14.10, 3.13.18, 3.12.16 and 3.11.18 are out",
-        "link": "https://blog.python.org/2026/10/python-3152-31410-31318-31216-31118/",
-        "published": "2026-10-26T00:00:00+00:00",
+        "title": "딸깍으로 안되는 Multi-interest 개발기",
+        "link": "https://d2.naver.com/helloworld/9639872",
+        "published": "2026-11-11T08:20:14+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "크림에서 통합 임베딩(Universal Embedding)은 어떻게 쓰일까?",
+        "link": "https://d2.naver.com/helloworld/7134499",
+        "published": "2026-11-11T08:19:08+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "worklog-system 주간보고 자동화 구축 경험기",
+        "link": "https://d2.naver.com/helloworld/5037598",
+        "published": "2026-11-11T08:17:53+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "로그인 화면, 이제 만들지 마세요 - n3r OIDC",
+        "link": "https://d2.naver.com/helloworld/4293206",
+        "published": "2026-11-11T08:16:53+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "우리 팀만의 스펙 주도 개발 정착기",
+        "link": "https://d2.naver.com/helloworld/8644274",
+        "published": "2026-11-11T08:15:47+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Socket.IO 서버를 여러 Pod에서 운영하기",
+        "link": "https://d2.naver.com/helloworld/3517874",
+        "published": "2026-11-11T08:14:48+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "검수도 답변도 호출도 AI가? 커머스API의 2026",
+        "link": "https://d2.naver.com/helloworld/7749530",
+        "published": "2026-11-11T08:11:58+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "AI 산출물이 프로덕션이 되기까지-AI와 디자인시스템이 함께 일하는 법",
+        "link": "https://d2.naver.com/helloworld/2568242",
+        "published": "2026-11-11T08:10:44+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Chaos Mesh로 Kubernetes 앱의 장애 내구성 검증하기",
+        "link": "https://d2.naver.com/helloworld/6523094",
+        "published": "2026-11-11T07:49:24+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "A2UI 1.0: Build delightful, fast, reliable, agentic experiences",
+        "link": "https://developers.googleblog.com/a2ui-10-build-delightful-fast-reliable-agentic-experiences/",
+        "published": "2026-11-11T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Running AV Reasoning Models Within Onboard Compute and Latency Limits",
+        "link": "https://developer.nvidia.com/blog/running-av-reasoning-models-within-onboard-compute-and-latency-limits/",
+        "published": "2026-11-10T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Agent Substrate: Advancing Kubernetes for Agents at Scale",
+        "link": "https://developer.nvidia.com/blog/agent-substrate-advancing-kubernetes-for-agents-at-scale/",
+        "published": "2026-11-10T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Start and Restore GPU Workloads in Seconds with NVIDIA Snapshot",
+        "link": "https://developer.nvidia.com/blog/start-and-restore-gpu-workloads-in-seconds-with-nvidia-snapshot/",
+        "published": "2026-11-10T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Manage Kubernetes Clusters for GPU Infrastructure with NVIDIA Kubernetes Engine",
+        "link": "https://developer.nvidia.com/blog/manage-kubernetes-clusters-for-gpu-infrastructure-with-nvidia-kubernetes-engine/",
+        "published": "2026-11-10T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "AI 스킬 만들기 10계명: Figma→Code 자동화 실전기",
+        "link": "https://d2.naver.com/helloworld/8562180",
+        "published": "2026-11-10T10:27:18+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Python 3.16.0 alpha 2 is now available",
+        "link": "https://blog.python.org/2026/11/python-3160-alpha-2-is-now-available/",
+        "published": "2026-11-10T00:00:00+00:00",
         "blog": "Python Blog"
+    },
+    {
+        "title": "On-Device Speech Recognition and Text-to-Speech in Google AI Edge Gallery",
+        "link": "https://developers.googleblog.com/on-device-speech-recognition-and-text-to-speech-in-google-ai-edge-gallery/",
+        "published": "2026-11-10T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Make a Robot Arm Feel Weightless with NVIDIA Holoscan 5",
+        "link": "https://developer.nvidia.com/blog/make-a-robot-arm-feel-weightless-with-nvidia-holoscan-5/",
+        "published": "2026-11-09T19:09:32+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Launching the Vite Ecosystem Fund",
+        "link": "https://blog.cloudflare.com/launching-vite-ecosystem-fund/",
+        "published": "2026-11-09T13:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Announcing Long-Context Training on TPUs with MaxText Context Parallelism",
+        "link": "https://developers.googleblog.com/announcing-long-context-training-on-tpus-with-maxtext-context-parallelism/",
+        "published": "2026-11-09T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "From prompt to app: Build with Google Maps in AI Studio",
+        "link": "https://developers.googleblog.com/from-prompt-to-app-build-with-google-maps-in-ai-studio/",
+        "published": "2026-11-09T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "What is Pathways? Single-controller training for large models",
+        "link": "https://developers.googleblog.com/what-is-pathways-single-controller-training-for-large-models/",
+        "published": "2026-11-09T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Speed Up Image Generation with FLUX 3 Image Klein on NVIDIA Blackwell GPUs",
+        "link": "https://developer.nvidia.com/blog/speed-up-image-generation-with-flux-3-image-klein-on-nvidia-blackwell-gpus/",
+        "published": "2026-11-06T22:20:20+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Accelerating Reinforcement Learning Weight Refit with the Reshard Collective",
+        "link": "https://developer.nvidia.com/blog/accelerating-reinforcement-learning-weight-refit-with-the-reshard-collective/",
+        "published": "2026-11-06T18:03:26+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "The post-quantum future of web privacy",
+        "link": "https://blog.cloudflare.com/vole-mole/",
+        "published": "2026-11-06T14:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "2026년과 이후 JavaScript의 동향 - WebAssembly",
+        "link": "https://d2.naver.com/helloworld/7770448",
+        "published": "2026-11-06T03:04:14+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "2026년과 이후 JavaScript의 동향 - 라이브러리와 프레임워크",
+        "link": "https://d2.naver.com/helloworld/0627744",
+        "published": "2026-11-06T02:04:33+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Agent Distraction",
+        "link": "https://developers.googleblog.com/agent-distraction/",
+        "published": "2026-11-06T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Inside GitHub&#8217;s new Git storage architecture",
+        "link": "https://github.blog/engineering/architecture-optimization/inside-githubs-new-git-storage-architecture/",
+        "published": "2026-11-05T20:23:21+00:00",
+        "blog": "GitHub Engineering"
+    },
+    {
+        "title": "Agents aren’t humans (but they kinda are)",
+        "link": "https://blog.cloudflare.com/trusted-agent-delegation/",
+        "published": "2026-11-05T17:03:04+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Configure, Certify, and Operate Kubernetes GPU Clusters with NVIDIA DSX OS",
+        "link": "https://developer.nvidia.com/blog/configure-certify-and-operate-kubernetes-gpu-clusters-with-nvidia-dsx-os/",
+        "published": "2026-11-05T17:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Five Ways NVIDIA Co-Design Maximizes the Value of Every Byte in the AI Factory",
+        "link": "https://developer.nvidia.com/blog/five-ways-nvidia-co-design-maximizes-the-value-of-every-byte-in-the-ai-factory/",
+        "published": "2026-11-05T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How NVIDIA Uses AI Agents to Streamline AI Factory Operations",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-uses-ai-agents-to-streamline-ai-factory-operations/",
+        "published": "2026-11-04T22:00:17+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "NVIDIA CUDA 13.5 Brings NVIDIA Vera Rubin GA Support",
+        "link": "https://developer.nvidia.com/blog/nvidia-cuda-13-5-brings-nvidia-vera-rubin-ga-support/",
+        "published": "2026-11-04T18:46:07+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How NVIDIA Factory Operations Blueprint Coordinates AI Agents to Investigate Production Issues",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-factory-operations-blueprint-coordinates-ai-agents-to-investigate-production-issues/",
+        "published": "2026-11-04T17:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Use NVIDIA NeMo to Turn Agent Failures into Tests and Harness Fixes",
+        "link": "https://developer.nvidia.com/blog/use-nvidia-nemo-to-turn-agent-failures-into-tests-and-harness-fixes/",
+        "published": "2026-11-04T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "See the agents, set the terms: New visibility and control for personal agents",
+        "link": "https://blog.cloudflare.com/personal-agents-visibility-control/",
+        "published": "2026-11-04T14:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "FE News 26년 11월 소식을 전해드립니다.",
+        "link": "https://d2.naver.com/news/1095957",
+        "published": "2026-11-04T01:24:58+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Introducing Zero Wire, a hub for investigating critical Internet vulnerabilities",
+        "link": "https://blog.cloudflare.com/zero-wire/",
+        "published": "2026-11-03T14:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Cost per task: Using cheap classifiers to route across Gemini models and thinking levels",
+        "link": "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/",
+        "published": "2026-11-03T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Diagnose Distributed AI Workload Failures with NVIDIA Attribution",
+        "link": "https://developer.nvidia.com/blog/diagnose-distributed-ai-workload-failures-with-nvidia-attribution/",
+        "published": "2026-11-02T23:39:34+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Keep Distributed Training Running with Automated Workload Recovery",
+        "link": "https://developer.nvidia.com/blog/keep-distributed-training-running-with-automated-workload-recovery/",
+        "published": "2026-11-02T22:43:05+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Making Kubernetes AI-Ready for NVIDIA Vera Rubin on Day One",
+        "link": "https://developer.nvidia.com/blog/making-kubernetes-ai-ready-for-nvidia-vera-rubin-on-day-one/",
+        "published": "2026-11-02T18:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Build World Models for Interactive Simulation with NVIDIA Cosmos",
+        "link": "https://developer.nvidia.com/blog/build-world-models-for-interactive-simulation-with-nvidia-cosmos/",
+        "published": "2026-11-02T17:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Support New AI Frameworks Faster Using NVIDIA Workload Map",
+        "link": "https://developer.nvidia.com/blog/support-new-ai-frameworks-faster-using-nvidia-workload-map/",
+        "published": "2026-11-02T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How we halved DNS build delay and cut memory use by 85%",
+        "link": "https://blog.cloudflare.com/dns-targeted-zone-builds/",
+        "published": "2026-11-02T14:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Build a Validated Kubernetes Runtime for NVIDIA Dynamo",
+        "link": "https://developer.nvidia.com/blog/build-a-validated-kubernetes-runtime-for-nvidia-dynamo/",
+        "published": "2026-10-30T21:35:31+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Run AI Models for Edge Application Development with Just a Few Commands",
+        "link": "https://developer.nvidia.com/blog/run-ai-models-for-edge-application-development-with-just-a-few-commands/",
+        "published": "2026-10-30T20:33:18+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "4 real? Tracking exploitation and patching of eMudhra’s weak keys",
+        "link": "https://blog.cloudflare.com/emudhra-patching/",
+        "published": "2026-10-30T17:38:50+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Build Specialized Agents on a Stack You Control with NVIDIA NemoClaw",
+        "link": "https://developer.nvidia.com/blog/build-specialized-agents-on-a-stack-you-control-with-nvidia-nemoclaw/",
+        "published": "2026-10-30T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How to Check and Configure NVIDIA GPUDirect Storage for Your Platform",
+        "link": "https://developer.nvidia.com/blog/how-to-check-and-configure-nvidia-gpudirect-storage-for-your-platform/",
+        "published": "2026-10-30T15:01:36+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Cloudflare services for private origins is now generally available",
+        "link": "https://blog.cloudflare.com/private-origins-public-to-private/",
+        "published": "2026-10-30T14:23:43+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "모두가 함께 성장하는 기술 축제, NAVER Engineering Day 10년의 여정",
+        "link": "https://d2.naver.com/news/0907869",
+        "published": "2026-10-30T04:26:27+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "DevFest is back!",
+        "link": "https://developers.googleblog.com/devfest-is-back/",
+        "published": "2026-10-30T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Unlocking Tensor Core Performance for Machine Learning Interatomic Potentials",
+        "link": "https://developer.nvidia.com/blog/unlocking-tensor-core-performance-for-machine-learning-interatomic-potentials/",
+        "published": "2026-10-29T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Cloudflare DDoS Threat Report 2026 Q3: More swarms, fewer giants",
+        "link": "https://blog.cloudflare.com/ddos-threat-report-2026-q3/",
+        "published": "2026-10-29T12:55:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "사이드카의 선언적 관리: OpenKruise SidecarSet 도입과 운영",
+        "link": "https://d2.naver.com/helloworld/2983631",
+        "published": "2026-10-29T08:22:22+00:00",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "AI 시대의 개발자를 꿈꾸는 학생 개발자에게",
+        "link": "https://d2.naver.com/helloworld/1975819",
+        "published": "2026-10-29T01:24:17Z",
+        "blog": "NAVER D2"
+    },
+    {
+        "title": "Build Generative UI Apps with A2UI & CopilotKit Agents",
+        "link": "https://developers.googleblog.com/build-generative-ui-apps-with-a2ui-copilotkit-agents/",
+        "published": "2026-10-29T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Hill-Climbing Agent Quality with Agents CLI Evaluation",
+        "link": "https://developers.googleblog.com/hill-climbing-agent-quality-with-agents-cli-evaluation/",
+        "published": "2026-10-28T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Smaller apps and faster GPU inference with LiteRT in Google Play services",
+        "link": "https://developers.googleblog.com/smaller-apps-and-faster-gpu-inference-with-litert-in-google-play-services/",
+        "published": "2026-10-28T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Memory-Enforced GPU Sharing in Kubernetes with NVIDIA CUDA 13.4",
+        "link": "https://developer.nvidia.com/blog/memory-enforced-gpu-sharing-in-kubernetes-with-nvidia-cuda-13-4/",
+        "published": "2026-10-27T20:50:39+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "NVIDIA RTX Spark Powers Neural Rendering and AI Characters in Games",
+        "link": "https://developer.nvidia.com/blog/nvidia-rtx-spark-powers-neural-rendering-and-ai-characters-in-games/",
+        "published": "2026-10-27T17:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Fine-Tuning NVIDIA Nemotron to Know Local Rules, Not Just Local Languages",
+        "link": "https://developer.nvidia.com/blog/fine-tuning-nvidia-nemotron-to-know-local-rules-not-just-local-languages/",
+        "published": "2026-10-27T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "3 Ways to Boost MoE Inference on NVIDIA DGX Spark",
+        "link": "https://developer.nvidia.com/blog/3-ways-to-boost-moe-inference-on-nvidia-dgx-spark/",
+        "published": "2026-10-27T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Introducing the Cloudflare PHP Capture the Flag challenge",
+        "link": "https://blog.cloudflare.com/php-ctf/",
+        "published": "2026-10-27T13:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "What took the Internet offline in Q3 2026",
+        "link": "https://blog.cloudflare.com/q3-2026-internet-disruption-summary/",
+        "published": "2026-10-27T13:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Building Conversational Commerce with Multi-Agent Swarms on GCP: A Working Prototype",
+        "link": "https://developers.googleblog.com/building-conversational-commerce-with-multi-agent-swarms-on-gcp-a-working-prototype/",
+        "published": "2026-10-27T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Fast, reliable A2UI, with swappable inference formats",
+        "link": "https://developers.googleblog.com/fast-reliable-a2ui/",
+        "published": "2026-10-27T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Cross-request KV cache exposure in the GLM-5.3 Workers AI model, and our remediation with SGLang",
+        "link": "https://blog.cloudflare.com/kv-cache-exposure-remediation/",
+        "published": "2026-10-26T22:01:23+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "How NVIDIA Minerva Turns Telemetry Chaos Into Peak GPU Yield",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-minerva-turns-telemetry-chaos-into-peak-gpu-yield/",
+        "published": "2026-10-26T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How NVIDIA Mission Control 2.5 Brings Autonomous Recovery to Kubernetes",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-mission-control-2-5-brings-autonomous-recovery-to-kubernetes/",
+        "published": "2026-10-26T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Preview, edit, and collaborate on markdown (.md) files natively in Google Docs and Drive",
+        "link": "https://developers.googleblog.com/preview-edit-and-collaborate-on-markdown-md-files-natively-in-google-docs-and-drive/",
+        "published": "2026-10-26T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Origin Range Requests: Serving large files without range-request tuning",
+        "link": "https://blog.cloudflare.com/origin-range-requests/",
+        "published": "2026-10-23T18:22:59+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Bringing post-quantum cryptography to geographically fenced key management",
+        "link": "https://blog.cloudflare.com/post-quantum-geo-key-manager/",
+        "published": "2026-10-23T18:06:56+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Scaling NVIDIA TensorRT Performance Optimization Beyond a Single Build Route with the Global Performance Tuner, Part 2",
+        "link": "https://developer.nvidia.com/blog/scaling-nvidia-tensorrt-performance-optimization-beyond-a-single-build-route-with-the-global-performance-tuner-part-2/",
+        "published": "2026-10-23T17:27:52+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Scaling NVIDIA TensorRT Performance Optimization Beyond a Single Build Route with the Global Performance Tuner, Part 1",
+        "link": "https://developer.nvidia.com/blog/scaling-nvidia-tensorrt-performance-optimization-beyond-a-single-build-route-with-the-global-performance-tuner-part-1/",
+        "published": "2026-10-23T17:27:35+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Using AI Agents to Teach Robots Like Microduck to Walk in Simulation",
+        "link": "https://developer.nvidia.com/blog/using-ai-agents-to-teach-robots-like-microduck-to-walk-in-simulation/",
+        "published": "2026-10-23T14:58:32+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How to Read Data into GPU Memory in Python with NVIDIA GPUDirect Storage",
+        "link": "https://developer.nvidia.com/blog/how-to-read-data-into-gpu-memory-in-python-with-nvidia-gpudirect-storage/",
+        "published": "2026-10-22T16:39:09+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Running Frontier-Class AI Models Across 8 NVIDIA DGX Spark Nodes",
+        "link": "https://developer.nvidia.com/blog/running-frontier-class-ai-models-across-8-nvidia-dgx-spark-nodes/",
+        "published": "2026-10-22T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Localizing compliance at scale: Achieving South Korea’s ISMS certification",
+        "link": "https://blog.cloudflare.com/k-isms/",
+        "published": "2026-10-22T13:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Architecting Governed, Self-Evolving AI Agents on Google Cloud",
+        "link": "https://developers.googleblog.com/architecting-governed-self-evolving-ai-agents-on-gemini-agent-platform/",
+        "published": "2026-10-22T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "Streaming comes to API Gateway: real-time and AI-ready APIs, without changing your spec",
+        "link": "https://developers.googleblog.com/streaming-comes-to-api-gateway-real-time-and-ai-ready-apis-without-changing-your-spec/",
+        "published": "2026-10-22T00:00:00+00:00",
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "The bridge to agent-scale Git infrastructure",
+        "link": "https://github.blog/engineering/architecture-optimization/the-bridge-to-agent-scale-git-infrastructure/",
+        "published": "2026-10-21T16:00:00+00:00",
+        "blog": "GitHub Engineering"
+    },
+    {
+        "title": "Introducing full transaction detection for Cloudflare WAF",
+        "link": "https://blog.cloudflare.com/full-transaction-waf/",
+        "published": "2026-10-21T14:10:42+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Cloudflare deploys protections against php2shell vulnerability",
+        "link": "https://blog.cloudflare.com/php-vulnerabilities-waf-protection/",
+        "published": "2026-10-21T13:56:45+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "How Commerce.com and Cloudflare are getting storefronts ready for AI agents",
+        "link": "https://blog.cloudflare.com/webmcp-commerce/",
+        "published": "2026-10-21T13:00:00+00:00",
+        "blog": "Cloudflare Blog"
+    },
+    {
+        "title": "Design Proteins with RFD4-Proteina Using Reward-Guided Inference-Time Search",
+        "link": "https://developer.nvidia.com/blog/design-proteins-with-rfd4-proteina-using-reward-guided-inference-time-search/",
+        "published": "2026-10-21T12:30:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Inside NVIDIA Sentry: Secure AI Agents at Runtime",
+        "link": "https://developer.nvidia.com/blog/inside-nvidia-sentry-secure-ai-agents-at-runtime/",
+        "published": "2026-10-21T09:52:16+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How NVIDIA OpenShell Reference Architecture Secures and Governs AI Agent Workloads at Scale",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-openshell-reference-architecture-secures-and-governs-ai-agent-workloads-at-scale/",
+        "published": "2026-10-21T09:50:14+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Developing an AI Factory Digital Twin with an Agent-Assisted Workflow",
+        "link": "https://developer.nvidia.com/blog/developing-an-ai-factory-digital-twin-with-an-agent-assisted-workflow/",
+        "published": "2026-10-21T09:38:49+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Achieve Productive AI Capacity Faster and More Predictably with NVIDIA DSX POD",
+        "link": "https://developer.nvidia.com/blog/achieve-productive-ai-capacity-faster-and-more-predictably-with-nvidia-dsx-pod/",
+        "published": "2026-10-21T09:35:32+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
         "title": "2026년과 이후 JavaScript의 동향 - 브라우저 밖의 JavaScript",
         "link": "https://d2.naver.com/helloworld/1443473",
-        "published": "2026-10-21T03:38:48+00:00",
+        "published": "2026-10-21T03:38:48Z",
         "blog": "NAVER D2"
     },
     {
-        "title": "Python 3.15.1, 3.14.9 and 3.13.17 are out",
-        "link": "https://blog.python.org/2026/10/python-3151-3149-31317/",
+        "title": "Powering the Agent Development Lifecycle with any framework, from ADK to LangChain and beyond",
+        "link": "https://developers.googleblog.com/powering-the-agent-development-lifecycle-with-any-framework-from-adk-to-langchain-and-beyond/",
         "published": "2026-10-21T00:00:00+00:00",
-        "blog": "Python Blog"
+        "blog": "Google Developers Blog"
+    },
+    {
+        "title": "8 eMudhra certificates are compromised. Here's what you need to know",
+        "link": "https://blog.cloudflare.com/emudhra-certificate-compromise/",
+        "published": "2026-10-20T22:20:16+00:00",
+        "blog": "Cloudflare Blog"
     },
     {
         "title": "2026년과 이후 JavaScript의 동향 - JavaScript(ECMAScript)",
         "link": "https://d2.naver.com/helloworld/2675915",
-        "published": "2026-10-20T05:51:56+00:00",
+        "published": "2026-10-20T05:51:56Z",
         "blog": "NAVER D2"
     },
     {
-        "title": "Python 3.16.0 alpha 1 is now available",
-        "link": "https://blog.python.org/2026/10/python-3160-alpha-1-is-now-available/",
-        "published": "2026-10-13T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Integrating TorchTPU into TorchTitan and Optimizing Models for TPU",
+        "link": "https://developers.googleblog.com/integrating-torchtpu-into-torchtitan-and-optimizing-models-for-tpu/",
+        "published": "2026-10-20T00:00:00+00:00",
+        "blog": "Google Developers Blog"
     },
     {
-        "title": "Python 3.15.0 (final) is here!",
-        "link": "https://blog.python.org/2026/10/python-3150-final-is-here/",
-        "published": "2026-10-09T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Accelerating Mamba-2 with High-Performance Forward Pass Kernels in NVIDIA CUDA Tile",
+        "link": "https://developer.nvidia.com/blog/accelerating-mamba-2-with-high-performance-forward-pass-kernels-in-nvidia-cuda-tile/",
+        "published": "2026-10-19T17:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Code, Test, and Deploy on One Machine with NVIDIA RTX Spark",
+        "link": "https://developer.nvidia.com/blog/code-test-and-deploy-on-one-machine-with-nvidia-rtx-spark/",
+        "published": "2026-10-16T17:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "NVIDIA Nemotron 3.5 Super VL Powers Specialized Agents with Multimodal Reasoning",
+        "link": "https://developer.nvidia.com/blog/nvidia-nemotron-3-5-super-vl-powers-specialized-agents-with-multimodal-reasoning/",
+        "published": "2026-10-15T18:01:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Scale Agentic Coding Workflows with Meta’s Muse Spark Open on NVIDIA GB300 NVL72",
+        "link": "https://developer.nvidia.com/blog/scale-agentic-coding-workflows-with-metas-muse-spark-open-on-nvidia-gb300-nvl72/",
+        "published": "2026-10-15T18:00:01+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Staying Evergreen: How we automated secure access and repo hygiene in a shared org",
+        "link": "https://github.blog/engineering/platform-security/staying-evergreen-how-we-automated-secure-access-and-repo-hygiene-in-a-shared-org/",
+        "published": "2026-10-15T18:00:00+00:00",
+        "blog": "GitHub Engineering"
+    },
+    {
+        "title": "From 2,500 requests to 24: Rebuilding star history without the stargazers",
+        "link": "https://github.blog/engineering/architecture-optimization/from-2500-requests-to-24-rebuilding-star-history-without-the-stargazers/",
+        "published": "2026-10-14T19:11:33+00:00",
+        "blog": "GitHub Engineering"
+    },
+    {
+        "title": "Optimizing Agent Reliability and Tool Calling Efficiency for Chip Design Using NVIDIA NeMo Gym",
+        "link": "https://developer.nvidia.com/blog/optimizing-agent-reliability-and-tool-calling-efficiency-for-chip-design-using-nvidia-nemo-gym/",
+        "published": "2026-10-14T16:10:45+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How to Rewrite Apache Spark UDFs for GPU Acceleration with AI Agents",
+        "link": "https://developer.nvidia.com/blog/rewrite-apache-spark-udfs-gpu-acceleration-ai-agents/",
+        "published": "2026-10-13T21:33:21+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "NVIDIA Run:ai Is Now Open Source as Part of NVIDIA DSX AI Factory Platform",
+        "link": "https://developer.nvidia.com/blog/nvidia-runai-is-now-open-source-as-part-of-nvidia-dsx-ai-factory-platform/",
+        "published": "2026-10-13T14:19:40+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "ReplaySSM: Rethinking State Storage for Faster Hybrid-Model Decoding",
+        "link": "https://developer.nvidia.com/blog/replayssm-rethinking-state-storage-for-faster-hybrid-model-decoding/",
+        "published": "2026-10-12T16:00:54+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "5 Steps to Create SimReady Assets for Robotics with Frontier AI Models",
+        "link": "https://developer.nvidia.com/blog/5-steps-to-create-simready-assets-for-robotics-with-frontier-ai-models/",
+        "published": "2026-10-08T20:57:55+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Building Reliable Data Analytics Agents: Lessons from the KDD Cup",
+        "link": "https://developer.nvidia.com/blog/building-reliable-data-analytics-agents-lessons-from-the-kdd-cup/",
+        "published": "2026-10-08T18:30:02+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
         "title": "Python의 GC가 멀티프로세싱과 만나면 생기는 일 - Python과 Airflow, 그리고 관련된 문제 해결기 2편",
         "link": "https://d2.naver.com/helloworld/4149925",
-        "published": "2026-10-08T06:44:57+00:00",
+        "published": "2026-10-08T06:44:57Z",
         "blog": "NAVER D2"
     },
     {
         "title": "Python의 멀티프로세싱과 Airflow의 task 동작 방식 - Python과 Airflow, 그리고 관련된 문제 해결기 1편",
         "link": "https://d2.naver.com/helloworld/4452165",
-        "published": "2026-10-08T06:43:18+00:00",
+        "published": "2026-10-08T06:43:18Z",
         "blog": "NAVER D2"
+    },
+    {
+        "title": "The Machines that Make the Machines",
+        "link": "https://developer.nvidia.com/blog/the-machines-that-make-the-machines/",
+        "published": "2026-10-07T18:21:03+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Validate AI Factory Changes with Digital Twins and AI Agents",
+        "link": "https://developer.nvidia.com/blog/validate-ai-factory-changes-with-digital-twins-and-ai-agents/",
+        "published": "2026-10-07T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Scaling Decision Optimization to 100 Million Variables and Beyond with mPDLP in NVIDIA cuOpt",
+        "link": "https://developer.nvidia.com/blog/scaling-decision-optimization-to-100-million-variables-and-beyond-with-mpdlp-in-nvidia-cuopt/",
+        "published": "2026-10-07T15:45:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Faster Scientific Image Analysis with NVIDIA cuPhoton",
+        "link": "https://developer.nvidia.com/blog/faster-scientific-image-analysis-with-nvidia-cuphoton/",
+        "published": "2026-10-07T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
         "title": "D2Coding 폰트 1.4.0 릴리즈 소식을 전합니다.",
         "link": "https://d2.naver.com/news/7193556",
-        "published": "2026-10-07T08:47:28+00:00",
+        "published": "2026-10-07T08:47:28Z",
         "blog": "NAVER D2"
     },
     {
         "title": "FE News 26년 10월 소식을 전해드립니다.",
         "link": "https://d2.naver.com/news/8711937",
-        "published": "2026-10-07T08:43:28+00:00",
+        "published": "2026-10-07T08:43:28Z",
         "blog": "NAVER D2"
     },
     {
-        "title": "Python 3.15.0 candidate 3 is here!",
-        "link": "https://blog.python.org/2026/10/python-3150-rc3/",
-        "published": "2026-10-02T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Building Git infrastructure for agent-scale development",
+        "link": "https://github.blog/engineering/architecture-optimization/building-git-infrastructure-for-agent-scale-development/",
+        "published": "2026-10-06T20:57:56+00:00",
+        "blog": "GitHub Engineering"
+    },
+    {
+        "title": "Scale Bitwise-Deterministic Pretraining with NVIDIA Megatron Core",
+        "link": "https://developer.nvidia.com/blog/scale-bitwise-deterministic-pretraining-with-nvidia-megatron-core/",
+        "published": "2026-10-06T19:58:03+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How DOCA GPUNetIO Unifies GPU-Initiated Networking Across the NVIDIA Software Stack",
+        "link": "https://developer.nvidia.com/blog/doca-gpunetio-gda-ki-unified-gpu-networking/",
+        "published": "2026-10-06T19:07:02+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "AICR v1.0: Open, stable, and verifiable GPU cluster configuration",
+        "link": "https://developer.nvidia.com/blog/aicr-v1-0-open-stable-and-verifiable-gpu-cluster-configuration/",
+        "published": "2026-10-06T16:13:47+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Control How Your GPU Shares Work with Green Contexts",
+        "link": "https://developer.nvidia.com/blog/control-how-your-gpu-shares-work-with-green-contexts/",
+        "published": "2026-10-06T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Build Applications on NVIDIA BlueField Faster with NVIDIA DOCA Agent Skills",
+        "link": "https://developer.nvidia.com/blog/build-applications-on-nvidia-bluefield-faster-with-nvidia-doca-agent-skills/",
+        "published": "2026-10-01T18:13:29+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Build Local AI Apps with C++ and NVIDIA TensorRT RTX Samples",
+        "link": "https://developer.nvidia.com/blog/build-local-ai-apps-with-c-and-nvidia-tensorrt-rtx-samples/",
+        "published": "2026-10-01T17:59:27+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Fine-Tuning NVIDIA Nemotron for Saudi Arabic Dialects, with a Path to Other Languages",
+        "link": "https://developer.nvidia.com/blog/fine-tuning-nvidia-nemotron-for-saudi-arabic-dialects-with-a-path-to-other-languages/",
+        "published": "2026-10-01T05:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
         "title": "에이전트, 개념부터 같이 정리해봐요 - 워크플로우 · 하네스 · Context/Memory · MCP/A2A",
         "link": "https://d2.naver.com/helloworld/8118359",
-        "published": "2026-10-01T02:40:01+00:00",
+        "published": "2026-10-01T02:40:01Z",
         "blog": "NAVER D2"
     },
     {
-        "title": "Python 3.10.22, 3.11.17, 3.12.15, 3.13.16 and 3.14.8 are now available!",
-        "link": "https://blog.python.org/2026/10/python-31022-31117/",
-        "published": "2026-10-01T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Deploying an HSTU Generative Recommender with NVIDIA Dynamo-Triton",
+        "link": "https://developer.nvidia.com/blog/deploying-an-hstu-generative-recommender-with-nvidia-dynamo-triton/",
+        "published": "2026-09-30T20:54:59+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
-        "title": "Python Language Summit 2026",
-        "link": "https://blog.python.org/2026/09/language-summit-2026/",
-        "published": "2026-09-30T12:00:11+00:00",
-        "blog": "Python Blog"
+        "title": "Expanding AI Storage Access with NVIDIA cuObject and the NVIDIA SCADA Server SDK",
+        "link": "https://developer.nvidia.com/blog/expanding-ai-storage-access-with-nvidia-cuobject-and-the-nvidia-scada-server-sdk/",
+        "published": "2026-09-30T19:13:02+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
-        "title": "Lightning Talks (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-lightning-talks/",
-        "published": "2026-09-30T12:00:10+00:00",
-        "blog": "Python Blog"
+        "title": "Tracing Agent Harness Behavior with NVIDIA NeMo Relay",
+        "link": "https://developer.nvidia.com/blog/tracing-agent-harness-behavior-with-nvidia-nemo-relay/",
+        "published": "2026-09-30T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
-        "title": "PEP 827: Type Manipulation (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-pep-827-type-manipulation/",
-        "published": "2026-09-30T12:00:09+00:00",
-        "blog": "Python Blog"
+        "title": "AI Native by Design: Lessons Learned from Building NVIDIA TensorRT Model Connect",
+        "link": "https://developer.nvidia.com/blog/ai-native-by-design-lessons-learned-from-building-nvidia-tensorrt-model-connect/",
+        "published": "2026-09-29T19:10:51+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
-        "title": "Free-Threaded Python Post-Era (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-free-threading-post-era/",
-        "published": "2026-09-30T12:00:08+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Developer-in-Residence Update & Future (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-developer-in-residence-update-and-future/",
-        "published": "2026-09-30T12:00:07+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Spicycrab (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-spicycrab/",
-        "published": "2026-09-30T12:00:06+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Rust for CPython (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-rust-for-cpython/",
-        "published": "2026-09-30T12:00:05+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Memory Snapshots for CPython (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-memory-snapshots/",
-        "published": "2026-09-30T12:00:04+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Memory Buffer Protocol (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-memory-buffer-protocol/",
-        "published": "2026-09-30T12:00:03+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Garbage Collection: Generational? Incremental? Both! (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-garbage-collection-generational-incremental-both/",
-        "published": "2026-09-30T12:00:02+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "macOS and Python (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-macos-python/",
-        "published": "2026-09-30T12:00:01+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "One namespace to namespace them all (Python Language Summit 2026)",
-        "link": "https://blog.python.org/2026/09/language-summit-2026-namespaces/",
-        "published": "2026-09-30T12:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Lower the Cost of Building and Running Visual AI Agents with NVIDIA VSS Blueprint 3.3",
+        "link": "https://developer.nvidia.com/blog/lower-the-cost-of-building-and-running-visual-ai-agents-with-nvidia-vss-blueprint-3-3/",
+        "published": "2026-09-29T18:35:09+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
         "title": "Hive는 잊으려 했지만, Spark는 기억하고 있었다: 사라진 get_table RPC 복원기",
         "link": "https://d2.naver.com/helloworld/7314597",
-        "published": "2026-09-29T08:39:50+00:00",
+        "published": "2026-09-29T08:39:50Z",
         "blog": "NAVER D2"
     },
     {
-        "title": "The Python documentation is now available in German",
-        "link": "https://blog.python.org/2026/09/python-docs-in-german/",
-        "published": "2026-09-26T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "NVIDIA Open Agent Safety Platform: A Reference for Continuous In-Silicon Agent Monitoring",
+        "link": "https://developer.nvidia.com/blog/nvidia-open-agent-safety-platform-a-reference-for-continuous-in-silicon-agent-monitoring/",
+        "published": "2026-09-28T08:56:55+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
-        "title": "The Python documentation is now available in Persian",
-        "link": "https://blog.python.org/2026/09/the-python-documentation-is-now-available-in-persian/",
-        "published": "2026-09-23T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Add Runtime Controls to AI Agents with NVIDIA OpenShell",
+        "link": "https://developer.nvidia.com/blog/add-runtime-controls-to-ai-agents-with-nvidia-openshell/",
+        "published": "2026-09-28T08:55:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How NVIDIA DSX MaxLPS Maximizes AI Factory Throughput and Efficiency",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-dsx-maxlps-maximizes-ai-factory-throughput-and-efficiency/",
+        "published": "2026-09-28T01:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Improving site performance by shipping more CSS",
+        "link": "https://github.blog/engineering/architecture-optimization/improving-site-performance-by-shipping-more-css/",
+        "published": "2026-09-25T15:00:00+00:00",
+        "blog": "GitHub Engineering"
+    },
+    {
+        "title": "Efficient MoE Training for Biological Foundation Models",
+        "link": "https://developer.nvidia.com/blog/efficient-moe-training-for-biological-foundation-models/",
+        "published": "2026-09-24T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Introducing NV-Reason-CT Open 3D CT VLM for Radiologist Chain-of-Thought Reasoning",
+        "link": "https://developer.nvidia.com/blog/introducing-nv-reason-ct-open-3d-ct-vlm-for-radiologist-chain-of-thought-reasoning/",
+        "published": "2026-09-23T22:54:56+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Validate GPU Cluster Readiness Before AI Workloads Land",
+        "link": "https://developer.nvidia.com/blog/validate-gpu-cluster-readiness-before-ai-workloads-land/",
+        "published": "2026-09-23T19:45:19+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Rendering huge pull requests in the GitHub Copilot app",
+        "link": "https://github.blog/engineering/user-experience/rendering-huge-pull-requests-in-the-github-copilot-app/",
+        "published": "2026-09-23T18:29:49+00:00",
+        "blog": "GitHub Engineering"
+    },
+    {
+        "title": "Manage Kubernetes Node Fleets with NodeWright",
+        "link": "https://developer.nvidia.com/blog/manage-kubernetes-node-fleets-with-nodewright/",
+        "published": "2026-09-23T18:25:49+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How SWE-Serve Exposes the Gap Between Local Tests and Live Serving",
+        "link": "https://developer.nvidia.com/blog/how-swe-serve-exposes-the-gap-between-local-tests-and-live-serving/",
+        "published": "2026-09-23T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Enabling Private High-Performance Production AI Inference with NVIDIA Confidential Computing",
+        "link": "https://developer.nvidia.com/blog/enabling-private-high-performance-production-ai-inference-with-nvidia-confidential-computing/",
+        "published": "2026-09-22T17:27:41+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Topology-Aware Workload Scheduling with NVIDIA Topograph",
+        "link": "https://developer.nvidia.com/blog/topology-aware-workload-scheduling-with-nvidia-topograph/",
+        "published": "2026-09-22T17:16:28+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "What’s New for Game Developers: DLSS 5 with 3D-Guided Neural Rendering, NVIDIA ACE Updates, and New RTX Kit Capabilities",
+        "link": "https://developer.nvidia.com/blog/whats-new-for-game-developers-dlss-5-with-3d-guided-neural-rendering-nvidia-ace-updates-and-new-rtx-kit-capabilities/",
+        "published": "2026-09-22T13:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Accelerating a ROS 2 Node with an AI Agent and NVIDIA Isaac ROS",
+        "link": "https://developer.nvidia.com/blog/accelerating-a-ros-2-node-with-an-ai-agent-and-nvidia-isaac-ros/",
+        "published": "2026-09-22T12:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Simplifying Model Serving Across Multiple GPUs with NVIDIA TensorRT Multi-Device Integration in NVIDIA Dynamo-Triton",
+        "link": "https://developer.nvidia.com/blog/simplifying-model-serving-across-multiple-gpus-with-nvidia-tensorrt-multi-device-integration-in-nvidia-dynamo-triton/",
+        "published": "2026-09-21T21:51:06+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How to Evaluate AI Agents From Tool Calls to Task Completion",
+        "link": "https://developer.nvidia.com/blog/how-to-evaluate-ai-agents-from-tool-calls-to-task-completion/",
+        "published": "2026-09-21T21:05:28+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Turn Your Latest Observations Into Timely Weather Decisions With NVIDIA Earth-2",
+        "link": "https://developer.nvidia.com/blog/turn-your-latest-observations-into-timely-weather-decisions-with-nvidia-earth-2/",
+        "published": "2026-09-21T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Benchmarking LLM Inference at Scale with AIPerf",
+        "link": "https://developer.nvidia.com/blog/benchmarking-llm-inference-at-scale-with-aiperf/",
+        "published": "2026-09-18T19:04:41+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How to Use AI Agents to Prepare 3D Scenes for Simulation",
+        "link": "https://developer.nvidia.com/blog/how-to-use-ai-agents-to-prepare-3d-scenes-for-simulation/",
+        "published": "2026-09-16T23:20:33+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "TensorRT Edge-LLM Completes the MLPerf Edge Agentic Benchmark 6.4x Faster on Jetson AGX Thor",
+        "link": "https://developer.nvidia.com/blog/tensorrt-edge-llm-completes-the-mlperf-edge-agentic-benchmark-6-4x-faster-on-jetson-agx-thor/",
+        "published": "2026-09-16T20:37:07+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Translating CUDA Tile Operations from Python to Rust Using Agentic AI",
+        "link": "https://developer.nvidia.com/blog/translating-cuda-tile-operations-from-python-to-rust-using-agentic-ai/",
+        "published": "2026-09-16T16:28:59+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Dense vs. MoE Models: Active Parameters, Throughput, and When to Choose Each",
+        "link": "https://developer.nvidia.com/blog/dense-vs-moe-models-active-parameters-throughput-and-when-to-choose-each/",
+        "published": "2026-09-15T17:00:11+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How NVIDIA Groq 3 LPX Deterministic Execution Drives Power-Efficient High-Interactivity Inference on NVIDIA Vera Rubin",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-groq-3-lpx-deterministic-execution-drives-power-efficient-high-interactivity-inference-on-nvidia-vera-rubin/",
+        "published": "2026-09-15T16:55:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How NVIDIA NVLink 6 Delivers Multi-Layer Resiliency for AI Factories",
+        "link": "https://developer.nvidia.com/blog/how-nvidia-nvlink-6-delivers-multi-layer-resiliency-for-ai-factories/",
+        "published": "2026-09-15T16:55:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Scaling Federated Learning Across Docker, Kubernetes, and Slurm with NVIDIA FLARE",
+        "link": "https://developer.nvidia.com/blog/scaling-federated-learning-across-docker-kubernetes-and-slurm-with-nvidia-flare/",
+        "published": "2026-09-15T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Accelerating Dropless MoE Training in JAX with NVIDIA Transformer Engine",
+        "link": "https://developer.nvidia.com/blog/accelerating-dropless-moe-training-in-jax-with-nvidia-transformer-engine/",
+        "published": "2026-09-14T16:39:15+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How Full-Stack NIM Optimizations Deliver 2.5x More Users on Nemotron 3 Ultra",
+        "link": "https://developer.nvidia.com/blog/how-full-stack-nim-optimizations-deliver-2-5x-more-users-on-nemotron-3-ultra/",
+        "published": "2026-09-10T16:55:32+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "High-Throughput Structure Prediction with BioNeMo Inference Runtime",
+        "link": "https://developer.nvidia.com/blog/high-throughput-structure-prediction-with-bionemo-inference-runtime/",
+        "published": "2026-09-10T15:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "From Wafer-Out to First Token: Codifying Supply Chain Expertise with Nemotron and Palantir Foundry",
+        "link": "https://developer.nvidia.com/blog/from-wafer-out-to-first-token-codifying-supply-chain-expertise-with-nemotron-and-palantir-foundry/",
+        "published": "2026-09-10T09:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "When to Use Encode-Prefill-Decode Disaggregation to Accelerate Multimodal Model Serving",
+        "link": "https://developer.nvidia.com/blog/when-to-use-encode-prefill-decode-disaggregation-to-accelerate-multimodal-model-serving/",
+        "published": "2026-09-09T20:31:04+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "CUDA Toolkit 13.4 Adds Windows on Arm Support and Greater Control over Shared GPUs",
+        "link": "https://developer.nvidia.com/blog/cuda-toolkit-13-4-adds-windows-on-arm-support-and-greater-control-over-shared-gpus/",
+        "published": "2026-09-09T20:24:12+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "React 19.3",
+        "link": "https://react.dev/blog/2026/09/09/react-19-3",
+        "published": "2026-09-09T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Introducing CUDA Rust: Two Tracks for Writing GPU Kernels",
+        "link": "https://developer.nvidia.com/blog/introducing-cuda-rust-two-tracks-for-writing-gpu-kernels/",
+        "published": "2026-09-08T12:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Building a Memory-Driven Agent with NVIDIA NemoClaw",
+        "link": "https://developer.nvidia.com/blog/building-a-memory-driven-agent-with-nvidia-nemoclaw/",
+        "published": "2026-09-04T18:04:55+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "Frontier Reasoning Reaches the Edge: How to Deploy and Optimize Models on NVIDIA Jetson",
+        "link": "https://developer.nvidia.com/blog/frontier-reasoning-reaches-the-edge-how-to-deploy-and-optimize-models-on-nvidia-jetson/",
+        "published": "2026-09-04T16:21:04+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "How to Carry User Identity Across Federated Kubernetes and AI Platforms",
+        "link": "https://developer.nvidia.com/blog/how-to-carry-user-identity-across-federated-kubernetes-and-ai-platforms/",
+        "published": "2026-09-03T22:36:02+00:00",
+        "blog": "NVIDIA Developer Blog"
+    },
+    {
+        "title": "NVIDIA PAIR Virtual Inference Router Expands Available Compute on Your Local Network",
+        "link": "https://developer.nvidia.com/blog/nvidia-pair-virtual-inference-router-expands-available-compute-on-your-local-network/",
+        "published": "2026-09-03T16:00:00+00:00",
+        "blog": "NVIDIA Developer Blog"
     },
     {
         "title": "FE News 26년 9월 소식을 전해드립니다.",
         "link": "https://d2.naver.com/news/7360495",
-        "published": "2026-09-03T05:29:14+00:00",
+        "published": "2026-09-03T05:29:14Z",
         "blog": "NAVER D2"
+    },
+    {
+        "title": "How we make AI coding more cost efficient without sacrificing task quality",
+        "link": "https://github.blog/ai-and-ml/github-copilot/how-we-make-ai-coding-more-cost-efficient-without-sacrificing-task-quality/",
+        "published": "2026-09-02T18:00:00+00:00",
+        "blog": "GitHub Engineering"
     },
     {
         "title": "[네이버피셜] 네이버 개발자라면 꼭 만나게 됩니다",
         "link": "https://d2.naver.com/news/3092933",
-        "published": "2026-09-02T05:51:41+00:00",
+        "published": "2026-09-02T05:51:41Z",
         "blog": "NAVER D2"
     },
     {
-        "title": "Python 3.15.0 candidate 2 is here!",
-        "link": "https://blog.python.org/2026/09/python-3150-rc2/",
-        "published": "2026-09-01T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Your alt text passes automated checks. That doesn&#8217;t mean it&#8217;s any good.",
+        "link": "https://github.blog/engineering/user-experience/your-alt-text-passes-automated-checks-that-doesnt-mean-its-any-good/",
+        "published": "2026-08-24T20:56:32+00:00",
+        "blog": "GitHub Engineering"
     },
     {
-        "title": "RISC-V is now officially supported by CPython!",
-        "link": "https://blog.python.org/2026/08/riscv-now-officially-supported/",
-        "published": "2026-08-24T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "The Python documentation is now available in Russian!",
-        "link": "https://blog.python.org/2026/08/the-python-documentation-is-now-available-in-russian/",
-        "published": "2026-08-22T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Announcing the Packaging Council Election Candidates for 2026!",
-        "link": "https://blog.python.org/2026/08/2026-packaging-council-nominees/",
-        "published": "2026-08-13T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Python 3.12.14, 3.11.16 and 3.10.21 are now available!",
-        "link": "https://blog.python.org/2026/08/python-31214-31116-31021/",
-        "published": "2026-08-12T00:00:00+00:00",
-        "blog": "Python Blog"
+        "title": "Using the GitHub Copilot SDK for Java",
+        "link": "https://github.blog/engineering/using-the-github-copilot-sdk-for-java/",
+        "published": "2026-08-10T19:30:00+00:00",
+        "blog": "GitHub Engineering"
     },
     {
         "title": "우리 팀만의 vLLM 플러그인 만들기 2편 - 모델 변환부터 배포까지 AI-native로 자동화하기",
         "link": "https://d2.naver.com/helloworld/7337586",
-        "published": "2026-08-10T16:39:52+00:00",
+        "published": "2026-08-10T16:39:52Z",
         "blog": "NAVER D2"
     },
     {
         "title": "우리 팀만의 vLLM 플러그인 만들기 1편 - 검색 AI 모델 서빙 성능 극대화하기",
         "link": "https://d2.naver.com/helloworld/0525182",
-        "published": "2026-08-10T16:39:25+00:00",
+        "published": "2026-08-10T16:39:25Z",
         "blog": "NAVER D2"
     },
     {
         "title": "FE News 26년 8월 소식을 전해드립니다.",
         "link": "https://d2.naver.com/news/1783497",
-        "published": "2026-08-05T14:12:35+00:00",
+        "published": "2026-08-05T14:12:35Z",
         "blog": "NAVER D2"
-    },
-    {
-        "title": "Python 3.14.7 and 3.13.15 are now available!",
-        "link": "https://blog.python.org/2026/08/python-3147-31315/",
-        "published": "2026-08-05T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Python 3.15.0 candidate 1 is here!",
-        "link": "https://blog.python.org/2026/08/python-3150-rc1/",
-        "published": "2026-08-04T00:00:00+00:00",
-        "blog": "Python Blog"
     },
     {
         "title": "[AI 해커톤 후기] AI 해커톤 1위 팀이 AI에게 맡기지 않은 것",
         "link": "https://d2.naver.com/helloworld/4821538",
-        "published": "2026-07-24T15:25:33+00:00",
+        "published": "2026-07-24T15:25:33Z",
         "blog": "NAVER D2"
-    },
-    {
-        "title": "Get Ready: 2026 Python Packaging Council Nominations Opening Soon!",
-        "link": "https://blog.python.org/2026/07/2026-packaging-council-nominations/",
-        "published": "2026-07-23T00:00:00+00:00",
-        "blog": "Python Blog"
     },
     {
         "title": "VictoriaMetrics 운영기 2편 — 장비 증설 없이 리소스 위기를 해결한 3단계 최적화 전략",
         "link": "https://d2.naver.com/helloworld/5788040",
-        "published": "2026-07-21T18:35:44+00:00",
+        "published": "2026-07-21T18:35:44Z",
         "blog": "NAVER D2"
-    },
-    {
-        "title": "Python 3.15.0 beta 4 is here!",
-        "link": "https://blog.python.org/2026/07/python-3150-beta-4/",
-        "published": "2026-07-18T00:00:00+00:00",
-        "blog": "Python Blog"
     },
     {
         "title": "[AI 해커톤 후기] AI 시대의 해커톤과 인간의 역할: AI의 계획과 사람의 전략",
         "link": "https://d2.naver.com/helloworld/1883072",
-        "published": "2026-07-13T12:43:28+00:00",
+        "published": "2026-07-13T12:43:28Z",
         "blog": "NAVER D2"
     },
     {
         "title": "FE News 26년 7월 소식을 전해드립니다.",
         "link": "https://d2.naver.com/news/7560502",
-        "published": "2026-07-08T17:52:20+00:00",
+        "published": "2026-07-08T17:52:20Z",
         "blog": "NAVER D2"
     },
     {
         "title": "[AI 해커톤 후기] 코드와 문서만 읽은 LLM은 어떻게 사람과 같은 팀을 1위로 골랐을까",
         "link": "https://d2.naver.com/helloworld/2541696",
-        "published": "2026-07-06T14:44:16+00:00",
+        "published": "2026-07-06T14:44:16Z",
         "blog": "NAVER D2"
     },
     {
         "title": "AI 에이전트 회사 차리기: 설립부터 어디서든 동기화까지",
         "link": "https://d2.naver.com/helloworld/3897377",
-        "published": "2026-06-30T11:00:48+00:00",
+        "published": "2026-06-30T11:00:48Z",
         "blog": "NAVER D2"
     },
     {
-        "title": "Packaging Council Inaugural Election Dates",
-        "link": "https://blog.python.org/2026/06/2026-packaging-council-election-dates/",
-        "published": "2026-06-28T00:00:00+00:00",
+        "title": "The React Foundation: A New Home for React Hosted by the Linux Foundation",
+        "link": "https://react.dev/blog/2026/02/24/the-react-foundation",
+        "published": "2026-02-24T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Denial of Service and Source Code Exposure in React Server Components",
+        "link": "https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components",
+        "published": "2025-12-11T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Critical Security Vulnerability in React Server Components",
+        "link": "https://react.dev/blog/2025/12/03/critical-security-vulnerability-in-react-server-components",
+        "published": "2025-12-03T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Conf 2025 Recap",
+        "link": "https://react.dev/blog/2025/10/16/react-conf-2025-recap",
+        "published": "2025-10-16T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Compiler v1.0",
+        "link": "https://react.dev/blog/2025/10/07/react-compiler-1",
+        "published": "2025-10-07T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Introducing the React Foundation",
+        "link": "https://react.dev/blog/2025/10/07/introducing-the-react-foundation",
+        "published": "2025-10-07T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React 19.2",
+        "link": "https://react.dev/blog/2025/10/01/react-19-2",
+        "published": "2025-10-01T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Labs: View Transitions, Activity, and more",
+        "link": "https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more",
+        "published": "2025-04-23T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Sunsetting Create React App",
+        "link": "https://react.dev/blog/2025/02/14/sunsetting-create-react-app",
+        "published": "2025-02-14T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React v19",
+        "link": "https://react.dev/blog/2024/12/05/react-19",
+        "published": "2024-12-05T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Compiler Beta Release",
+        "link": "https://react.dev/blog/2024/10/21/react-compiler-beta-release",
+        "published": "2024-10-21T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Conf 2024 Recap",
+        "link": "https://react.dev/blog/2024/05/22/react-conf-2024-recap",
+        "published": "2024-05-22T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React 19 Upgrade Guide",
+        "link": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide",
+        "published": "2024-04-25T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Labs: What We've Been Working On – February 2024",
+        "link": "https://react.dev/blog/2024/02/15/react-labs-what-we-have-been-working-on-february-2024",
+        "published": "2024-02-15T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Canaries: Enabling Incremental Feature Rollout Outside Meta",
+        "link": "https://react.dev/blog/2023/05/03/react-canaries",
+        "published": "2023-05-03T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Labs: What We've Been Working On – March 2023",
+        "link": "https://react.dev/blog/2023/03/22/react-labs-what-we-have-been-working-on-march-2023",
+        "published": "2023-03-22T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Introducing react.dev",
+        "link": "https://react.dev/blog/2023/03/16/introducing-react-dev",
+        "published": "2023-03-16T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Labs: What We've Been Working On – June 2022",
+        "link": "https://react.dev/blog/2022/06/15/react-labs-what-we-have-been-working-on-june-2022",
+        "published": "2022-06-15T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React v18.0",
+        "link": "https://react.dev/blog/2022/03/29/react-v18",
+        "published": "2022-03-08T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "How to Upgrade to React 18",
+        "link": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide",
+        "published": "2022-03-08T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "React Conf 2021 Recap",
+        "link": "https://react.dev/blog/2021/12/17/react-conf-2021-recap",
+        "published": "2021-12-17T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "The Plan for React 18",
+        "link": "https://react.dev/blog/2021/06/08/the-plan-for-react-18",
+        "published": "2021-06-08T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Introducing Zero-Bundle-Size React Server Components",
+        "link": "https://react.dev/blog/2020/12/21/data-fetching-with-react-server-components",
+        "published": "2020-12-21T00:00:00+00:00",
+        "blog": "React Blog"
+    },
+    {
+        "title": "Python Language Summit 2026",
+        "link": "https://blog.python.org/2026/09/language-summit-2026/",
+        "published": "Wed, 30 Sep 2026 12:00:11 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Mitigated API authentication bypass for python.org download metadata",
-        "link": "https://blog.python.org/2026/06/mitigated-api-bypass-for-download-metadata-python-dot-org/",
-        "published": "2026-06-23T00:00:00+00:00",
+        "title": "Lightning Talks (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-lightning-talks/",
+        "published": "Wed, 30 Sep 2026 12:00:10 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.15.0 beta 3 is here!",
-        "link": "https://blog.python.org/2026/06/python-3150-beta-3/",
-        "published": "2026-06-23T00:00:00+00:00",
+        "title": "PEP 827: Type Manipulation (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-pep-827-type-manipulation/",
+        "published": "Wed, 30 Sep 2026 12:00:09 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.14.6 and 3.13.14 are now available!",
-        "link": "https://blog.python.org/2026/06/python-3146-31314/",
-        "published": "2026-06-10T00:00:00+00:00",
+        "title": "Free-Threaded Python Post-Era (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-free-threading-post-era/",
+        "published": "Wed, 30 Sep 2026 12:00:08 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.15.0 beta 2 is here!",
-        "link": "https://blog.python.org/2026/06/python-3150-beta-2/",
-        "published": "2026-06-02T00:00:00+00:00",
+        "title": "Developer-in-Residence Update & Future (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-developer-in-residence-update-and-future/",
+        "published": "Wed, 30 Sep 2026 12:00:07 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.14.5 is out!",
-        "link": "https://blog.python.org/2026/05/python-3145-is-out/",
-        "published": "2026-05-10T00:00:00+00:00",
+        "title": "Spicycrab (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-spicycrab/",
+        "published": "Wed, 30 Sep 2026 12:00:06 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.15.0 beta 1 is here!",
-        "link": "https://blog.python.org/2026/05/python-3150-beta-1/",
-        "published": "2026-05-07T00:00:00+00:00",
+        "title": "Rust for CPython (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-rust-for-cpython/",
+        "published": "Wed, 30 Sep 2026 12:00:05 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.14.5 release candidate",
-        "link": "https://blog.python.org/2026/05/python-3145rc1/",
-        "published": "2026-05-04T00:00:00+00:00",
+        "title": "Memory Snapshots for CPython (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-memory-snapshots/",
+        "published": "Wed, 30 Sep 2026 12:00:04 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Rust for CPython Progress Update April 2026",
-        "link": "https://blog.python.org/2026/04/rust-for-cpython-2026-04/",
-        "published": "2026-04-08T00:00:00+00:00",
+        "title": "Memory Buffer Protocol (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-memory-buffer-protocol/",
+        "published": "Wed, 30 Sep 2026 12:00:03 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.15.0a8, 3.14.4 and 3.13.13 are out!",
-        "link": "https://blog.python.org/2026/04/python-3150a8-3144-31313/",
-        "published": "2026-04-07T00:00:00+00:00",
+        "title": "Garbage Collection: Generational? Incremental? Both! (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-garbage-collection-generational-incremental-both/",
+        "published": "Wed, 30 Sep 2026 12:00:02 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.15's JIT is now back on track",
-        "link": "https://blog.python.org/2026/03/jit-on-track/",
-        "published": "2026-03-23T00:00:00+00:00",
+        "title": "macOS and Python (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-macos-python/",
+        "published": "Wed, 30 Sep 2026 12:00:01 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.15.0 alpha 7",
-        "link": "https://blog.python.org/2026/03/python-3150-alpha-7/",
-        "published": "2026-03-10T00:00:00+00:00",
+        "title": "One namespace to namespace them all (Python Language Summit 2026)",
+        "link": "https://blog.python.org/2026/09/language-summit-2026-namespaces/",
+        "published": "Wed, 30 Sep 2026 12:00:00 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "CPython: 36 Years of Source Code",
-        "link": "https://blog.python.org/2026/03/cpython-codebase-growth/",
-        "published": "2026-03-08T00:00:00+00:00",
+        "title": "The Python documentation is now available in Persian",
+        "link": "https://blog.python.org/2026/09/the-python-documentation-is-now-available-in-persian/",
+        "published": "Wed, 23 Sep 2026 00:00:00 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.12.13, 3.11.15 and 3.10.20 are now available!",
-        "link": "https://blog.python.org/2026/03/python-31213-31115-31020/",
-        "published": "2026-03-03T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "The Python Insider Blog Has Moved!",
-        "link": "https://blog.python.org/2026/03/the-python-insider-blog-has-moved/",
-        "published": "2026-03-03T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Join the Python Security Response Team!",
-        "link": "https://blog.python.org/2026/02/join-the-python-security-response-team/",
-        "published": "2026-02-17T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Python 3.15.0 alpha 6",
-        "link": "https://blog.python.org/2026/02/python-3150-alpha-6/",
-        "published": "2026-02-11T00:00:00+00:00",
-        "blog": "Python Blog"
-    },
-    {
-        "title": "Python 3.14.3 and 3.13.12 are now available!",
-        "link": "https://blog.python.org/2026/02/python-3143-and-31312-are-now-available/",
-        "published": "2026-02-03T00:00:00+00:00",
+        "title": "Python 3.15.1, 3.14.9 and 3.13.17 are out",
+        "link": "https://blog.python.org/2026/10/python-3151-3149-31317/",
+        "published": "Wed, 21 Oct 2026 00:00:00 GMT",
         "blog": "Python Blog"
     },
     {
         "title": "Python 3.15.0 alpha 5 (yes, another alpha!)",
         "link": "https://blog.python.org/2026/01/python-3150-alpha-5-yes-another-alpha/",
-        "published": "2026-01-14T00:00:00+00:00",
+        "published": "Wed, 14 Jan 2026 00:00:00 GMT",
         "blog": "Python Blog"
     },
     {
-        "title": "Python 3.15.0 alpha 4",
-        "link": "https://blog.python.org/2026/01/python-3150-alpha-4/",
-        "published": "2026-01-13T00:00:00+00:00",
+        "title": "Python 3.12.14, 3.11.16 and 3.10.21 are now available!",
+        "link": "https://blog.python.org/2026/08/python-31214-31116-31021/",
+        "published": "Wed, 12 Aug 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 6",
+        "link": "https://blog.python.org/2026/02/python-3150-alpha-6/",
+        "published": "Wed, 11 Feb 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.6 and 3.13.14 are now available!",
+        "link": "https://blog.python.org/2026/06/python-3146-31314/",
+        "published": "Wed, 10 Jun 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Rust for CPython Progress Update April 2026",
+        "link": "https://blog.python.org/2026/04/rust-for-cpython-2026-04/",
+        "published": "Wed, 08 Apr 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.7 and 3.13.15 are now available!",
+        "link": "https://blog.python.org/2026/08/python-3147-31315/",
+        "published": "Wed, 05 Aug 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Mitigated API authentication bypass for python.org download metadata",
+        "link": "https://blog.python.org/2026/06/mitigated-api-bypass-for-download-metadata-python-dot-org/",
+        "published": "Tue, 23 Jun 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 beta 3 is here!",
+        "link": "https://blog.python.org/2026/06/python-3150-beta-3/",
+        "published": "Tue, 23 Jun 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Join the Python Security Response Team!",
+        "link": "https://blog.python.org/2026/02/join-the-python-security-response-team/",
+        "published": "Tue, 17 Feb 2026 00:00:00 GMT",
         "blog": "Python Blog"
     },
     {
         "title": "Python 3.15.0 alpha 3",
         "link": "https://blog.python.org/2025/12/python-3150-alpha-3/",
-        "published": "2025-12-16T00:00:00+00:00",
+        "published": "Tue, 16 Dec 2025 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.16.0 alpha 1 is now available",
+        "link": "https://blog.python.org/2026/10/python-3160-alpha-1-is-now-available/",
+        "published": "Tue, 13 Oct 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 4",
+        "link": "https://blog.python.org/2026/01/python-3150-alpha-4/",
+        "published": "Tue, 13 Jan 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 alpha 7",
+        "link": "https://blog.python.org/2026/03/python-3150-alpha-7/",
+        "published": "Tue, 10 Mar 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0a8, 3.14.4 and 3.13.13 are out!",
+        "link": "https://blog.python.org/2026/04/python-3150a8-3144-31313/",
+        "published": "Tue, 07 Apr 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 candidate 1 is here!",
+        "link": "https://blog.python.org/2026/08/python-3150-rc1/",
+        "published": "Tue, 04 Aug 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.12.13, 3.11.15 and 3.10.20 are now available!",
+        "link": "https://blog.python.org/2026/03/python-31213-31115-31020/",
+        "published": "Tue, 03 Mar 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "The Python Insider Blog Has Moved!",
+        "link": "https://blog.python.org/2026/03/the-python-insider-blog-has-moved/",
+        "published": "Tue, 03 Mar 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.3 and 3.13.12 are now available!",
+        "link": "https://blog.python.org/2026/02/python-3143-and-31312-are-now-available/",
+        "published": "Tue, 03 Feb 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 beta 2 is here!",
+        "link": "https://blog.python.org/2026/06/python-3150-beta-2/",
+        "published": "Tue, 02 Jun 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 candidate 2 is here!",
+        "link": "https://blog.python.org/2026/09/python-3150-rc2/",
+        "published": "Tue, 01 Sep 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Get Ready: 2026 Python Packaging Council Nominations Opening Soon!",
+        "link": "https://blog.python.org/2026/07/2026-packaging-council-nominations/",
+        "published": "Thu, 23 Jul 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Announcing the Packaging Council Election Candidates for 2026!",
+        "link": "https://blog.python.org/2026/08/2026-packaging-council-nominees/",
+        "published": "Thu, 13 Aug 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 beta 1 is here!",
+        "link": "https://blog.python.org/2026/05/python-3150-beta-1/",
+        "published": "Thu, 07 May 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.10.22, 3.11.17, 3.12.15, 3.13.16 and 3.14.8 are now available!",
+        "link": "https://blog.python.org/2026/10/python-31022-31117/",
+        "published": "Thu, 01 Oct 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Packaging Council Inaugural Election Dates",
+        "link": "https://blog.python.org/2026/06/2026-packaging-council-election-dates/",
+        "published": "Sun, 28 Jun 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.5 is out!",
+        "link": "https://blog.python.org/2026/05/python-3145-is-out/",
+        "published": "Sun, 10 May 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "CPython: 36 Years of Source Code",
+        "link": "https://blog.python.org/2026/03/cpython-codebase-growth/",
+        "published": "Sun, 08 Mar 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "The Python documentation is now available in German",
+        "link": "https://blog.python.org/2026/09/python-docs-in-german/",
+        "published": "Sat, 26 Sep 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "The Python documentation is now available in Russian!",
+        "link": "https://blog.python.org/2026/08/the-python-documentation-is-now-available-in-russian/",
+        "published": "Sat, 22 Aug 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 beta 4 is here!",
+        "link": "https://blog.python.org/2026/07/python-3150-beta-4/",
+        "published": "Sat, 18 Jul 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.2, 3.14.10, 3.13.18, 3.12.16 and 3.11.18 are out",
+        "link": "https://blog.python.org/2026/10/python-3152-31410-31318-31216-31118/",
+        "published": "Mon, 26 Oct 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "RISC-V is now officially supported by CPython!",
+        "link": "https://blog.python.org/2026/08/riscv-now-officially-supported/",
+        "published": "Mon, 24 Aug 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15's JIT is now back on track",
+        "link": "https://blog.python.org/2026/03/jit-on-track/",
+        "published": "Mon, 23 Mar 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.14.5 release candidate",
+        "link": "https://blog.python.org/2026/05/python-3145rc1/",
+        "published": "Mon, 04 May 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 (final) is here!",
+        "link": "https://blog.python.org/2026/10/python-3150-final-is-here/",
+        "published": "Fri, 09 Oct 2026 00:00:00 GMT",
+        "blog": "Python Blog"
+    },
+    {
+        "title": "Python 3.15.0 candidate 3 is here!",
+        "link": "https://blog.python.org/2026/10/python-3150-rc3/",
+        "published": "Fri, 02 Oct 2026 00:00:00 GMT",
         "blog": "Python Blog"
     }
 ]
