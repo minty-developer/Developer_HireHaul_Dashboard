@@ -10,6 +10,7 @@ from .config import load_config
 from .db import connect, init_db
 from .logging_config import configure_logging
 from .maintenance import backup_database, prune_backups, restore_database
+from .rss_import import RssImportError, import_rss_files
 
 
 @click.group()
@@ -26,6 +27,26 @@ def cli(ctx: click.Context) -> None:
 
 
 pass_config = click.make_pass_decorator(dict)
+
+
+@cli.command("import-rss")
+@click.argument("blogs_json", type=click.Path(exists=True, dir_okay=False))
+@click.argument("posts_json", type=click.Path(exists=True, dir_okay=False))
+@pass_config
+def import_rss_command(config: dict, blogs_json: str, posts_json: str) -> None:
+    """RSS 수집기가 만든 blogs.json·posts.json을 DB에 넣는다. 여러 번 실행해도 안전하다."""
+    try:
+        result = import_rss_files(config["DATABASE_PATH"], blogs_json, posts_json)
+    except RssImportError as error:
+        raise click.ClickException(str(error)) from None
+    click.echo(
+        f"블로그 {result['blogs']}개, 새 글 {result['new']}개, "
+        f"이미 있던 글 {result['existing']}개를 반영했습니다."
+    )
+    if result["invalid"]:
+        click.echo(f"제목이나 링크가 없어 건너뛴 글: {result['invalid']}개")
+    if result["unknown_blogs"]:
+        click.echo("blogs.json에 없는 블로그라 건너뛴 글의 블로그: " + ", ".join(result["unknown_blogs"]))
 
 
 @cli.command("prune-auth-tokens")
