@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8fafc">
+    <title>비밀번호 재설정 — FEED</title>
+    <link rel="stylesheet" href="../../CSS/account-flow.css">
+</head>
+<body>
+    <header><a class="brand" href="../index.html" aria-label="FEED 홈"><span class="brandMark">T<span>/</span></span><strong>FEED<span class="brandDot">.</span></strong></a></header>
+    <main>
+        <section class="flowCard" aria-labelledby="flowTitle">
+            <p class="eyebrow">PASSWORD RESET</p>
+            <h1 id="flowTitle">새 비밀번호 설정</h1>
+            <form id="resetForm" class="flowForm">
+                <label for="newPassword">새 비밀번호</label>
+                <input id="newPassword" type="password" required minlength="8" maxlength="128" autocomplete="new-password">
+                <label for="confirmPassword">새 비밀번호 확인</label>
+                <input id="confirmPassword" type="password" required minlength="8" maxlength="128" autocomplete="new-password">
+                <p id="flowMessage" class="flowMessage" role="status" aria-live="polite"></p>
+                <button id="resetSubmit" class="solidAction" type="submit">비밀번호 저장</button>
+            </form>
+            <a id="returnLink" class="flowLink" href="../index.html">로그인으로 돌아가기</a>
+        </section>
+    </main>
+    <script src="../../JS/config.js"></script>
+    <script src="../../JS/reset-password.js"></script>
+</body>
+</html>

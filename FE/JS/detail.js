@@ -1,7 +1,6 @@
 'use strict';
 
-// Set this to the API origin when the service is hosted separately.
-const API_BASE_URL = 'https://developer-hirehaul-dashboard.onrender.com';
+const API_BASE_URL = window.FEED_API_BASE_URL || 'http://127.0.0.1:5000';
 const PAGE_SIZE = 20;
 const REQUEST_TIMEOUT_MS = 30000;
 const $ = (id) => document.getElementById(id);
@@ -31,7 +30,11 @@ async function request(path) {
             try { payload = JSON.parse(text); }
             catch { payload = { message: text }; }
         }
-        if (!response.ok) throw new Error(payload?.message || payload?.error || `요청에 실패했습니다. (${response.status})`);
+        if (!response.ok || payload?.ok === false) {
+            const error = new Error(payload?.error || payload?.message || `요청에 실패했습니다. (${response.status})`);
+            error.status = response.status;
+            throw error;
+        }
         return payload;
     } finally { clearTimeout(timeout); }
 }
@@ -47,7 +50,7 @@ function showBlogError(message) {
 function formatDate(value) {
     if (!value) return '';
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? String(value) : new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium' }).format(date);
+    return Number.isNaN(date.getTime()) ? String(value) : new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium', timeZone: 'Asia/Seoul' }).format(date);
 }
 
 function setExternalLink(element, value) {
@@ -126,7 +129,7 @@ function makeArticle(article) {
         summary.textContent = article.summary;
         item.append(summary);
     }
-    const metadata = [article.author, formatDate(article.published_at)].filter(Boolean).join(' · ');
+    const metadata = [article.author, formatDate(article.published_at || article.fetched_at)].filter(Boolean).join(' · ');
     if (metadata) {
         const meta = document.createElement('p');
         meta.className = 'articleMeta';
