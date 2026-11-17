@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Tech Blog Aggregator API",
-    "description": "국내 IT 기업 기술 블로그 RSS 수집·검색·키워드 구독 API",
+    "description": "국내 IT 기업 기술 블로그 검색·키워드 구독 API",
     "version": "2.0.0"
   },
   "paths": {
@@ -1172,95 +1172,6 @@
         }
       }
     },
-    "/api/admin/sync": {
-      "post": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "활성 블로그 전체 수집",
-        "operationId": "sync_all_blogs_api_admin_sync_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "401": {
-            "description": "관리자 인증 실패",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "APIKeyHeader": []
-          }
-        ]
-      }
-    },
-    "/api/admin/sync/{blog_id}": {
-      "post": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "특정 블로그 수집",
-        "operationId": "sync_one_blog_api_admin_sync__blog_id__post",
-        "security": [
-          {
-            "APIKeyHeader": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "blog_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Blog Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "400": {
-            "description": "입력값 오류",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "관리자 인증 실패",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/admin/status": {
       "get": {
         "tags": [
@@ -1293,25 +1204,6 @@
             "APIKeyHeader": []
           }
         ]
-      }
-    },
-    "/api/discord/interactions": {
-      "post": {
-        "tags": [
-          "discord"
-        ],
-        "summary": "Discord Slash Command 수신",
-        "operationId": "discord_interactions_api_discord_interactions_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
       }
     }
   },

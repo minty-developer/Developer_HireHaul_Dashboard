@@ -7,8 +7,9 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app import create_app
-from app.db import MIGRATIONS, connect, upsert_articles, upsert_blog
+from app.db import MIGRATIONS, connect, upsert_blog
 from app.security import hash_password, verify_password
+from tests.helpers import insert_articles
 
 
 def article(blog_id, key, title, summary="", content="", published="2026-10-01"):
@@ -43,7 +44,7 @@ class ArticleSearchTest(unittest.TestCase):
             "name": "NAVER D2", "company": "네이버",
             "feed_url": "https://naver.example/feed", "site_url": "https://naver.example",
         })
-        upsert_articles(self.database_path, [
+        insert_articles(self.database_path, [
             article(self.kakao, "k1", "쿠버네티스 운영 가이드", "클러스터 모니터링", published="2026-10-03"),
             article(self.kakao, "k2", "Kafka 이벤트 처리", "쿠버네티스 위에서 Kafka 운영", published="2026-10-04"),
             article(self.naver, "n1", "검색 엔진 개선기", "형태소 분석과 색인", published="2026-10-02"),
@@ -99,9 +100,11 @@ class ArticleSearchTest(unittest.TestCase):
         )
 
     def test_index_follows_updates_and_deletes(self):
-        upsert_articles(self.database_path, [
-            article(self.kakao, "k1", "서비스 메시 도입기", "Istio 적용", published="2026-10-03"),
-        ])
+        with connect(self.database_path) as db:
+            db.execute(
+                "UPDATE articles SET title = ?, summary = ? WHERE entry_key = 'k1'",
+                ("서비스 메시 도입기", "Istio 적용"),
+            )
         self.assertEqual(self.search("q=서비스 메시"), ["서비스 메시 도입기"])
         self.assertEqual(self.search("q=쿠버네티스"), ["Kafka 이벤트 처리"])
         with connect(self.database_path) as db:
@@ -126,13 +129,13 @@ class MigrationCompatibilityTest(unittest.TestCase):
     def test_existing_articles_are_indexed_when_upgrading(self):
         with tempfile.TemporaryDirectory() as temp:
             path = str(Path(temp) / "old.db")
-            # 7번 마이그레이션까지 적용된 기존 Flask 시절 DB를 만든다.
+            # 8번(전문 검색) 이전 마이그레이션까지 적용된 기존 Flask 시절 DB를 만든다.
             with sqlite3.connect(path) as db:
                 db.execute(
                     "CREATE TABLE schema_migrations (version INTEGER PRIMARY KEY,"
                     " name TEXT NOT NULL, applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)"
                 )
-                for version, name, sql in MIGRATIONS[:7]:
+                for version, name, sql in [m for m in MIGRATIONS if m[0] < 8]:
                     db.executescript(sql)
                     db.execute("INSERT INTO schema_migrations (version, name) VALUES (?, ?)",
                                (version, name))

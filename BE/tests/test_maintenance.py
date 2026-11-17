@@ -1,11 +1,10 @@
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
 
 from app import create_app
 from app.db import connect
-from app.maintenance import backup_database, restore_database, run_scheduler
+from app.maintenance import backup_database, restore_database
 
 
 class MaintenanceTest(unittest.TestCase):
@@ -39,23 +38,6 @@ class MaintenanceTest(unittest.TestCase):
             count = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
         self.assertEqual(count, 1)
 
-    @patch("app.maintenance.time.sleep", side_effect=StopIteration)
-    def test_scheduler_collects_and_creates_backup(self, _sleep):
-        collect = Mock(return_value={"failed": 0})
-        report = Mock()
-        with self.assertRaises(StopIteration):
-            run_scheduler(
-                collect,
-                self.database_path,
-                self.backup_directory,
-                interval_seconds=60,
-                timeout=5,
-                retention_days=14,
-                on_result=report,
-            )
-        collect.assert_called_once_with(self.database_path, timeout=5)
-        report.assert_called_once_with({"failed": 0})
-        self.assertEqual(len(list(Path(self.backup_directory).glob("*.db"))), 1)
 
 
 if __name__ == "__main__":
