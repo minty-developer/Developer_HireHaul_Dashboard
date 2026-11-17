@@ -8,8 +8,8 @@ FastAPI와 SQLite 기반 기술 블로그 서비스의 백엔드(API·검색·DB
 
 | 담당 | 범위 | 이 폴더에 있는가 |
 | --- | --- | --- |
-| 2번 백엔드 | FastAPI, API, 검색, DB 구조·연결, 회원, 키워드 구독 API | 있음 |
-| 3번 RSS 수집 | RSS 자동 수집, 파싱, 중복 제거, `blogs`·`articles`에 데이터 저장 | 없음 (3번이 작성) |
+| 2번 백엔드 | FastAPI, API, 검색, DB 구조·연결(수집 결과 가져오기 포함), 회원, 키워드 구독 API | 있음 |
+| 3번 RSS 수집 | RSS 자동 수집, 파싱, 중복 제거, JSON 저장 | 없음 (`rss-collector/`, 3번이 작성) |
 | 4번 알림·배포 | Discord 알림 발송, 스케줄링, Docker | 없음 (4번이 작성) |
 
 ## 데이터 구조
@@ -22,22 +22,34 @@ FastAPI와 SQLite 기반 기술 블로그 서비스의 백엔드(API·검색·DB
 
 테이블은 서버를 띄우거나 `python -m app.cli`를 실행할 때 `app/db.py`의 마이그레이션으로 만들어집니다.
 
-## 3번(RSS 수집)이 DB에 글을 넣는 규칙
+## RSS 수집 결과를 DB에 넣기 (3번 → 2번)
 
-- **DB 연결:** SQLite 파일 `DATABASE_PATH`(기본 `data/tech_blog.db`)를 씁니다. `from app.db import connect`로 같은 연결 설정(외래키 켜짐, busy timeout)을 쓸 수 있습니다.
-- **블로그 등록:** 관리자 API `POST /api/admin/blogs`를 쓰거나 `blogs`에 직접 넣습니다. `feed_url`은 중복될 수 없습니다.
-- **수집할 블로그:** `active = 1`인 블로그만 수집합니다.
-- **글 저장:** `articles` 필수 컬럼은 `blog_id`, `entry_key`, `title`, `url`, `fetched_at`입니다.
-  - `author`, `summary`, `content`는 선택이며, HTML 태그를 뺀 텍스트로 넣어 주세요.
-  - `published_at`, `fetched_at` 같은 시각은 UTC ISO 8601 문자열(예: `2026-10-05T01:00:00+00:00`)로 통일해 주세요. 목록 정렬과 기간 검색이 이 문자열을 그대로 씁니다.
-- **중복:** `(blog_id, entry_key)`가 UNIQUE라 같은 글을 두 번 INSERT 하면 오류가 납니다. 갱신할지 건너뛸지는 3번이 정합니다(`ON CONFLICT ... DO UPDATE` 또는 `DO NOTHING`).
-- **검색 색인:** 트리거가 자동으로 처리하므로 따로 할 일이 없습니다.
-- **수집 상태:** 수집할 때마다 `blogs`의 `last_checked_at`, `last_success_at`, `last_error`를 갱신해 주세요. `GET /api/blogs`와 `GET /api/admin/status`가 이 값을 보여줍니다.
+3번의 수집기(`rss-collector/`)는 결과를 JSON 파일로 저장하고, 백엔드가 그 파일을 DB로 가져옵니다.
+
+```powershell
+.venv\Scripts\python.exe -m app.cli import-rss ..\rss-collector\blogs.json ..\rss-collector\posts.json
+```
+
+- **블로그:** `blogs.json`의 `rss_url`을 기준으로 등록·갱신합니다. `enabled: false`이면 비활성으로 들어가 목록과 검색에서 빠집니다.
+- **글:** `posts.json`의 `link`를 중복 기준으로 씁니다. 여러 번 실행해도 같은 글이 두 번 들어가지 않고, 이미 있는 글은 제목·날짜가 갱신됩니다.
+- **날짜:** ISO 8601이든 RSS 형식(`Wed, 30 Sep 2026 12:00:11 GMT`)이든 `2026-09-30T12:00:11+00:00` 형식의 UTC로 바꿔 저장합니다.
+- **검색 색인:** 트리거가 자동으로 맞춥니다.
+
+`app/rss_import.py`가 읽는 필드는 아래와 같습니다. `?`는 있으면 쓰는 선택 필드입니다.
+
+| 파일 | 필드 | 들어가는 곳 |
+| --- | --- | --- |
+| `blogs.json` | `name`, `rss_url`, `enabled?` | `blogs.name`, `feed_url`, `active` |
+| `blogs.json` | `company?`, `site_url?` | 없으면 각각 블로그 이름, RSS 주소의 도메인 |
+| `posts.json` | `title`, `link`, `published`, `blog` | `articles.title`, `url`·`entry_key`, `published_at`, 블로그 연결 |
+| `posts.json` | `summary?`, `content?`, `author?` | 검색 대상. 비어 있으면 제목만 검색됨 |
+
+`posts.json`의 `blog` 값은 `blogs.json`의 `name`과 같아야 합니다. 다르면 그 글은 건너뛰고 블로그 이름을 출력합니다.
 
 ## 4번(알림·배포)과 맞물리는 지점
 
 - **구독 정보:** `subscriptions`에서 `active = 1`이고 `discord_webhook_url`이 있는 행이 알림 대상입니다. `keyword`는 대소문자를 구분하지 않습니다.
-- **알림 시점:** 새 글이 저장된 뒤 알림을 어떻게 실행할지는 3번과 4번이 정합니다. 예: 3번이 새 글 id 목록을 넘겨주기, 또는 4번이 `articles.id`를 기준으로 새 글을 조회하기.
+- **알림 시점:** 4번의 스케줄러가 "3번 수집기 실행 → `import-rss` 실행 → 새 글 알림" 순서로 묶으면 됩니다. 새 글은 `articles.id`나 `created_at`이 지난번보다 큰 행으로 찾을 수 있습니다.
 - **발송 기록 테이블:** 4번이 `app/db.py`의 `MIGRATIONS`에 9번부터 추가합니다. 4·6·7번은 삭제된 예전 마이그레이션이 쓰던 번호라 쓰지 않습니다.
   - 예전 코드로 만든 로컬 DB에는 `webhook_deliveries`, `discord_*` 테이블이 남아 있을 수 있으니, 다른 이름을 쓰거나 로컬 DB를 새로 만드세요.
 - **서버 실행(Docker용):**
