@@ -45,6 +45,36 @@ class TestRSSCollector(unittest.TestCase):
             "2026-10-28T10:00:00+00:00",
         )
 
+    def test_summary_and_author_are_saved_as_plain_text(self):
+        entry = {
+            "title": "테스트 게시글",
+            "link": "https://example.com/post",
+            "summary": "<p>쿠버네티스 <b>운영</b>\n  ​ 가이드</p><img src='x.png'>",
+            "author": " 홍길동 ",
+        }
+
+        result = rss_collector.normalize_post(entry, "Test Blog")
+
+        self.assertEqual(result["summary"], "쿠버네티스 운영 가이드")
+        self.assertEqual(result["author"], "홍길동")
+
+    def test_missing_summary_and_author_become_empty(self):
+        entry = {
+            "title": "테스트 게시글",
+            "link": "https://example.com/post",
+        }
+
+        result = rss_collector.normalize_post(entry, "Test Blog")
+
+        self.assertEqual(result["summary"], "")
+        self.assertEqual(result["author"], "")
+
+    def test_every_blog_has_company(self):
+        blogs = rss_collector.load_blogs()
+
+        self.assertTrue(blogs)
+        self.assertTrue(all(blog.get("company") for blog in blogs))
+
     def test_posts_are_sorted_newest_first(self):
         posts = [
             {"title": "오래된 글", "published": "2026-10-20T00:00:00+00:00"},

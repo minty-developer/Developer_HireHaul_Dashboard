@@ -207,6 +207,20 @@ def normalize_date(entry):
 # 6. 게시글 데이터 정규화
 # ==========================================
 
+def clean_text(value):
+    """RSS 요약의 HTML 태그를 지우고 공백을 하나로 정리한다."""
+
+    if not isinstance(value, str) or not value.strip():
+        return ""
+
+    text = BeautifulSoup(value, "html.parser").get_text(" ")
+
+    # 눈에 안 보이는 폭 없는 공백(U+200B)도 지운다.
+    text = text.replace("​", " ")
+
+    return " ".join(text.split())
+
+
 def normalize_post(entry, blog_name):
 
     title = entry.get("title", "")
@@ -229,6 +243,9 @@ def normalize_post(entry, blog_name):
         "link": link,
         "published": normalize_date(entry_with_blog),
         "blog": blog_name,
+        # 검색과 글 상세 화면에 쓰인다 (RSS 2.0의 description도 feedparser가 summary로 넘겨줌).
+        "summary": clean_text(entry.get("summary")),
+        "author": clean_text(entry.get("author")),
     }
 
 
