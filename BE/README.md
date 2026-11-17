@@ -56,6 +56,7 @@ FastAPI와 SQLite 기반 기술 블로그 서비스의 백엔드(API·검색·DB
   - 실행 명령은 `uvicorn run:app --host 0.0.0.0 --port 5000`입니다.
   - 상태 확인은 `GET /api/health`로 합니다.
   - DB 백업은 `python -m app.cli backup-db`로 합니다.
+  - 지금 Render 배포는 임시 `BE/Dockerfile`로 돌고 있습니다. 빌드 컨텍스트는 저장소 루트이고, 서버가 켜질 때 `import-rss`를 먼저 실행합니다. 4번이 자기 Docker·배포 설정을 만들면 바꿔도 됩니다.
 
 ## 환경변수
 
