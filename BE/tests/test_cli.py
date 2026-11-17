@@ -1,8 +1,6 @@
-import json
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 from click.testing import CliRunner
 
@@ -30,35 +28,6 @@ class CliTest(unittest.TestCase):
 
     def tearDown(self):
         self.temp.cleanup()
-
-    @patch("app.cli.collect_all")
-    def test_collect_feeds_command(self, collect_all_mock):
-        collect_all_mock.return_value = {
-            "total": 1,
-            "succeeded": 1,
-            "failed": 0,
-            "saved": 3,
-            "results": [],
-        }
-        result = self.invoke(["collect-feeds", "--timeout", "5"])
-        self.assertEqual(result.exit_code, 0)
-        self.assertEqual(json.loads(result.output)["saved"], 3)
-        collect_all_mock.assert_called_once_with(
-            self.app.state.config["DATABASE_PATH"], timeout=5, discord_bot_token=""
-        )
-
-    @patch("app.cli.collect_all")
-    def test_collect_feeds_command_fails_when_a_feed_fails(self, collect_all_mock):
-        collect_all_mock.return_value = {
-            "total": 1,
-            "succeeded": 0,
-            "failed": 1,
-            "saved": 0,
-            "results": [],
-        }
-        result = self.invoke(["collect-feeds"])
-        self.assertNotEqual(result.exit_code, 0)
-        self.assertIn("1개 블로그 수집에 실패", result.output)
 
     def test_prunes_expired_auth_tokens(self):
         client = TestClient(self.app)

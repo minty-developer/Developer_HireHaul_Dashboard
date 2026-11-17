@@ -1,3 +1,4 @@
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -5,8 +6,8 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app import create_app
-from app.db import connect, upsert_articles, upsert_blog
-from app.seed_blogs import DEFAULT_BLOGS, seed_default_blogs
+from app.db import connect, upsert_blog
+from tests.helpers import insert_articles
 
 
 class AppTest(unittest.TestCase):
@@ -68,9 +69,7 @@ class AppTest(unittest.TestCase):
             {
                 "blogs", "articles", "users", "auth_tokens", "subscriptions",
                 "schema_migrations", "login_attempts",
-                "auth_action_tokens",
-                "discord_guilds", "discord_subscriptions", "discord_deliveries",
-                "webhook_deliveries",
+                "auth_action_tokens", "articles_fts",
             }.issubset(tables)
         )
         with connect(self.app.state.config["DATABASE_PATH"]) as db:
@@ -80,9 +79,9 @@ class AppTest(unittest.TestCase):
                     "SELECT version FROM schema_migrations ORDER BY version"
                 ).fetchall()
             ]
-        self.assertEqual(versions, [1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(versions, [1, 2, 3, 5, 8])
 
-    def test_blog_and_article_upsert(self):
+    def test_blog_upsert_and_article_unique_key(self):
         database_path = self.app.state.config["DATABASE_PATH"]
         blog_id = upsert_blog(database_path, {
             "name": "Engineering Blog",
@@ -105,19 +104,18 @@ class AppTest(unittest.TestCase):
         }
 
         self.assertEqual(blog_id, same_blog_id)
-        self.assertEqual(upsert_articles(database_path, [article]), 1)
-        self.assertEqual(
-            upsert_articles(database_path, [{**article, "title": "Updated title"}]),
-            1,
-        )
+        insert_articles(database_path, [article])
+        # 같은 블로그의 같은 entry_key는 DB가 중복 저장을 막는다.
+        with self.assertRaises(sqlite3.IntegrityError):
+            insert_articles(database_path, [{**article, "title": "Duplicate"}])
 
         with connect(database_path) as db:
             blog = db.execute("SELECT * FROM blogs").fetchone()
-            saved_article = db.execute("SELECT * FROM articles").fetchone()
+            saved = db.execute("SELECT * FROM articles").fetchall()
 
         self.assertEqual(blog["name"], "Updated Engineering Blog")
-        self.assertEqual(saved_article["title"], "Updated title")
-        self.assertEqual(saved_article["blog_id"], blog_id)
+        self.assertEqual([row["title"] for row in saved], ["First title"])
+        self.assertEqual(saved[0]["blog_id"], blog_id)
 
     def test_deleting_blog_deletes_its_articles(self):
         database_path = self.app.state.config["DATABASE_PATH"]
@@ -127,7 +125,7 @@ class AppTest(unittest.TestCase):
             "feed_url": "https://example.com/feed.xml",
             "site_url": "https://example.com/tech",
         })
-        upsert_articles(database_path, [{
+        insert_articles(database_path, [{
             "blog_id": blog_id,
             "entry_key": "article-1",
             "title": "Article",
@@ -142,18 +140,6 @@ class AppTest(unittest.TestCase):
             count = db.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
 
         self.assertEqual(count, 0)
-
-    def test_seed_default_blogs_is_repeatable(self):
-        database_path = self.app.state.config["DATABASE_PATH"]
-
-        self.assertEqual(seed_default_blogs(database_path), len(DEFAULT_BLOGS))
-        self.assertEqual(seed_default_blogs(database_path), len(DEFAULT_BLOGS))
-
-        with connect(database_path) as db:
-            blogs = db.execute("SELECT * FROM blogs ORDER BY id").fetchall()
-
-        self.assertEqual(len(blogs), len(DEFAULT_BLOGS))
-        self.assertTrue(all(blog["active"] == 1 for blog in blogs))
 
     def test_production_requires_secure_configuration(self):
         with self.assertRaises(RuntimeError):

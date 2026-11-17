@@ -5,7 +5,8 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app import create_app
-from app.db import upsert_articles, upsert_blog
+from app.db import upsert_blog
+from tests.helpers import insert_articles
 
 
 class PublicApiTest(unittest.TestCase):
@@ -26,7 +27,7 @@ class PublicApiTest(unittest.TestCase):
             "feed_url": "https://example.com/feed.xml",
             "site_url": "https://example.com/tech",
         })
-        upsert_articles(self.database_path, [
+        insert_articles(self.database_path, [
             {
                 "blog_id": self.blog_id,
                 "entry_key": "python-article",

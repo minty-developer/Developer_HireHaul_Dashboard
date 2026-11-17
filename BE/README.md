@@ -1,26 +1,59 @@
 # Tech Blog Aggregator Backend
 
-FastAPI와 SQLite 기반의 기술 블로그 RSS 수집 서비스 백엔드입니다.
+FastAPI와 SQLite 기반 기술 블로그 서비스의 백엔드(API·검색·DB)입니다.
 
 서버를 실행한 뒤 `http://127.0.0.1:5000/api/docs`에서 Swagger UI로 모든 API를 바로 호출해 볼 수 있습니다.
 
-RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄러와 Docker 배포 구성을 제공합니다.
+## 담당 범위
+
+| 담당 | 범위 | 이 폴더에 있는가 |
+| --- | --- | --- |
+| 2번 백엔드 | FastAPI, API, 검색, DB 구조·연결, 회원, 키워드 구독 API | 있음 |
+| 3번 RSS 수집 | RSS 자동 수집, 파싱, 중복 제거, `blogs`·`articles`에 데이터 저장 | 없음 (3번이 작성) |
+| 4번 알림·배포 | Discord 알림 발송, 스케줄링, Docker | 없음 (4번이 작성) |
 
 ## 데이터 구조
 
-- `blogs`: 블로그·회사·RSS 주소와 활성 상태, 조건부 요청용 ETag, 최근 수집 상태
-- `articles`: 블로그별 RSS 항목 식별자, 제목, 원문 주소, 작성자, 요약·본문, 게시·수집 시각
-- `articles_fts`: 게시글 제목·요약·본문·작성자의 FTS5(trigram) 전문 검색 색인. 트리거로 `articles`와 자동 동기화
+- `blogs`: 블로그·회사·RSS 주소, 활성 상태, 수집 상태 컬럼(`etag`, `last_modified`, `last_checked_at`, `last_success_at`, `last_error`)
+- `articles`: 블로그별 글 식별자(`entry_key`), 제목, 원문 주소, 작성자, 요약·본문, 게시·수집 시각
+- `articles_fts`: 제목·요약·본문·작성자 전문 검색 색인(FTS5 trigram). `articles`에 넣거나 고치면 트리거가 자동으로 맞춰 줌
+- `users`, `auth_tokens`, `auth_action_tokens`, `login_attempts`: 회원·로그인
+- `subscriptions`: 사용자별 키워드 구독과 Discord 웹훅 주소
 
-게시글은 `blog_id + entry_key` 조합으로 중복 저장을 막습니다. RSS의 GUID를 `entry_key`로 사용하고, GUID가 없다면 원문 URL을 사용합니다.
+테이블은 서버를 띄우거나 `python -m app.cli`를 실행할 때 `app/db.py`의 마이그레이션으로 만들어집니다.
+
+## 3번(RSS 수집)이 DB에 글을 넣는 규칙
+
+- **DB 연결:** SQLite 파일 `DATABASE_PATH`(기본 `data/tech_blog.db`)를 씁니다. `from app.db import connect`로 같은 연결 설정(외래키 켜짐, busy timeout)을 쓸 수 있습니다.
+- **블로그 등록:** 관리자 API `POST /api/admin/blogs`를 쓰거나 `blogs`에 직접 넣습니다. `feed_url`은 중복될 수 없습니다.
+- **수집할 블로그:** `active = 1`인 블로그만 수집합니다.
+- **글 저장:** `articles` 필수 컬럼은 `blog_id`, `entry_key`, `title`, `url`, `fetched_at`입니다.
+  - `author`, `summary`, `content`는 선택이며, HTML 태그를 뺀 텍스트로 넣어 주세요.
+  - `published_at`, `fetched_at` 같은 시각은 UTC ISO 8601 문자열(예: `2026-10-05T01:00:00+00:00`)로 통일해 주세요. 목록 정렬과 기간 검색이 이 문자열을 그대로 씁니다.
+- **중복:** `(blog_id, entry_key)`가 UNIQUE라 같은 글을 두 번 INSERT 하면 오류가 납니다. 갱신할지 건너뛸지는 3번이 정합니다(`ON CONFLICT ... DO UPDATE` 또는 `DO NOTHING`).
+- **검색 색인:** 트리거가 자동으로 처리하므로 따로 할 일이 없습니다.
+- **수집 상태:** 수집할 때마다 `blogs`의 `last_checked_at`, `last_success_at`, `last_error`를 갱신해 주세요. `GET /api/blogs`와 `GET /api/admin/status`가 이 값을 보여줍니다.
+
+## 4번(알림·배포)과 맞물리는 지점
+
+- **구독 정보:** `subscriptions`에서 `active = 1`이고 `discord_webhook_url`이 있는 행이 알림 대상입니다. `keyword`는 대소문자를 구분하지 않습니다.
+- **알림 시점:** 새 글이 저장된 뒤 알림을 어떻게 실행할지는 3번과 4번이 정합니다. 예: 3번이 새 글 id 목록을 넘겨주기, 또는 4번이 `articles.id`를 기준으로 새 글을 조회하기.
+- **발송 기록 테이블:** 4번이 `app/db.py`의 `MIGRATIONS`에 9번부터 추가합니다. 4·6·7번은 삭제된 예전 마이그레이션이 쓰던 번호라 쓰지 않습니다.
+  - 예전 코드로 만든 로컬 DB에는 `webhook_deliveries`, `discord_*` 테이블이 남아 있을 수 있으니, 다른 이름을 쓰거나 로컬 DB를 새로 만드세요.
+- **서버 실행(Docker용):**
+  - 실행 명령은 `uvicorn run:app --host 0.0.0.0 --port 5000`입니다.
+  - 상태 확인은 `GET /api/health`로 합니다.
+  - DB 백업은 `python -m app.cli backup-db`로 합니다.
 
 ## 환경변수
 
 - `APP_ENV`: `development`, `testing`, `production`
 - `SECRET_KEY`: 애플리케이션 비밀키. 운영 환경에서는 안전한 무작위 값 필수
 - `DATABASE_PATH`: SQLite 데이터베이스 경로
-- `ADMIN_API_KEY`: 관리자 수집 API의 `X-API-Key` 값
+- `ADMIN_API_KEY`: 관리자 API의 `X-API-Key` 값
 - `CORS_ORIGINS`: 허용할 프론트엔드 Origin. 여러 개면 쉼표로 구분
+- `BACKUP_DIRECTORY`, `BACKUP_RETENTION_DAYS`: DB 백업 위치와 보관 일수
+- 이메일 발송: `PUBLIC_BASE_URL`, `MAIL_FROM`, `SMTP_*`, `REQUIRE_EMAIL_VERIFICATION`
 
 ## API
 
@@ -29,7 +62,6 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 - `GET /api/docs`: Swagger UI (Authorize 버튼으로 Bearer 토큰·관리자 키 입력)
 - `GET /api/redoc`: ReDoc 문서
 - `GET /api/openapi.json`: OpenAPI 3.1 명세 (FastAPI가 자동 생성)
-- `POST /api/discord/interactions`: Discord Slash Command 수신
 - `GET /api/articles`: 게시글 목록 및 검색
 - `GET /api/articles/{article_id}`: 게시글 상세 조회
 - `GET /api/blogs`: 활성 기술 블로그 목록
@@ -49,13 +81,11 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 - `POST /api/subscriptions`: 키워드 구독 추가
 - `PATCH /api/subscriptions/{subscription_id}`: Discord 웹훅 주소 및 활성 상태 변경
 - `DELETE /api/subscriptions/{subscription_id}`: 키워드 구독 삭제
-- `POST /api/admin/sync`: 활성 블로그 전체 수집
-- `POST /api/admin/sync/{blog_id}`: 특정 블로그 수집
 - `GET /api/admin/blogs`: 전체 블로그 관리 목록
 - `POST /api/admin/blogs`: 블로그 등록
 - `PATCH /api/admin/blogs/{blog_id}`: 블로그 수정·재활성화
 - `DELETE /api/admin/blogs/{blog_id}`: 블로그 비활성화
-- `GET /api/admin/status`: DB·수집 운영 상태
+- `GET /api/admin/status`: DB·수집 상태
 
 ## 검색
 
@@ -70,115 +100,38 @@ RSS 수집·검색, 사용자 키워드 구독, Discord 알림, 운영 스케줄
 | `sort` | `latest`(기본, 최신순) 또는 `relevance`(검색 관련도순) |
 | `limit`, `offset` | 페이지네이션 (`limit` 1~100, 기본 20) |
 
-3글자 이상 단어는 FTS5 trigram 색인으로 찾아 한국어 부분 문자열도 빠르게 검색합니다.
-trigram은 3글자 미만을 색인할 수 없으므로 `AI`, `검색` 같은 1~2글자 단어는 LIKE로 찾습니다.
-관련도는 bm25 점수이며 제목 > 요약 > 작성자 > 본문 순으로 가중치를 둡니다.
-`%`, `_`, `"`, `AND` 같은 문자는 검색 문법이 아닌 일반 글자로 처리합니다.
+- 3글자 이상 단어는 FTS5 trigram 색인으로 찾아서, 한국어 부분 문자열도 빠르게 검색합니다.
+- trigram은 3글자 미만을 색인할 수 없어서, `AI`, `검색` 같은 1~2글자 단어는 LIKE로 찾습니다.
+- 관련도는 bm25 점수이고, 가중치는 제목 > 요약 > 작성자 > 본문 순입니다.
+- `%`, `_`, `"`, `AND` 같은 문자는 검색 문법이 아닌 일반 글자로 처리합니다.
 
 검증 실패는 `400 {"ok": false, "error": "<안내 메시지>"}` 형식으로 응답합니다.
-키워드 구독 생성 시 선택적으로 `discord_webhook_url`을 전달하면, 새로 수집된 글의
-제목·요약·본문에 키워드가 포함될 때 Discord로 한 번만 알림을 보냅니다. 일시적인
-발송 실패는 이후 수집 주기에 최대 3회까지 자동 재시도합니다.
-구독 후 웹훅을 추가하거나 교체할 때는 `PATCH` 본문에 `discord_webhook_url`을
-전달합니다. 알림을 끄려면 `null`을 전달합니다.
-구독을 일시 중지하거나 다시 켜려면 같은 `PATCH` 본문에 `active: false` 또는
-`active: true`를 전달합니다. 두 필드는 한 요청에서 함께 변경할 수 있습니다.
 
-## 테스트
+## 키워드 구독
+
+- 구독을 만들 때 `discord_webhook_url`을 함께 보낼 수 있습니다. Discord 웹훅 주소 형식만 허용합니다.
+  - 실제 알림 발송은 4번 담당 기능입니다.
+- 웹훅을 추가하거나 바꿀 때는 `PATCH` 본문에 `discord_webhook_url`을 보냅니다. `null`을 보내면 알림이 꺼집니다.
+- 구독을 일시정지하거나 다시 켤 때는 `active: false` 또는 `active: true`를 보냅니다. 두 필드는 한 요청에서 함께 바꿀 수 있습니다.
+
+## 실행과 테스트
 
 ```powershell
-uv venv --python 3.13 .venv   # 또는 python -m venv .venv
-uv pip install --python .venv -r requirements-dev.txt
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.venv\Scripts\python.exe run.py   # 개발 모드에서는 코드 변경 시 자동 재시작
 .venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-## 기본 기술 블로그 등록
+## 운영 명령
 
 ```powershell
-.venv\Scripts\python.exe -m app.cli seed-blogs
-```
-
-카카오 Tech, NAVER D2, LY Corporation 한국어 기술 블로그를 중복 없이 등록합니다.
-
-## RSS 수집 실행
-
-모든 관리자 수집 요청에는 `X-API-Key` 헤더가 필요합니다.
-
-```powershell
-$env:ADMIN_API_KEY = "local-admin-key"
-.venv\Scripts\python.exe run.py   # 개발 모드에서는 코드 변경 시 자동 재시작
-```
-
-다른 터미널에서 전체 또는 특정 블로그를 수집할 수 있습니다.
-
-```powershell
-curl.exe -X POST -H "X-API-Key: local-admin-key" http://127.0.0.1:5000/api/admin/sync
-curl.exe -X POST -H "X-API-Key: local-admin-key" http://127.0.0.1:5000/api/admin/sync/1
-```
-
-전체 수집은 한 블로그가 실패해도 나머지 블로그를 계속 처리합니다. 피드 서버가 ETag 또는 Last-Modified를 제공하면 다음 수집부터 조건부 요청에 사용합니다.
-
-작업 스케줄러나 cron에서는 HTTP 요청 대신 CLI를 사용할 수 있습니다.
-
-```powershell
-.venv\Scripts\python.exe -m app.cli collect-feeds
 .venv\Scripts\python.exe -m app.cli prune-auth-tokens
 .venv\Scripts\python.exe -m app.cli prune-login-attempts
 .venv\Scripts\python.exe -m app.cli backup-db
 .venv\Scripts\python.exe -m app.cli restore-db data\backups\tech_blog_YYYYMMDDTHHMMSSZ.db --yes
-.venv\Scripts\python.exe -m app.cli run-scheduler
 ```
 
-`run-scheduler`는 설정된 간격으로 RSS를 수집하고 하루 한 번 DB 백업을 생성합니다.
-복원할 때는 API와 스케줄러를 먼저 중지해야 합니다. Docker Compose에서는 `scheduler`
-서비스가 자동 수집을 담당하며 백업은 SQLite 데이터 볼륨의 `backups` 폴더에 저장됩니다.
+복원할 때는 API 서버를 먼저 멈춰야 합니다.
 
-이메일 인증과 비밀번호 재설정을 실제 발송하려면 `SMTP_HOST`, `SMTP_PORT`,
-`MAIL_FROM`을 설정합니다. 인증을 로그인 필수 조건으로 만들려면
-`REQUIRE_EMAIL_VERIFICATION=true`를 사용합니다.
-
-## Discord 봇
-
-Discord Developer Portal에서 애플리케이션을 만든 뒤 `.env`에 다음 값을 설정합니다.
-
-```env
-DISCORD_APPLICATION_ID=애플리케이션_ID
-DISCORD_PUBLIC_KEY=공개키
-DISCORD_BOT_TOKEN=봇_토큰
-DISCORD_TEST_GUILD_ID=개발용_서버_ID
-```
-
-개발 서버 명령은 즉시 반영되며, `DISCORD_TEST_GUILD_ID`를 비우면 전역 명령으로
-등록됩니다.
-
-```powershell
-.venv\Scripts\python.exe -m app.cli register-discord-commands
-```
-
-Interaction Endpoint URL에는 공개 HTTPS 주소의
-`/api/discord/interactions`를 등록합니다. 봇은 `/알림채널`, `/구독추가`,
-`/구독목록`, `/구독삭제`, `/최신글`, `/검색` 명령을 제공합니다. 새 게시글이
-Discord 구독 키워드와 일치하면 설정된 채널로 한 번만 전송합니다.
-일시적인 채널 전송 실패는 이후 수집 주기에 최대 3회까지 자동 재시도합니다.
-
-## Docker 실행
-
-저장소 루트에서 다음 명령을 실행합니다.
-
-```powershell
-docker compose up --build -d
-docker compose exec backend python -m app.cli seed-blogs
-docker compose exec backend python -m app.cli collect-feeds
-```
-
-API는 기본적으로 `http://127.0.0.1:5000`에서 열립니다. SQLite 데이터는
-`backend_data` 볼륨에 보존됩니다. 운영 환경에서는 `APP_ENV=production`과 함께
-안전한 `SECRET_KEY`, `ADMIN_API_KEY`, 실제 `CORS_ORIGINS`를 반드시 설정해야 합니다.
-
-## 배포 초기화 확인
-
-새 데이터베이스로 배포하면 블로그와 게시글 목록은 비어 있습니다. 배포 환경의
-영구 저장소에 `DATABASE_PATH`를 연결한 뒤 `python -m app.cli seed-blogs`와
-`python -m app.cli collect-feeds`를 한 번 실행합니다. 이후 `python -m app.cli run-scheduler`를 별도
-프로세스로 실행해야 주기적 수집과 백업이 계속됩니다. 공개 API의
-`/api/blogs`, `/api/articles`에서 데이터가 반환되는지 확인합니다.
+이메일 인증과 비밀번호 재설정 메일을 실제로 보내려면 `SMTP_HOST`, `SMTP_PORT`, `MAIL_FROM`을 설정합니다. 이메일 인증을 로그인 필수 조건으로 만들려면 `REQUIRE_EMAIL_VERIFICATION=true`를 씁니다.

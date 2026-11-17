@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import sqlite3
-import time
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -50,25 +49,3 @@ def prune_backups(backup_directory: str, retention_days: int) -> int:
             path.unlink()
             removed += 1
     return removed
-
-
-def run_scheduler(
-    collect,
-    database_path: str,
-    backup_directory: str,
-    interval_seconds: int,
-    timeout: int,
-    retention_days: int = 14,
-    on_result=None,
-) -> None:
-    last_backup_date = None
-    while True:
-        today = datetime.now(timezone.utc).date()
-        if last_backup_date != today:
-            backup_database(database_path, backup_directory)
-            prune_backups(backup_directory, retention_days)
-            last_backup_date = today
-        result = collect(database_path, timeout=timeout)
-        if on_result:
-            on_result(result)
-        time.sleep(interval_seconds)

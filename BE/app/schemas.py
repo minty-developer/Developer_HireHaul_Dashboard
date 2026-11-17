@@ -5,11 +5,9 @@
 """
 from __future__ import annotations
 
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 
 from pydantic import BaseModel, ConfigDict, StrictBool, field_validator
-
-from .discord_webhook import valid_discord_webhook_url
 
 
 def _password(value: str, label: str = "비밀번호") -> str:
@@ -23,6 +21,29 @@ def _display_name(value: str) -> str:
     if not 1 <= len(value) <= 50:
         raise ValueError("표시 이름은 1~50자여야 합니다.")
     return value
+
+
+def valid_discord_webhook_url(value: str) -> bool:
+    """Discord의 HTTPS 웹훅 주소(https://discord.com/api/webhooks/<id>/<token>)만 허용한다."""
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port
+    except ValueError:
+        return False
+    segments = parsed.path.split("/")
+    return (
+        parsed.scheme == "https"
+        and parsed.hostname in {"discord.com", "discordapp.com"}
+        and port in (None, 443)
+        and len(segments) == 5
+        and segments[:3] == ["", "api", "webhooks"]
+        and segments[3].isdigit()
+        and bool(segments[4])
+        and parsed.username is None
+        and parsed.password is None
+        and not parsed.query
+        and not parsed.fragment
+    )
 
 
 def _webhook_url(value: str | None) -> str | None:
@@ -192,6 +213,60 @@ class BlogUpdateRequest(_BlogFields):
 
 
 # ---------- 응답 ----------
+
+class ErrorResponse(BaseModel):
+    """모든 에러 응답 형식. 일부 API는 `ok: false`를 함께 보낸다."""
+
+    error: str
+    ok: bool | None = None
+
+
+class MessageResponse(BaseModel):
+    message: str
+
+
+class HealthResponse(BaseModel):
+    status: str
+    database: str
+
+
+class UserPublic(BaseModel):
+    id: int
+    email: str
+    display_name: str
+    email_verified: int  # SQLite 값 그대로 1 또는 0
+    created_at: str
+
+
+class UserResponse(BaseModel):
+    user: UserPublic
+
+
+class RegisterResponse(UserResponse):
+    verification_sent: bool
+
+
+class LoginResponse(UserResponse):
+    token: str
+    expires_at: str
+
+
+class Subscription(BaseModel):
+    id: int
+    keyword: str
+    discord_webhook_url: str | None
+    active: int  # SQLite 값 그대로 1 또는 0
+    created_at: str
+    updated_at: str
+
+
+class SubscriptionResponse(BaseModel):
+    subscription: Subscription
+
+
+class SubscriptionListResponse(BaseModel):
+    subscriptions: list[Subscription]
+
 
 class ArticleSummary(BaseModel):
     model_config = ConfigDict(extra="allow")

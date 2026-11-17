@@ -123,74 +123,9 @@ CREATE INDEX idx_auth_action_tokens_expires
 ON auth_action_tokens(expires_at);
 """
 
-DISCORD_SCHEMA = """
-CREATE TABLE discord_guilds (
-    guild_id TEXT PRIMARY KEY,
-    name TEXT NOT NULL DEFAULT '',
-    channel_id TEXT,
-    configured_by TEXT,
-    active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE discord_subscriptions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    guild_id TEXT NOT NULL,
-    channel_id TEXT NOT NULL,
-    keyword TEXT NOT NULL COLLATE NOCASE,
-    created_by TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (guild_id) REFERENCES discord_guilds(guild_id) ON DELETE CASCADE,
-    UNIQUE (guild_id, channel_id, keyword)
-);
-
-CREATE TABLE discord_deliveries (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    subscription_id INTEGER NOT NULL,
-    article_id INTEGER NOT NULL,
-    status TEXT NOT NULL CHECK (status IN ('pending', 'sent', 'failed')),
-    error TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    sent_at TEXT,
-    FOREIGN KEY (subscription_id) REFERENCES discord_subscriptions(id) ON DELETE CASCADE,
-    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
-    UNIQUE (subscription_id, article_id)
-);
-
-CREATE INDEX idx_discord_subscriptions_guild
-ON discord_subscriptions(guild_id, channel_id);
-
-CREATE INDEX idx_discord_deliveries_status
-ON discord_deliveries(status, created_at);
-"""
-
+# 알림 발송 기록 테이블은 알림 담당(4번)이 자체 마이그레이션으로 추가한다.
 WEBHOOK_SCHEMA = """
 ALTER TABLE subscriptions ADD COLUMN discord_webhook_url TEXT;
-
-CREATE TABLE webhook_deliveries (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    subscription_id INTEGER NOT NULL,
-    article_id INTEGER NOT NULL,
-    status TEXT NOT NULL CHECK (status IN ('pending', 'sent', 'failed')),
-    error TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    sent_at TEXT,
-    FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE CASCADE,
-    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
-    UNIQUE (subscription_id, article_id)
-);
-
-CREATE INDEX idx_webhook_deliveries_status
-ON webhook_deliveries(status, created_at);
-"""
-
-WEBHOOK_RETRY_SCHEMA = """
-ALTER TABLE webhook_deliveries ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0;
-"""
-
-DISCORD_RETRY_SCHEMA = """
-ALTER TABLE discord_deliveries ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0;
 """
 
 # trigram 토크나이저는 한국어처럼 띄어쓰기만으로 단어를 나누기 어려운 텍스트에서도
@@ -226,10 +161,9 @@ MIGRATIONS = (
     (1, "initial_schema", SCHEMA),
     (2, "login_attempts", LOGIN_ATTEMPTS_SCHEMA),
     (3, "email_auth", EMAIL_AUTH_SCHEMA),
-    (4, "discord_bot", DISCORD_SCHEMA),
+    # 4, 6, 7번은 삭제된 Discord 봇·발송 기록 마이그레이션이 쓰던 번호라 비워 둔다.
+    # 새 마이그레이션은 9번부터 쓴다.
     (5, "subscription_webhooks", WEBHOOK_SCHEMA),
-    (6, "webhook_delivery_retries", WEBHOOK_RETRY_SCHEMA),
-    (7, "discord_delivery_retries", DISCORD_RETRY_SCHEMA),
     (8, "article_full_text_search", ARTICLE_SEARCH_SCHEMA),
 )
 
@@ -306,95 +240,3 @@ def upsert_blog(path: str, blog: dict) -> int:
         ).fetchone()
 
     return int(row["id"])
-
-
-def upsert_articles(path: str, articles: list[dict]) -> int:
-    if not articles:
-        return 0
-
-    sql = """
-    INSERT INTO articles (
-        blog_id, entry_key, title, url, author, summary, content,
-        published_at, feed_updated_at, fetched_at
-    ) VALUES (
-        :blog_id, :entry_key, :title, :url, :author, :summary, :content,
-        :published_at, :feed_updated_at, :fetched_at
-    )
-    ON CONFLICT(blog_id, entry_key) DO UPDATE SET
-        title = excluded.title,
-        url = excluded.url,
-        author = excluded.author,
-        summary = excluded.summary,
-        content = excluded.content,
-        published_at = excluded.published_at,
-        feed_updated_at = excluded.feed_updated_at,
-        fetched_at = excluded.fetched_at,
-        updated_at = CURRENT_TIMESTAMP
-    """
-
-    defaults = {
-        "author": "",
-        "summary": "",
-        "content": "",
-        "published_at": None,
-        "feed_updated_at": None,
-    }
-    rows = [{**defaults, **article} for article in articles]
-
-    with connect(path) as db:
-        db.executemany(sql, rows)
-
-    return len(rows)
-
-
-def get_blog(path: str, blog_id: int) -> dict | None:
-    with connect(path) as db:
-        row = db.execute(
-            "SELECT * FROM blogs WHERE id = ?",
-            (blog_id,),
-        ).fetchone()
-    return dict(row) if row else None
-
-
-def get_active_blogs(path: str) -> list[dict]:
-    with connect(path) as db:
-        rows = db.execute(
-            "SELECT * FROM blogs WHERE active = 1 ORDER BY id"
-        ).fetchall()
-    return [dict(row) for row in rows]
-
-
-def update_blog_sync_status(
-    path: str,
-    blog_id: int,
-    *,
-    checked_at: str,
-    succeeded: bool,
-    etag: str | None = None,
-    last_modified: str | None = None,
-    error: str | None = None,
-) -> None:
-    if succeeded:
-        sql = """
-        UPDATE blogs
-        SET last_checked_at = ?,
-            last_success_at = ?,
-            last_error = NULL,
-            etag = COALESCE(?, etag),
-            last_modified = COALESCE(?, last_modified),
-            updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-        """
-        values = (checked_at, checked_at, etag, last_modified, blog_id)
-    else:
-        sql = """
-        UPDATE blogs
-        SET last_checked_at = ?,
-            last_error = ?,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-        """
-        values = (checked_at, error or "알 수 없는 수집 오류", blog_id)
-
-    with connect(path) as db:
-        db.execute(sql, values)

@@ -28,8 +28,6 @@ def load_config(overrides: dict | None = None) -> dict:
         "AUTH_LOGIN_MAX_ATTEMPTS": _int("AUTH_LOGIN_MAX_ATTEMPTS", "5"),
         "AUTH_LOGIN_WINDOW_SECONDS": _int("AUTH_LOGIN_WINDOW_SECONDS", "300"),
         "MAX_CONTENT_LENGTH": _int("MAX_CONTENT_LENGTH", "1048576"),
-        "FEED_COLLECTION_INTERVAL_SECONDS": _int("FEED_COLLECTION_INTERVAL_SECONDS", "3600"),
-        "FEED_COLLECTION_TIMEOUT_SECONDS": _int("FEED_COLLECTION_TIMEOUT_SECONDS", "20"),
         "BACKUP_DIRECTORY": os.getenv("BACKUP_DIRECTORY", str(ROOT / "data" / "backups")),
         "BACKUP_RETENTION_DAYS": _int("BACKUP_RETENTION_DAYS", "14"),
         "LOG_LEVEL": os.getenv("LOG_LEVEL", "INFO").upper(),
@@ -44,10 +42,6 @@ def load_config(overrides: dict | None = None) -> dict:
         "SMTP_PASSWORD": os.getenv("SMTP_PASSWORD", ""),
         "SMTP_USE_TLS": _bool("SMTP_USE_TLS", "true"),
         "SMTP_USE_SSL": _bool("SMTP_USE_SSL", "false"),
-        "DISCORD_APPLICATION_ID": os.getenv("DISCORD_APPLICATION_ID", ""),
-        "DISCORD_PUBLIC_KEY": os.getenv("DISCORD_PUBLIC_KEY", ""),
-        "DISCORD_BOT_TOKEN": os.getenv("DISCORD_BOT_TOKEN", ""),
-        "DISCORD_TEST_GUILD_ID": os.getenv("DISCORD_TEST_GUILD_ID", ""),
         "CORS_ORIGINS": os.getenv("CORS_ORIGINS", "http://localhost:3000"),
     }
     if overrides:
