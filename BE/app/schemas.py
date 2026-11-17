@@ -64,6 +64,9 @@ def _http_url(value: str, field: str) -> str:
 # ---------- 인증 ----------
 
 class RegisterRequest(BaseModel):
+    # 누락된 필드의 기본값도 검사해 빈 계정 정보가 저장되지 않게 한다.
+    model_config = ConfigDict(validate_default=True)
+
     email: str = ""
     password: str = ""
     display_name: str = ""

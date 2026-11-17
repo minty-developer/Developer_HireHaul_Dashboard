@@ -65,6 +65,24 @@ class AuthApiTest(unittest.TestCase):
         self.assertEqual(self.register(password="short").status_code, 400)
         self.assertEqual(self.register(display_name="").status_code, 400)
 
+    def test_rejects_missing_registration_fields_without_creating_users(self):
+        valid = {"email": "user@example.com", "password": "password123", "display_name": "Tester"}
+        for field in valid:
+            with self.subTest(missing=field):
+                body = {key: value for key, value in valid.items() if key != field}
+                response = self.client.post("/api/auth/register", json=body)
+                self.assertEqual(response.status_code, 400)
+        self.assertEqual(self.client.post("/api/auth/register", json={}).status_code, 400)
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM users").fetchone()[0], 0)
+
+    def test_rejects_blank_or_null_email_without_creating_users(self):
+        for email in ("", "   ", "\t\r\n", "\u3000", None):
+            with self.subTest(email=email):
+                self.assertEqual(self.register(email=email).status_code, 400)
+        with connect(self.app.state.config["DATABASE_PATH"]) as db:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM users").fetchone()[0], 0)
+
     def test_login_me_and_logout(self):
         self.register()
         login = self.login()
