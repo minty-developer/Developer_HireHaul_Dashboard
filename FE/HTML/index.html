@@ -18,7 +18,7 @@
             <label class="srOnly" for="searchInput">기술 글 검색</label>
             <input type="search" id="searchInput" maxlength="200" autocomplete="off" placeholder="글 제목, 기술, 기업 검색…">
         </div>
-        <div class="authHeader"><span id="apiStatus" class="apiStatus" data-state="checking" role="status"><span class="apiStatusDot" aria-hidden="true"></span><span id="apiStatusText">API 연결 확인 중</span></span><span id="userLabel" class="userLabel"></span><button id="accountOpen" class="textButton hide" type="button">계정 관리</button><button id="authOpen" class="textButton" type="button">로그인</button><button id="logoutButton" class="textButton hide" type="button">로그아웃</button></div>
+        <div class="authHeader"><span id="apiStatus" class="apiStatus" data-state="checking" role="status"><span class="apiStatusDot" aria-hidden="true"></span><span id="apiStatusText">API 연결 확인 중</span></span><span id="userLabel" class="userLabel"></span><a id="accountLink" class="textButton" href="account.html">로그인</a><button id="logoutButton" class="textButton hide" type="button">로그아웃</button></div>
     </header>
     <nav aria-label="주 메뉴"><div class="buttonBox"><a href="index.html" aria-current="page">아티클</a></div></nav>
     <main>
@@ -71,7 +71,7 @@
                 <p class="eyebrow">KEYWORD ALERTS</p>
                 <h2>관심 키워드를<br>놓치지 마세요.</h2>
                 <p>새 글 알림을 디스코드 웹훅으로 받아보세요.</p>
-                <button id="subscriptionOpen" class="inlineAction" type="button">구독 관리 <span>↗</span></button>
+                <a id="subscriptionLink" class="inlineAction" href="subscriptions.html">구독 관리 <span>↗</span></a>
                 <span class="subscriptionNote">RSS 수집 · 주기적 갱신 · Docker 배포</span>
             </div>
             <div class="asideSection overview"><h2 class="tagTitle">블로그</h2><div id="blogList" class="blogList"></div></div>
@@ -81,26 +81,8 @@
         <p class="eyebrow">ARTICLE</p><h3 id="dialogTitle"></h3><p id="dialogMeta"></p><p id="dialogText"></p>
         <div class="dialogActions"><a id="dialogLink" class="dialogLink hide" href="#" target="_blank" rel="noopener noreferrer">원문 읽기 ↗</a><button type="button" id="dialogClose">닫기</button></div>
     </dialog>
-    <dialog id="authDialog" aria-labelledby="authTitle">
-        <button type="button" class="dialogX" data-close="authDialog" aria-label="닫기" title="닫기">×</button><p class="eyebrow">YOUR ACCOUNT</p><h2 id="authTitle">로그인</h2>
-        <div class="authTabs"><button type="button" class="authTab active" data-mode="login">로그인</button><button type="button" class="authTab" data-mode="register">회원가입</button></div>
-        <form id="authForm"><label for="authEmail">이메일</label><input id="authEmail" type="email" required maxlength="254" autocomplete="email"><label for="authPassword">비밀번호</label><input id="authPassword" type="password" required minlength="8" maxlength="128" autocomplete="current-password"><div id="displayNameField" class="hide"><label for="displayName">표시 이름</label><input id="displayName" type="text" maxlength="50" autocomplete="name"></div><p id="authMessage" class="formMessage" role="status"></p><button id="authSubmit" class="solidAction" type="submit">로그인</button></form>
-        <div id="authRecoveryActions" class="accountLinks"><button id="verificationResend" class="textButton" type="button">인증 메일 다시 받기</button><button id="passwordResetRequest" class="textButton" type="button">비밀번호 재설정 메일</button></div>
-        <p id="authRecoveryMessage" class="formMessage" role="status"></p>
-    </dialog>
-    <dialog id="accountDialog" aria-labelledby="accountTitle">
-        <button type="button" class="dialogX" data-close="accountDialog" aria-label="닫기" title="닫기">×</button><p class="eyebrow">ACCOUNT SETTINGS</p><h2 id="accountTitle">계정 관리</h2>
-        <p id="accountIdentity" class="modalHint"></p>
-        <form id="profileForm" class="accountForm"><h3>표시 이름</h3><label for="profileDisplayName">새 표시 이름</label><input id="profileDisplayName" type="text" required minlength="1" maxlength="50" autocomplete="name"><p id="profileMessage" class="formMessage" role="status"></p><button class="solidAction" type="submit">이름 저장</button></form>
-        <form id="passwordForm" class="accountForm"><h3>비밀번호 변경</h3><label for="currentPassword">현재 비밀번호</label><input id="currentPassword" type="password" required minlength="8" maxlength="128" autocomplete="current-password"><label for="newPassword">새 비밀번호</label><input id="newPassword" type="password" required minlength="8" maxlength="128" autocomplete="new-password"><p id="passwordMessage" class="formMessage" role="status"></p><button class="solidAction" type="submit">비밀번호 변경</button></form>
-        <form id="deleteAccountForm" class="accountForm dangerZone"><h3>계정 탈퇴</h3><p class="modalHint">탈퇴하면 다시 로그인할 수 없습니다.</p><label for="deleteAccountPassword">비밀번호 확인</label><input id="deleteAccountPassword" type="password" required minlength="8" maxlength="128" autocomplete="current-password"><p id="deleteAccountMessage" class="formMessage" role="status"></p><button class="dangerAction" type="submit">계정 탈퇴</button></form>
-    </dialog>
-    <dialog id="subscriptionDialog" aria-labelledby="subscriptionTitle">
-        <button type="button" class="dialogX" data-close="subscriptionDialog" aria-label="닫기" title="닫기">×</button><p class="eyebrow">PERSONAL FEED</p><h2 id="subscriptionTitle">키워드 구독</h2><p id="subscriptionHint" class="modalHint">로그인하면 키워드 알림을 관리할 수 있습니다.</p>
-        <form id="subscriptionForm" class="hide"><label for="keywordInput">키워드</label><input id="keywordInput" type="text" required maxlength="100" placeholder="예: Python, Kubernetes"><label for="webhookInput">디스코드 웹훅 <span>(선택)</span></label><input id="webhookInput" type="url" placeholder="https://discord.com/api/webhooks/…"><button class="solidAction" type="submit">키워드 구독 추가</button></form>
-        <p id="subscriptionMessage" class="formMessage" role="status"></p><div id="subscriptionList" class="subscriptionList"></div>
-    </dialog>
     <script src="../JS/config.js"></script>
+    <script src="../JS/api-client.js"></script>
     <script src="../JS/index.js"></script>
 </body>
 </html>

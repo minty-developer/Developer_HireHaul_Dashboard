@@ -40,7 +40,7 @@ nav { min-height: 45px; padding: 0 clamp(22px, 5vw, 80px); border-bottom: 1px so
 .apiStatus[data-state="connected"] .apiStatusDot { background: #16a34a; }
 .apiStatus[data-state="error"] { color: #b91c1c; }
 .apiStatus[data-state="error"] .apiStatusDot { background: #dc2626; }
-.textButton, .inlineAction { border: 0; border-bottom: 1px solid var(--text); background: none; color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+.textButton, .inlineAction { border: 0; border-bottom: 1px solid var(--text); background: none; color: var(--text); font: inherit; font-size: 12px; cursor: pointer; text-decoration: none; }
 .textButton:hover, .inlineAction:hover { color: var(--accent); border-color: var(--accent); }
 .textButton:active, .inlineAction:active, .pagination button:active, .tag:active { color: var(--accent); }
 

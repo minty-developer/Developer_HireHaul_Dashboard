@@ -1,8 +1,6 @@
 'use strict';
 
-const API_BASE_URL = window.FEED_API_BASE_URL || 'http://127.0.0.1:5000';
 const PAGE_SIZE = 20;
-const REQUEST_TIMEOUT_MS = 30000;
 const $ = (id) => document.getElementById(id);
 
 const ui = {
@@ -17,27 +15,7 @@ const ui = {
 const blogId = new URLSearchParams(window.location.search).get('blog_id');
 const state = { offset: 0, total: 0, loadingBlog: false, loadingArticles: false };
 
-function apiUrl(path) { return `${API_BASE_URL}${path}`; }
-
-async function request(path) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-    try {
-        const response = await fetch(apiUrl(path), { headers: { Accept: 'application/json' }, signal: controller.signal });
-        const text = await response.text();
-        let payload = null;
-        if (text) {
-            try { payload = JSON.parse(text); }
-            catch { payload = { message: text }; }
-        }
-        if (!response.ok || payload?.ok === false) {
-            const error = new Error(payload?.error || payload?.message || `요청에 실패했습니다. (${response.status})`);
-            error.status = response.status;
-            throw error;
-        }
-        return payload;
-    } finally { clearTimeout(timeout); }
-}
+const request = (path) => window.feedApi.request(path);
 
 function showBlogError(message) {
     ui.blogLoading.classList.add('hide');
