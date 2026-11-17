@@ -29,11 +29,15 @@ from ..schemas import (
     DisplayNameRequest,
     EmailRequest,
     LoginRequest,
+    LoginResponse,
+    MessageResponse,
     PasswordChangeRequest,
     PasswordRequest,
     PasswordResetConfirmRequest,
     RegisterRequest,
+    RegisterResponse,
     TokenRequest,
+    UserResponse,
 )
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -65,7 +69,7 @@ def _send_action_email(config: dict, user: dict, purpose: str) -> bool:
     return True
 
 
-@router.post("/register", status_code=201, summary="회원가입")
+@router.post("/register", status_code=201, response_model=RegisterResponse, summary="회원가입")
 def register(body: RegisterRequest, config: Config):
     try:
         user = create_user(
@@ -77,7 +81,7 @@ def register(body: RegisterRequest, config: Config):
     return {"user": user, "verification_sent": verification_sent}
 
 
-@router.post("/login", summary="로그인 및 Bearer 토큰 발급")
+@router.post("/login", response_model=LoginResponse, summary="로그인 및 Bearer 토큰 발급")
 def login(body: LoginRequest, request: Request, config: Config):
     database_path = config["DATABASE_PATH"]
     remote = request.client.host if request.client else "unknown"
@@ -111,12 +115,12 @@ def login(body: LoginRequest, request: Request, config: Config):
     }
 
 
-@router.get("/me", summary="로그인 사용자 조회")
+@router.get("/me", response_model=UserResponse, summary="로그인 사용자 조회")
 def me(user: CurrentUser):
     return {"user": user}
 
 
-@router.patch("/me", summary="표시 이름 수정")
+@router.patch("/me", response_model=UserResponse, summary="표시 이름 수정")
 def update_me(body: DisplayNameRequest, user: CurrentUser, config: Config):
     updated = update_display_name(config["DATABASE_PATH"], user["id"], body.display_name)
     return {"user": updated}
@@ -147,7 +151,7 @@ def logout(_user: CurrentUser, token: BearerToken, config: Config):
     return Response(status_code=204)
 
 
-@router.post("/email/verification/request", status_code=202, summary="이메일 인증 메일 재요청")
+@router.post("/email/verification/request", status_code=202, response_model=MessageResponse, summary="이메일 인증 메일 재요청")
 def request_email_verification(config: Config, body: EmailRequest | None = None):
     user = find_user_by_email(config["DATABASE_PATH"], body.email if body else "")
     if user and not user["email_verified"]:
@@ -166,7 +170,7 @@ def confirm_email_verification(config: Config, body: TokenRequest | None = None)
     return Response(status_code=204)
 
 
-@router.post("/password/reset/request", status_code=202, summary="비밀번호 재설정 메일 요청")
+@router.post("/password/reset/request", status_code=202, response_model=MessageResponse, summary="비밀번호 재설정 메일 요청")
 def request_password_reset(config: Config, body: EmailRequest | None = None):
     user = find_user_by_email(config["DATABASE_PATH"], body.email if body else "")
     if user:

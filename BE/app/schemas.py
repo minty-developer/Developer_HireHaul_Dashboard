@@ -193,6 +193,60 @@ class BlogUpdateRequest(_BlogFields):
 
 # ---------- 응답 ----------
 
+class ErrorResponse(BaseModel):
+    """모든 에러 응답 형식. 일부 API는 `ok: false`를 함께 보낸다."""
+
+    error: str
+    ok: bool | None = None
+
+
+class MessageResponse(BaseModel):
+    message: str
+
+
+class HealthResponse(BaseModel):
+    status: str
+    database: str
+
+
+class UserPublic(BaseModel):
+    id: int
+    email: str
+    display_name: str
+    email_verified: int  # SQLite 값 그대로 1 또는 0
+    created_at: str
+
+
+class UserResponse(BaseModel):
+    user: UserPublic
+
+
+class RegisterResponse(UserResponse):
+    verification_sent: bool
+
+
+class LoginResponse(UserResponse):
+    token: str
+    expires_at: str
+
+
+class Subscription(BaseModel):
+    id: int
+    keyword: str
+    discord_webhook_url: str | None
+    active: int  # SQLite 값 그대로 1 또는 0
+    created_at: str
+    updated_at: str
+
+
+class SubscriptionResponse(BaseModel):
+    subscription: Subscription
+
+
+class SubscriptionListResponse(BaseModel):
+    subscriptions: list[Subscription]
+
+
 class ArticleSummary(BaseModel):
     model_config = ConfigDict(extra="allow")
 

@@ -7,14 +7,19 @@ from fastapi import APIRouter, Response
 from ..db import connect
 from ..deps import CurrentUser, DatabasePath
 from ..errors import ApiError
-from ..schemas import SubscriptionCreateRequest, SubscriptionUpdateRequest
+from ..schemas import (
+    SubscriptionCreateRequest,
+    SubscriptionListResponse,
+    SubscriptionResponse,
+    SubscriptionUpdateRequest,
+)
 
 router = APIRouter(prefix="/api/subscriptions", tags=["subscriptions"])
 
 COLUMNS = "id, keyword, discord_webhook_url, active, created_at, updated_at"
 
 
-@router.get("", summary="내 키워드 구독 목록")
+@router.get("", response_model=SubscriptionListResponse, summary="내 키워드 구독 목록")
 def list_subscriptions(user: CurrentUser, database_path: DatabasePath):
     with connect(database_path) as db:
         rows = db.execute(
@@ -28,7 +33,7 @@ def list_subscriptions(user: CurrentUser, database_path: DatabasePath):
     return {"subscriptions": [dict(row) for row in rows]}
 
 
-@router.post("", status_code=201, summary="키워드 구독 추가")
+@router.post("", status_code=201, response_model=SubscriptionResponse, summary="키워드 구독 추가")
 def create_subscription(
     body: SubscriptionCreateRequest, user: CurrentUser, database_path: DatabasePath
 ):
@@ -48,6 +53,7 @@ def create_subscription(
 
 @router.patch(
     "/{subscription_id}",
+    response_model=SubscriptionResponse,
     summary="Discord 웹훅 주소 및 활성 상태 변경",
     description="보낸 필드만 변경합니다. `discord_webhook_url: null`은 알림을 끕니다.",
 )

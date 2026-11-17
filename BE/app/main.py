@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 
 from .config import cors_origins, load_config
@@ -13,6 +14,7 @@ from .db import init_db
 from .errors import HTTP_MESSAGES, register_error_handlers
 from .logging_config import configure_logging, logger
 from .routes import router
+from .schemas import ErrorResponse
 
 NO_STORE_PREFIXES = ("/api/auth", "/api/admin", "/api/subscriptions")
 
@@ -71,4 +73,45 @@ def create_app(test_config: dict | None = None) -> FastAPI:
     )
     register_error_handlers(app)
     app.include_router(router)
+    app.openapi = lambda: _openapi(app)
     return app
+
+
+ERROR_SCHEMA_REF = {"$ref": "#/components/schemas/ErrorResponse"}
+
+
+def _error_response(description: str) -> dict:
+    return {"description": description, "content": {"application/json": {"schema": ERROR_SCHEMA_REF}}}
+
+
+def _openapi(app: FastAPI) -> dict:
+    """문서를 실제 응답과 맞춘다.
+
+    FastAPI는 검증 실패를 422로 문서화하지만, errors.py의 핸들러가 400
+    `{"ok": false, "error": "..."}`로 바꿔 보내므로 문서도 400으로 고친다.
+    """
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+    )
+    components = schema.setdefault("components", {}).setdefault("schemas", {})
+    components.pop("HTTPValidationError", None)
+    components.pop("ValidationError", None)
+    components["ErrorResponse"] = ErrorResponse.model_json_schema()
+
+    for path_item in schema.get("paths", {}).values():
+        for operation in path_item.values():
+            responses = operation.get("responses", {})
+            if responses.pop("422", None) is not None:
+                responses.setdefault("400", _error_response("입력값 오류"))
+            security = {name for item in operation.get("security", []) for name in item}
+            if "HTTPBearer" in security:
+                responses.setdefault("401", _error_response("토큰 없음 또는 만료"))
+            if "APIKeyHeader" in security:
+                responses.setdefault("401", _error_response("관리자 인증 실패"))
+    app.openapi_schema = schema
+    return schema

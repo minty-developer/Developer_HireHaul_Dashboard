@@ -6,11 +6,17 @@ from fastapi.responses import JSONResponse
 from ..db import connect
 from ..deps import DatabasePath
 from ..logging_config import logger
+from ..schemas import HealthResponse
 
 router = APIRouter(tags=["health"])
 
 
-@router.get("/api/health", summary="서버와 데이터베이스 상태 확인")
+@router.get(
+    "/api/health",
+    response_model=HealthResponse,
+    responses={503: {"model": HealthResponse, "description": "DB 연결 실패"}},
+    summary="서버와 데이터베이스 상태 확인",
+)
 def health(database_path: DatabasePath):
     try:
         with connect(database_path) as db:

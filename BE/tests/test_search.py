@@ -184,6 +184,28 @@ class ApiDocsTest(unittest.TestCase):
             self.assertIn("APIKeyHeader", spec["components"]["securitySchemes"])
             client.close()
 
+    def test_spec_matches_real_error_and_response_shapes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            client = TestClient(create_app({
+                "TESTING": True, "DATABASE_PATH": str(Path(temp) / "t.db"),
+            }))
+            spec = client.get("/api/openapi.json").json()
+            client.close()
+        paths = spec["paths"]
+        self.assertNotIn('"422"', str(spec).replace("'", '"'))
+        self.assertNotIn("HTTPValidationError", spec["components"]["schemas"])
+        self.assertIn("400", paths["/api/articles"]["get"]["responses"])
+        self.assertIn("401", paths["/api/auth/me"]["get"]["responses"])
+        self.assertIn("401", paths["/api/admin/blogs"]["get"]["responses"])
+        for path, method in [
+            ("/api/auth/login", "post"), ("/api/auth/me", "get"),
+            ("/api/subscriptions", "get"), ("/api/subscriptions", "post"),
+            ("/api/health", "get"),
+        ]:
+            with self.subTest(path=path, method=method):
+                ok = next(v for k, v in paths[path][method]["responses"].items() if k.startswith("2"))
+                self.assertIn("$ref", str(ok["content"]["application/json"]["schema"]))
+
 
 if __name__ == "__main__":
     unittest.main()
