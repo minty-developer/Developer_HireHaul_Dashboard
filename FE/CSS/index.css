@@ -42,6 +42,7 @@ nav { min-height: 45px; padding: 0 clamp(22px, 5vw, 80px); border-bottom: 1px so
 .apiStatus[data-state="error"] .apiStatusDot { background: #dc2626; }
 .textButton, .inlineAction { border: 0; border-bottom: 1px solid var(--text); background: none; color: var(--text); font: inherit; font-size: 12px; cursor: pointer; text-decoration: none; }
 .textButton:hover, .inlineAction:hover { color: var(--accent); border-color: var(--accent); }
+.textButton:focus-visible, .inlineAction:focus-visible { outline-offset: 3px; }
 .textButton:active, .inlineAction:active, .pagination button:active, .tag:active { color: var(--accent); }
 
 main { flex: 1; width: min(1480px, 100%); margin: 0 auto; padding: 0 clamp(24px, 4.5vw, 72px); display: grid; grid-template-columns: minmax(0, 1fr) 288px; align-content: start; gap: clamp(34px, 4vw, 58px); }
@@ -128,44 +129,10 @@ aside { padding: 39px 0 48px; }
 .dialogActions { margin-top: 28px; display: flex; justify-content: flex-end; align-items: center; gap: 20px; }
 .dialogLink, #dialogClose { border: 0; border-bottom: 1px solid var(--text); background: transparent; color: var(--text); font: inherit; font-size: 13px; text-decoration: none; cursor: pointer; }
 .dialogLink:hover, #dialogClose:hover { color: var(--accent); border-color: var(--accent); }
-#authDialog, #subscriptionDialog, #accountDialog { width: min(540px, calc(100% - 32px)); max-height: min(88vh, 780px); margin: auto; padding: 30px; overflow-y: auto; border: 0; background: var(--bg); color: var(--text); box-shadow: 0 24px 70px #0f172a33; }
-#authDialog::backdrop, #subscriptionDialog::backdrop, #accountDialog::backdrop { background: #0f172a80; }
-#authDialog h2, #subscriptionDialog h2, #accountDialog h2 { margin: 12px 0 18px; font-size: 25px; font-weight: 650; letter-spacing: -.04em; }
-.dialogX { float: right; border: 0; background: none; color: var(--muted); font-size: 24px; cursor: pointer; }
-.authTabs { margin-bottom: 20px; display: flex; gap: 18px; }
-.authTab { padding-bottom: 5px; border: 0; border-bottom: 1px solid transparent; background: none; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; }
-.authTab.active { border-color: var(--text); color: var(--text); }
-#authForm, #subscriptionForm, .accountForm { display: grid; gap: 8px; }
-#authForm label, #subscriptionForm label, .accountForm label { margin-top: 8px; color: var(--muted); font-size: 12px; }
-#authForm input, #subscriptionForm input, .accountForm input { width: 100%; min-height: 38px; padding: 9px 3px; border: 0; border-bottom: 1px solid #cbd5e1; border-radius: 0; background: transparent; color: var(--text); font: inherit; }
-#subscriptionForm label span { color: var(--quiet); }
-.accountLinks { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px 18px; }
-.accountForm { padding: 17px 0; border-top: 1px solid var(--line); }
-.accountForm h3 { font-size: 15px; font-weight: 650; }
-.dangerZone { margin-top: 8px; }
-.dangerAction { justify-self: start; min-height: 36px; padding: 0 12px; border: 1px solid #b91c1c; background: transparent; color: #b91c1c; font: inherit; font-size: 12px; cursor: pointer; }
-.dangerAction:hover { background: #fef2f2; }
-.solidAction { margin-top: 16px; padding: 10px 14px; border: 0; background: var(--text); color: white; font: inherit; font-size: 13px; cursor: pointer; }
-.solidAction:hover { background: var(--accent); }
-.formMessage { min-height: 19px; color: var(--accent); font-size: 12px; }
-.modalHint { margin: -8px 0 16px; color: var(--muted); font-size: 13px; }
-.subscriptionList { margin-top: 20px; display: grid; }
-.subscriptionItem { padding: 12px 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; border-top: 1px solid var(--line); }
-.subscriptionItem strong { font-size: 14px; }
-.subscriptionItem small { color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
-.subscriptionActions { grid-column: 2; grid-row: 1 / span 2; align-self: center; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px 12px; }
-.subscriptionActions button { min-height: 32px; padding: 0 2px; border: 0; border-bottom: 1px solid transparent; background: none; color: var(--muted); font: inherit; font-size: 11px; cursor: pointer; transition: color var(--ease), border-color var(--ease); }
-.subscriptionActions button:hover { border-color: var(--accent); color: var(--accent); }
-.subscriptionActions button:active { color: var(--accent); }
-.dialogX:hover { color: var(--accent); }
-.dialogX:active { transform: scale(.96); }
-.solidAction { transition: background-color var(--ease); }
-.solidAction:active { background: var(--accent); }
-.solidAction:disabled { opacity: .55; cursor: wait; }
-
 @media (max-width: 1200px) {
     main { grid-template-columns: minmax(0, 1fr); gap: 0; }
-    aside { order: -1; padding: 25px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+    .feedColumn { order: 0; }
+    aside { order: 1; padding: 25px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
     .asideSection { margin-bottom: 18px; padding-bottom: 16px; }
     .overview { grid-column: 1 / -1; }
     .blogList { max-height: 180px; overflow-y: auto; padding-right: 8px; }
@@ -190,6 +157,7 @@ aside { padding: 39px 0 48px; }
     .dateFilter { grid-column: 1 / -1; }
     .pageSizeFilter, .sortFilter { grid-column: auto; }
     .filterGroup + .filterGroup { padding-left: 0; border-left: 0; }
+    .searchFilters select, .searchFilters input { min-height: 36px; }
     .dateRange { gap: 4px; }
     #cards { grid-template-columns: 1fr; padding: 0 12px 24px; }
     #resultCount { padding: 10px 0; }

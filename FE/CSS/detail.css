@@ -42,6 +42,8 @@ main { width: min(1120px, 100%); margin: 0 auto; padding: 0 clamp(22px, 5vw, 64p
 .errorMessage { color: #b91c1c; }
 .textAction { min-height: 34px; padding: 0 10px; border: 1px solid currentColor; background: transparent; color: inherit; font: inherit; cursor: pointer; transition: background-color var(--ease), color var(--ease); }
 .textAction:hover { background: #fff7ed; color: var(--accent); }
+.textAction:active:not(:disabled) { background: #ffedd5; }
+.textAction:disabled { opacity: .5; cursor: default; }
 .articleSection { padding: clamp(34px, 5vw, 54px) 0 64px; }
 .sectionHeading { margin-bottom: 20px; display: flex; align-items: end; justify-content: space-between; gap: 20px; }
 .sectionHeading h2 { margin-top: 8px; font-size: clamp(24px, 4vw, 34px); font-weight: 650; letter-spacing: -.045em; }
@@ -74,6 +76,7 @@ footer span:first-child { color: var(--text); font-weight: 800; letter-spacing: 
     .articleItem { grid-template-columns: minmax(0, 1fr) auto; gap: 7px 12px; padding: 18px 6px; }
     .articleTitle { font-size: 17px; }
     .articleSummary { font-size: 12px; }
+    .pagination button { min-height: 38px; }
     footer { min-height: 50px; }
 }
 
