@@ -3,58 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="title">Developer HireHaul Dashboard</title>
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="description" content="국내 IT 기업 기술블로그의 새 글을 모아 검색하고 구독하는 RSS 리더">
+    <title>기술블로그 아카이브 — FEED</title>
     <link rel="stylesheet" href="../CSS/index.css">
 </head>
 <body>
     <header>
         <div class="brand">
-            <a class="homeLink" href="index.html" aria-label="Developer HireHaul 홈"><span class="mainIcon" aria-hidden="true">D<span class="mainIconLine">-</span></span></a>
-            <h1 class="mainTitle"><a class="homeLink" href="index.html">Developer HireHaul</a></h1>
+            <a class="homeLink" href="index.html" aria-label="기술블로그 아카이브 홈"><span class="mainIcon" aria-hidden="true">T<span class="mainIconLine">/</span></span></a>
+            <h1 class="mainTitle"><a class="homeLink" href="index.html">FEED<span class="brandDot">.</span></a></h1>
         </div>
         <div class="searchBox" role="search">
-            <input type="search" id="searchInput" autocomplete="off" aria-label="공고 검색" placeholder="회사명 또는 공고내용 검색...">
+            <label class="srOnly" for="searchInput">기술 글 검색</label>
+            <input type="search" id="searchInput" maxlength="200" autocomplete="off" placeholder="글 제목, 요약, 본문, 작성자 검색…">
         </div>
+        <div class="authHeader"><span id="apiStatus" class="apiStatus" data-state="checking" role="status"><span class="apiStatusDot" aria-hidden="true"></span><span id="apiStatusText">API 연결 확인 중</span></span><span id="userLabel" class="userLabel"></span><a id="accountLink" class="textButton" href="account.html">로그인</a><button id="logoutButton" class="textButton hide" type="button">로그아웃</button></div>
     </header>
-    <nav aria-label="주 메뉴">
-        <div class="buttonBox">
-            <a href="index.html" aria-current="page">Home</a>
-        </div>
-    </nav>
+    <nav aria-label="주 메뉴"><div class="buttonBox"><a href="index.html" aria-current="page">아티클</a></div></nav>
     <main>
-        <section id="cards" aria-label="채용 공고 목록">
-            <p id="resultCount" aria-live="polite"></p>
-            <div id="searchAction" class="hide" role="status">검색 중입니다.</div>
-            <div id="searchFailed" class="hide" role="alert">검색에 실패 했습니다. <button type="button" id="retryButton">다시 시도</button></div>
-            <div id="searchEmpty" class="hide" role="status">검색 결과가 없습니다. 다른 검색어나 필터를 선택해 보세요.</div>
+        <section class="feedColumn" aria-label="기술블로그 글 목록">
+            <div class="intro">
+                <p class="eyebrow">TECH BLOG AGGREGATOR <span>— 매일 업데이트</span></p>
+                <h2>좋은 기술 글을 <em>한 곳에서.</em></h2>
+                <p class="introCopy">국내 IT 기업 블로그의 새로운 글을 모아 읽고, 필요한 주제를 구독하세요.</p>
+            </div>
+            <div class="searchFilters" aria-label="게시글 검색 조건">
+                <div class="filterGroup sourceFilter">
+                    <label for="sourceSelect">블로그</label>
+                    <select id="sourceSelect"><option value="">전체 블로그</option></select>
+                </div>
+                <div class="filterGroup companyFilter">
+                    <label for="companySelect">회사</label>
+                    <select id="companySelect"><option value="">전체 회사</option></select>
+                </div>
+                <div class="filterGroup dateFilter">
+                    <label for="fromDate">기간</label>
+                    <div class="dateRange"><input id="fromDate" type="date" aria-label="시작 날짜"><span class="dateSep" aria-hidden="true">—</span><input id="toDate" type="date" aria-label="종료 날짜"></div>
+                </div>
+                <div class="filterGroup pageSizeFilter">
+                    <label for="pageSize">표시</label>
+                    <select id="pageSize"><option value="20">20개</option><option value="50">50개</option><option value="100">100개</option></select>
+                </div>
+                <div class="filterGroup sortFilter">
+                    <label for="sortSelect">정렬</label>
+                    <select id="sortSelect"><option value="latest">최신순</option><option value="relevance">관련도순</option></select>
+                </div>
+            </div>
+            <section id="cards" aria-label="아티클 목록">
+                <p id="resultCount" aria-live="polite"></p>
+                <div id="searchAction" class="hide" role="status">새 글을 불러오고 있습니다.</div>
+                <div id="searchFailed" class="hide" role="alert"><span>글을 불러오지 못했습니다.</span><button type="button" id="retryButton" class="stateAction">다시 시도</button></div>
+                <div id="searchEmpty" class="hide" role="status">검색 결과가 없습니다. 다른 검색어나 필터를 선택해 보세요.</div>
+            </section>
+            <div id="pagination" class="pagination hide"><button type="button" id="prevPage">← 이전</button><span id="pageLabel"></span><button type="button" id="nextPage">다음 →</button></div>
         </section>
-        <aside aria-label="필터와 통계">
-            <h2 class="tagTitle">Filter</h2>
-            <div class="filterBox">
-                <label for="locationSelect">지역</label>
-                <select id="locationSelect"><option value="">전체</option></select>
-                <label for="sourceSelect">출처</label>
-                <select id="sourceSelect"><option value="">전체</option></select>
+        <aside aria-label="필터와 구독 관리">
+            <div class="asideSection">
+                <h2 class="tagTitle">주제</h2>
+                <div id="tagBox" aria-label="주제별 필터">
+                    <button type="button" class="tag" aria-pressed="false"><span class="tagCheck" aria-hidden="true"></span><span class="tagName">Front End</span><span class="tagCount">—</span></button>
+                    <button type="button" class="tag" aria-pressed="false"><span class="tagCheck" aria-hidden="true"></span><span class="tagName">Back End</span><span class="tagCount">—</span></button>
+                    <button type="button" class="tag" aria-pressed="false"><span class="tagCheck" aria-hidden="true"></span><span class="tagName">AI</span><span class="tagCount">—</span></button>
+                </div>
             </div>
-            <h2 class="tagTitle" id="tagTitle">Tag filter</h2>
-            <div id="tagBox">
-                <button type="button" class="tag" aria-pressed="false">Front End</button>
-                <button type="button" class="tag" aria-pressed="false">Back End</button>
-                <button type="button" class="tag" aria-pressed="false">AI</button>
+            <div class="asideSection subscription">
+                <p class="eyebrow">KEYWORD ALERTS</p>
+                <h2>관심 키워드를<br>놓치지 마세요.</h2>
+                <p>새 글 알림을 디스코드 웹훅으로 받아보세요.</p>
+                <a id="subscriptionLink" class="inlineAction" href="subscriptions.html">구독 관리 <span>↗</span></a>
+                <span class="subscriptionNote">RSS 수집 · 주기적 갱신 · Docker 배포</span>
             </div>
-            <h2 class="tagTitle">Overview</h2>
-            <div id="statsBox" class="hide"></div>
+            <div class="asideSection overview"><h2 class="tagTitle">블로그</h2><p id="blogListStatus" class="blogListStatus" role="status" aria-live="polite">블로그 목록을 불러오는 중입니다.</p><button id="retryBlogsButton" class="stateAction hide" type="button">다시 시도</button><div id="blogList" class="blogList"></div></div>
         </aside>
     </main>
-    <dialog id="jobDialog" aria-labelledby="dialogTitle">
-        <h3 id="dialogTitle"></h3>
-        <p id="dialogMeta"></p>
+    <dialog id="articleDialog" aria-labelledby="dialogTitle">
+        <p class="eyebrow">ARTICLE</p><h3 id="dialogTitle"></h3><p id="dialogMeta"></p>
+        <a id="dialogLink" class="dialogLink hide" href="#" target="_blank" rel="noopener noreferrer">원문 보기 ↗</a>
         <p id="dialogText"></p>
-        <div class="dialogActions">
-            <a id="dialogLink" class="dialogLink hide" href="#" target="_blank" rel="noopener noreferrer">공고 원문 보기</a>
-            <button type="button" id="dialogClose">닫기</button>
-        </div>
+        <div class="dialogActions"><button type="button" id="dialogClose">닫기</button></div>
     </dialog>
+    <script src="../JS/config.js"></script>
+    <script src="../JS/api-client.js"></script>
     <script src="../JS/index.js"></script>
 </body>
 </html>

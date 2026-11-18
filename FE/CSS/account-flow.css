@@ -1,0 +1,59 @@
+:root { --bg: #f8fafc; --text: #1e293b; --muted: #64748b; --quiet: #94a3b8; --accent: #c2410c; --line: #e2e8f0; --ease: 160ms ease; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--text); font: 15px/1.55 "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+:where(a, button, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+header { min-height: 76px; padding: 0 clamp(22px, 5vw, 80px); display: flex; align-items: center; border-bottom: 1px solid var(--line); }
+.brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; letter-spacing: .12em; }
+.brand strong { font-size: 18px; font-weight: 800; }
+.brandMark { width: 30px; height: 30px; display: grid; place-items: center; color: var(--accent); font: 700 14px/1 Georgia, serif; }
+.brandMark span { margin-left: -5px; font-size: 12px; }
+.brandDot { color: var(--accent); }
+main { width: min(560px, 100%); margin: auto; padding: 36px 22px; }
+.flowCard { padding: clamp(24px, 6vw, 40px); border: 1px solid var(--line); background: #fff; }
+.eyebrow { color: var(--accent); font-size: 10px; font-weight: 750; letter-spacing: .15em; }
+h1 { margin-top: 12px; font-size: clamp(27px, 5vw, 34px); font-weight: 650; letter-spacing: -.045em; }
+.flowMessage { min-height: 26px; margin: 14px 0; color: var(--muted); font-size: 13px; }
+.flowMessage:empty { display: none; }
+.flowForm { display: grid; gap: 10px; }
+.flowForm label { margin-top: 8px; color: var(--muted); font-size: 12px; }
+.flowForm input { width: 100%; min-height: 40px; padding: 9px 3px; border: 0; border-bottom: 1px solid #cbd5e1; background: transparent; color: var(--text); font: inherit; transition: border-color var(--ease); }
+.flowForm input:focus-visible { outline-offset: 2px; border-color: var(--text); }
+.flowForm input:disabled { color: var(--quiet); cursor: not-allowed; }
+.solidAction { justify-self: start; min-height: 40px; margin-top: 12px; padding: 0 16px; border: 0; background: var(--text); color: #fff; font: inherit; font-size: 13px; cursor: pointer; transition: background-color var(--ease); }
+.solidAction:hover { background: var(--accent); }
+.solidAction:active:not(:disabled) { background: var(--accent); }
+.solidAction:disabled { opacity: .55; cursor: wait; }
+.flowLink { display: inline-block; margin-top: 22px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; text-decoration: none; }
+.flowLink:hover { border-color: var(--accent); color: var(--accent); }
+.managePage { width: min(720px, 100%); }
+.pageNav { display: flex; gap: 22px; margin-left: auto; color: var(--muted); font-size: 13px; }
+.pageNav a { text-decoration: none; }
+.pageNav a:hover, .textAction:hover { color: var(--accent); }
+.authTabs { display: flex; gap: 18px; margin: 24px 0 18px; border-bottom: 1px solid var(--line); }
+.authTab { padding: 0 0 10px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font: inherit; cursor: pointer; }
+.authTab.active { border-color: var(--accent); color: var(--text); font-weight: 700; }
+.authTab:hover:not(.active) { color: var(--text); }
+.accountLinks { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; }
+.textAction { min-height: 36px; padding: 4px 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; transition: color var(--ease); }
+.textAction:active:not(:disabled) { color: var(--accent); }
+.accountForm { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+.accountForm h2, .subscriptionListHeading h2 { font-size: 16px; font-weight: 650; }
+.dangerZone { border-top-color: #fed7aa; }
+.dangerAction { justify-self: start; min-height: 38px; margin-top: 10px; padding: 0 14px; border: 1px solid #c2410c; background: #fff; color: #c2410c; font: inherit; font-size: 12px; cursor: pointer; }
+.dangerAction:hover { background: #fff7ed; }
+.dangerAction:disabled { opacity: .5; cursor: wait; }
+.flowHint { margin: 12px 0 16px; color: var(--muted); font-size: 13px; }
+.subscriptionListHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 30px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.managedSubscriptions { display: grid; }
+.managedSubscription { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.managedSubscription h3 { overflow-wrap: anywhere; font-size: 14px; }
+.managedSubscription p { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.managedActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 14px; }
+.managedActions button { min-height: 36px; padding: 0 2px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; transition: color var(--ease); }
+.managedActions button:hover { color: var(--accent); }
+.managedActions button:active:not(:disabled) { color: var(--accent); }
+.managedActions button:disabled, .textAction:disabled { opacity: .5; cursor: wait; }
+.hide { display: none !important; }
+@media (max-width: 600px) { header { min-height: 64px; padding-inline: 18px; } .pageNav { gap: 14px; font-size: 12px; } .managedSubscription { grid-template-columns: 1fr; } .managedActions { justify-content: flex-start; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }

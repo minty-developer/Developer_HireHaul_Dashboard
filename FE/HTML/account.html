@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="description" content="FEED 계정에 로그인하거나 회원 정보를 관리하세요.">
+    <title>계정 — FEED</title>
+    <link rel="stylesheet" href="../CSS/account-flow.css">
+</head>
+<body>
+    <header>
+        <a class="brand" href="index.html" aria-label="FEED 홈"><span class="brandMark">T<span>/</span></span><strong>FEED<span class="brandDot">.</span></strong></a>
+        <nav class="pageNav" aria-label="계정 메뉴"><a href="index.html">아티클</a><a href="subscriptions.html">키워드 구독</a></nav>
+    </header>
+    <main class="managePage">
+        <section id="authPanel" class="flowCard" aria-labelledby="authHeading">
+            <p class="eyebrow">YOUR ACCOUNT</p>
+            <h1 id="authHeading">계정에 로그인</h1>
+            <div class="authTabs" role="tablist" aria-label="계정 접근">
+                <button type="button" class="authTab active" data-mode="login" role="tab" aria-selected="true">로그인</button>
+                <button type="button" class="authTab" data-mode="register" role="tab" aria-selected="false">회원가입</button>
+            </div>
+            <form id="authForm" class="flowForm">
+                <label for="authEmail">이메일</label>
+                <input id="authEmail" type="email" required maxlength="254" autocomplete="email">
+                <label for="authPassword">비밀번호</label>
+                <input id="authPassword" type="password" required minlength="8" maxlength="128" autocomplete="current-password">
+                <div id="displayNameField" class="hide">
+                    <label for="displayName">표시 이름</label>
+                    <input id="displayName" type="text" maxlength="50" autocomplete="name">
+                </div>
+                <p id="authMessage" class="flowMessage" role="status" aria-live="polite"></p>
+                <button id="authSubmit" class="solidAction" type="submit">로그인</button>
+            </form>
+        </section>
+
+        <section id="userPanel" class="flowCard hide" aria-labelledby="accountHeading">
+            <p class="eyebrow">ACCOUNT SETTINGS</p>
+            <h1 id="accountHeading">내 계정</h1>
+            <p id="accountIdentity" class="flowMessage"></p>
+            <p id="accountNotice" class="flowMessage" role="status" aria-live="polite"></p>
+            <form id="profileForm" class="flowForm accountForm">
+                <h2>표시 이름</h2>
+                <label for="profileDisplayName">새 표시 이름</label>
+                <input id="profileDisplayName" type="text" required minlength="1" maxlength="50" autocomplete="name">
+                <p id="profileMessage" class="flowMessage" role="status"></p>
+                <button class="solidAction" type="submit">이름 저장</button>
+            </form>
+            <form id="passwordForm" class="flowForm accountForm">
+                <h2>비밀번호 변경</h2>
+                <label for="currentPassword">현재 비밀번호</label>
+                <input id="currentPassword" type="password" required minlength="8" maxlength="128" autocomplete="current-password">
+                <label for="newPassword">새 비밀번호</label>
+                <input id="newPassword" type="password" required minlength="8" maxlength="128" autocomplete="new-password">
+                <p id="passwordMessage" class="flowMessage" role="status"></p>
+                <button class="solidAction" type="submit">비밀번호 변경</button>
+            </form>
+            <form id="deleteAccountForm" class="flowForm accountForm dangerZone">
+                <h2>계정 탈퇴</h2>
+                <p class="flowHint">탈퇴하면 다시 로그인할 수 없습니다.</p>
+                <label for="deleteAccountPassword">비밀번호 확인</label>
+                <input id="deleteAccountPassword" type="password" required minlength="8" maxlength="128" autocomplete="current-password">
+                <p id="deleteAccountMessage" class="flowMessage" role="status"></p>
+                <button class="dangerAction" type="submit">계정 탈퇴</button>
+            </form>
+            <div class="accountLinks"><a class="flowLink" href="subscriptions.html">키워드 구독 관리</a><button id="logoutButton" class="textAction" type="button">로그아웃</button></div>
+        </section>
+    </main>
+    <script src="../JS/config.js"></script>
+    <script src="../JS/api-client.js"></script>
+    <script src="../JS/account.js"></script>
+</body>
+</html>
