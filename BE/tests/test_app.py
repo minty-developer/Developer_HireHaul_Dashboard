@@ -33,7 +33,7 @@ class AppTest(unittest.TestCase):
     def test_health(self):
         response = self.client.get("/api/health")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"status": "ok", "database": "ok"})
+        self.assertEqual(response.json(), {"status": "ok", "database": "ok", "email": "disabled"})
 
     def test_api_errors_and_security_headers(self):
         missing = self.client.get("/api/does-not-exist")

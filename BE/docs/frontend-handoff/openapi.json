@@ -631,6 +631,16 @@
               }
             }
           },
+          "503": {
+            "description": "메일 발송 설정 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "입력값 오류",
             "content": {
@@ -716,6 +726,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "메일 발송 설정 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1675,6 +1695,32 @@
         "type": "object",
         "title": "EmailRequest"
       },
+      "ErrorResponse": {
+        "description": "모든 에러 응답 형식. 일부 API는 `ok: false`를 함께 보낸다.",
+        "properties": {
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ok"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -1684,12 +1730,17 @@
           "database": {
             "type": "string",
             "title": "Database"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
           }
         },
         "type": "object",
         "required": [
           "status",
-          "database"
+          "database",
+          "email"
         ],
         "title": "HealthResponse"
       },
@@ -2004,32 +2055,6 @@
           "user"
         ],
         "title": "UserResponse"
-      },
-      "ErrorResponse": {
-        "description": "모든 에러 응답 형식. 일부 API는 `ok: false`를 함께 보낸다.",
-        "properties": {
-          "error": {
-            "title": "Error",
-            "type": "string"
-          },
-          "ok": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Ok"
-          }
-        },
-        "required": [
-          "error"
-        ],
-        "title": "ErrorResponse",
-        "type": "object"
       }
     },
     "securitySchemes": {

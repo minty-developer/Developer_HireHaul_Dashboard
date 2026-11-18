@@ -179,6 +179,26 @@ class AuthApiTest(unittest.TestCase):
             self.assertEqual(db.execute("SELECT COUNT(*) FROM subscriptions").fetchone()[0], 0)
 
     @patch("app.routes.auth.send_email")
+    def test_reports_mail_unavailable_without_mail_settings(self, send_email_mock):
+        registered = self.register()
+        self.assertEqual(registered.status_code, 201)
+        self.assertFalse(registered.json()["verification_sent"])
+        self.assertEqual(self.login().status_code, 200)
+
+        for path in (
+            "/api/auth/email/verification/request",
+            "/api/auth/password/reset/request",
+        ):
+            response = self.client.post(path, json={"email": "user@example.com"})
+            self.assertEqual(response.status_code, 503)
+            self.assertIn("메일", response.json()["error"])
+        send_email_mock.assert_not_called()
+
+        self.assertEqual(self.client.get("/api/health").json()["email"], "disabled")
+        self.app.state.config.update({"SMTP_HOST": "smtp.test", "MAIL_FROM": "noreply@example.com"})
+        self.assertEqual(self.client.get("/api/health").json()["email"], "enabled")
+
+    @patch("app.routes.auth.send_email")
     def test_verifies_email_and_can_require_verification(self, send_email_mock):
         self.app.state.config.update({
             "SMTP_HOST": "smtp.test",

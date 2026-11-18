@@ -4,6 +4,11 @@ import smtplib
 from email.message import EmailMessage
 
 
+def email_enabled(config) -> bool:
+    """메일 서버 설정(SMTP_HOST, MAIL_FROM)이 있어야 메일을 보낼 수 있다."""
+    return bool(config.get("SMTP_HOST") and config.get("MAIL_FROM"))
+
+
 def send_email(config, recipient: str, subject: str, body: str) -> None:
     if not config.get("SMTP_HOST"):
         raise RuntimeError("SMTP_HOST가 설정되지 않았습니다.")

@@ -231,6 +231,7 @@ class MessageResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     database: str
+    email: str  # enabled 또는 disabled (메일 발송 가능 여부)
 
 
 class UserPublic(BaseModel):
