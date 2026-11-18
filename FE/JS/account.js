@@ -10,7 +10,7 @@ const ui = {
     currentPassword: $('currentPassword'), newPassword: $('newPassword'), passwordMessage: $('passwordMessage'),
     deleteForm: $('deleteAccountForm'), deletePassword: $('deleteAccountPassword'), deleteMessage: $('deleteAccountMessage')
 };
-const state = { mode: 'login', user: null, throttleTimer: null };
+const state = { mode: 'login', user: null, throttleTimer: null, verificationPending: false, verificationEmail: '' };
 const nextPage = new URLSearchParams(window.location.search).get('next');
 
 function setMode(mode) {
@@ -25,6 +25,7 @@ function setMode(mode) {
         tab.classList.toggle('active', active);
         tab.setAttribute('aria-selected', String(active));
     });
+    ui.authPanel.classList.toggle('verificationPending', mode === 'login' && state.verificationPending);
     ui.authMessage.textContent = '';
     ui.recoveryMessage.textContent = '';
 }
@@ -85,6 +86,8 @@ async function submitAuth(event) {
                 method: 'POST', body: JSON.stringify({ email, password, display_name: ui.displayName.value.trim() })
             });
             ui.authForm.reset();
+            state.verificationPending = true;
+            state.verificationEmail = email;
             setMode('login');
             ui.authEmail.value = email;
             ui.authMessage.textContent = payload?.verification_sent
@@ -100,6 +103,11 @@ async function submitAuth(event) {
         const destination = nextPage === 'subscriptions.html' ? 'subscriptions.html' : 'index.html';
         window.location.replace(destination);
     } catch (error) {
+        if (error.status === 403) {
+            state.verificationPending = true;
+            state.verificationEmail = email;
+            ui.authPanel.classList.add('verificationPending');
+        }
         ui.authMessage.textContent = error.status === 403
             ? '이메일 인증이 필요합니다. 인증 메일을 확인하거나 다시 요청하세요.'
             : error.message;
@@ -183,6 +191,13 @@ async function logout() {
 
 document.querySelectorAll('.authTab').forEach((tab) => tab.addEventListener('click', () => setMode(tab.dataset.mode)));
 ui.authForm.addEventListener('submit', submitAuth);
+ui.authEmail.addEventListener('input', () => {
+    if (state.verificationPending && ui.authEmail.value.trim() !== state.verificationEmail) {
+        state.verificationPending = false;
+        state.verificationEmail = '';
+        ui.authPanel.classList.remove('verificationPending');
+    }
+});
 document.getElementById('verificationResend').addEventListener('click', () => requestEmailAction('/api/auth/email/verification/request', '인증 메일을 요청했습니다.'));
 document.getElementById('passwordResetRequest').addEventListener('click', () => requestEmailAction('/api/auth/password/reset/request', '비밀번호 재설정 메일을 요청했습니다.'));
 ui.profileForm.addEventListener('submit', updateProfile);

@@ -9,14 +9,14 @@ const ui = {
     company: $('companySelect'), sort: $('sortSelect'), pageSize: $('pageSize'), cards: $('cards'), resultCount: $('resultCount'), loading: $('searchAction'),
     failed: $('searchFailed'), empty: $('searchEmpty'), retry: $('retryButton'), pagination: $('pagination'),
     prev: $('prevPage'), next: $('nextPage'), pageLabel: $('pageLabel'), tags: [...document.querySelectorAll('.tag')],
-    blogList: $('blogList'), apiStatus: $('apiStatus'), apiStatusText: $('apiStatusText'), articleDialog: $('articleDialog'), dialogTitle: $('dialogTitle'),
+    blogList: $('blogList'), blogListStatus: $('blogListStatus'), retryBlogs: $('retryBlogsButton'), apiStatus: $('apiStatus'), apiStatusText: $('apiStatusText'), articleDialog: $('articleDialog'), dialogTitle: $('dialogTitle'),
     dialogMeta: $('dialogMeta'), dialogText: $('dialogText'), dialogLink: $('dialogLink'),
     accountLink: $('accountLink'), logout: $('logoutButton'), userLabel: $('userLabel')
 };
 
 const state = {
     token: window.feedApi.getToken(), user: null, blogs: [], articles: [], total: 0,
-    offset: 0, pageSize: 20, searchTimer: null, activeTag: '', topicCounts: null, activeArticleId: null
+    offset: 0, pageSize: 20, searchTimer: null, activeTag: '', topicCounts: null, activeArticleId: null, taggedArticles: null, taggedQueryKey: ''
 };
 
 async function api(path, options = {}) {
@@ -71,18 +71,45 @@ async function loadArticles() {
     ui.resultCount.textContent = '';
     ui.pagination.classList.add('hide');
     setStatus('loading');
-    const params = new URLSearchParams({ limit: String(state.pageSize), offset: String(state.offset) });
+    const filters = new URLSearchParams();
     const query = ui.search.value.trim();
-    if (query) params.set('q', query);
-    if (ui.source.value) params.set('blog_id', ui.source.value);
-    if (ui.company.value) params.set('company', ui.company.value);
-    if (ui.from.value) params.set('from', ui.from.value);
-    if (ui.to.value) params.set('to', ui.to.value);
-    if (ui.sort.value) params.set('sort', ui.sort.value);
+    if (query) filters.set('q', query);
+    if (ui.source.value) filters.set('blog_id', ui.source.value);
+    if (ui.company.value) filters.set('company', ui.company.value);
+    if (ui.from.value) filters.set('from', ui.from.value);
+    if (ui.to.value) filters.set('to', ui.to.value);
+    if (ui.sort.value) filters.set('sort', ui.sort.value);
     try {
-        const payload = await api(`/api/articles?${params}`);
-        state.articles = Array.isArray(payload?.articles) ? payload.articles : [];
-        state.total = Number(payload?.total ?? payload?.count ?? state.articles.length);
+        if (state.activeTag) {
+            const queryKey = `${filters.toString()}|${state.activeTag}`;
+            if (state.taggedQueryKey !== queryKey || !Array.isArray(state.taggedArticles)) {
+                const all = [];
+                let offset = 0;
+                let total = 0;
+                do {
+                    const params = new URLSearchParams(filters);
+                    params.set('limit', String(PAGE_SIZE_LIMIT));
+                    params.set('offset', String(offset));
+                    const payload = await api(`/api/articles?${params}`);
+                    const batch = Array.isArray(payload?.articles) ? payload.articles : [];
+                    total = Number(payload?.total ?? offset + batch.length);
+                    all.push(...batch);
+                    offset += batch.length;
+                    if (!batch.length) break;
+                } while (offset < total);
+                state.taggedArticles = all.filter((article) => articleMatchesTag(article, state.activeTag));
+                state.taggedQueryKey = queryKey;
+            }
+            state.total = state.taggedArticles.length;
+            state.articles = state.taggedArticles.slice(state.offset, state.offset + state.pageSize);
+        } else {
+            const params = new URLSearchParams(filters);
+            params.set('limit', String(state.pageSize));
+            params.set('offset', String(state.offset));
+            const payload = await api(`/api/articles?${params}`);
+            state.articles = Array.isArray(payload?.articles) ? payload.articles : [];
+            state.total = Number(payload?.total ?? payload?.count ?? state.articles.length);
+        }
         renderArticles();
     } catch (error) {
         if (error.name === 'AbortError') return;
@@ -139,21 +166,24 @@ async function loadTopicCounts() {
 }
 function renderArticles() {
     clearArticleCards();
-    const visibleArticles = state.activeTag ? state.articles.filter((article) => articleMatchesTag(article, state.activeTag)) : state.articles;
+    const visibleArticles = state.articles;
     visibleArticles.forEach((article) => {
-        const card = makeElement('button', 'card');
-        card.type = 'button';
-        card.addEventListener('click', () => openArticle(article));
-        const titleBox = makeElement('div', 'cardTitleBox');
-        const title = makeElement('h3', 'cardTitle', article.title || '제목 없음');
+        const card = makeElement('article', 'card');
+        const openButton = makeElement('button', 'cardOpen');
+        openButton.type = 'button';
+        openButton.setAttribute('aria-label', `게시글 열기: ${article.title || '제목 없음'}`);
+        openButton.addEventListener('click', () => openArticle(article));
+        const titleBox = makeElement('span', 'cardTitleBox');
+        const title = makeElement('span', 'cardTitle', article.title || '제목 없음');
         title.title = article.title || '';
         titleBox.append(title);
-        const textBox = makeElement('div', 'cardTextBox');
+        const textBox = makeElement('span', 'cardTextBox');
         textBox.append(makeElement('strong', 'cardCompany', [article.blog_name, article.company].filter(Boolean).join(' · ')));
         const meta = [article.author, safeDate(article.published_at || article.fetched_at)].filter(Boolean).join(' · ');
         if (meta) textBox.append(makeElement('span', 'cardMeta', meta));
-        if (article.summary) textBox.append(makeElement('p', 'cardDesc', article.summary));
-        card.append(titleBox, textBox);
+        if (article.summary) textBox.append(makeElement('span', 'cardDesc', article.summary));
+        openButton.append(titleBox, textBox);
+        card.append(openButton);
         ui.cards.append(card);
     });
 
@@ -197,12 +227,22 @@ function openArticle(article) {
 }
 
 async function loadBlogs() {
+    ui.blogListStatus.textContent = '블로그 목록을 불러오는 중입니다.';
+    ui.blogListStatus.classList.remove('hide', 'isError');
+    ui.retryBlogs.classList.add('hide');
     try {
         const payload = await api('/api/blogs');
         state.blogs = Array.isArray(payload?.blogs) ? payload.blogs : [];
         fillBlogFilters();
         renderBlogList();
-    } catch (error) { console.error('블로그 목록 조회 실패:', error); }
+        ui.blogListStatus.classList.toggle('hide', state.blogs.length > 0);
+        if (!state.blogs.length) ui.blogListStatus.textContent = '등록된 블로그가 없습니다.';
+    } catch (error) {
+        console.error('블로그 목록 조회 실패:', error);
+        ui.blogListStatus.textContent = '블로그 목록을 불러오지 못했습니다.';
+        ui.blogListStatus.classList.add('isError');
+        ui.retryBlogs.classList.remove('hide');
+    }
 }
 function fillBlogFilters() {
     const current = ui.source.value;
@@ -256,13 +296,17 @@ function bindEvents() {
     ui.search.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.isComposing) { clearTimeout(state.searchTimer); state.offset = 0; loadArticles(); } });
     [ui.source, ui.company, ui.from, ui.to, ui.pageSize, ui.sort].forEach((control) => control.addEventListener('change', () => { state.offset = 0; loadArticles(); if (control === ui.source) renderBlogList(); }));
     ui.retry.addEventListener('click', loadArticles);
+    ui.retryBlogs.addEventListener('click', loadBlogs);
     ui.prev.addEventListener('click', () => { state.offset = Math.max(0, state.offset - state.pageSize); loadArticles(); });
     ui.next.addEventListener('click', () => { if (state.offset + state.pageSize < state.total) { state.offset += state.pageSize; loadArticles(); } });
     ui.tags.forEach((button) => button.addEventListener('click', () => {
         const name = button.querySelector('.tagName').textContent.trim();
         state.activeTag = state.activeTag === name ? '' : name;
+        state.offset = 0;
+        state.taggedArticles = null;
+        state.taggedQueryKey = '';
         ui.tags.forEach((item) => item.setAttribute('aria-pressed', String(item.querySelector('.tagName').textContent.trim() === state.activeTag)));
-        renderArticles();
+        loadArticles();
     }));
     ui.logout.addEventListener('click', logout);
     $('dialogClose').addEventListener('click', () => ui.articleDialog.close());

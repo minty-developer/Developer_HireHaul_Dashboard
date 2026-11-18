@@ -2,10 +2,22 @@
 
 const $ = (id) => document.getElementById(id);
 const ui = {
-    prompt: $('authPrompt'), manager: $('subscriptionManager'), form: $('subscriptionForm'),
+    prompt: $('authPrompt'), promptMessage: $('authPromptMessage'), manager: $('subscriptionManager'), form: $('subscriptionForm'),
     keyword: $('keywordInput'), webhook: $('webhookInput'), message: $('subscriptionMessage'),
     list: $('subscriptionList'), refresh: $('refreshSubscriptions')
 };
+
+async function api(path, options) {
+    try { return await window.feedApi.request(path, options); }
+    catch (error) {
+        if (error.status === 401) {
+            window.feedApi.clearToken();
+            setSignedIn(false);
+            ui.promptMessage.textContent = '로그인 세션이 만료되었습니다. 다시 로그인해 주세요.';
+        }
+        throw error;
+    }
+}
 
 function setSignedIn(signedIn) {
     ui.prompt.classList.toggle('hide', signedIn);
@@ -26,9 +38,10 @@ async function loadSubscriptions() {
         return;
     }
     setSignedIn(true);
+    ui.promptMessage.textContent = '구독을 관리하려면 로그인하세요.';
     ui.message.textContent = '구독을 불러오는 중…';
     try {
-        const payload = await window.feedApi.request('/api/subscriptions');
+        const payload = await api('/api/subscriptions');
         renderSubscriptions(Array.isArray(payload?.subscriptions) ? payload.subscriptions : []);
         ui.message.textContent = '';
     } catch (error) {
@@ -68,7 +81,7 @@ function renderSubscriptions(subscriptions) {
         const remove = makeAction('삭제', 'dangerAction');
         toggle.addEventListener('click', async () => {
             try {
-                await window.feedApi.request(`/api/subscriptions/${encodeURIComponent(subscription.id)}`, {
+                await api(`/api/subscriptions/${encodeURIComponent(subscription.id)}`, {
                     method: 'PATCH', body: JSON.stringify({ active: !isActive })
                 });
                 await loadSubscriptions();
@@ -79,7 +92,7 @@ function renderSubscriptions(subscriptions) {
             const url = window.prompt('Discord 웹훅 URL을 입력하세요. 비우면 연결을 해제합니다.', subscription.discord_webhook_url || '');
             if (url === null) return;
             try {
-                await window.feedApi.request(`/api/subscriptions/${encodeURIComponent(subscription.id)}`, {
+                await api(`/api/subscriptions/${encodeURIComponent(subscription.id)}`, {
                     method: 'PATCH', body: JSON.stringify({ discord_webhook_url: url.trim() || null })
                 });
                 await loadSubscriptions();
@@ -88,7 +101,7 @@ function renderSubscriptions(subscriptions) {
         remove.addEventListener('click', async () => {
             if (!window.confirm(`“${subscription.keyword}” 구독을 삭제할까요?`)) return;
             try {
-                await window.feedApi.request(`/api/subscriptions/${encodeURIComponent(subscription.id)}`, { method: 'DELETE' });
+                await api(`/api/subscriptions/${encodeURIComponent(subscription.id)}`, { method: 'DELETE' });
                 await loadSubscriptions();
                 ui.message.textContent = '키워드 구독을 삭제했습니다.';
             } catch (error) { ui.message.textContent = error.message; }
@@ -103,7 +116,7 @@ async function createSubscription(event) {
     event.preventDefault();
     ui.message.textContent = '';
     try {
-        await window.feedApi.request('/api/subscriptions', {
+        await api('/api/subscriptions', {
             method: 'POST',
             body: JSON.stringify({ keyword: ui.keyword.value.trim(), discord_webhook_url: ui.webhook.value.trim() || undefined })
         });

@@ -28,7 +28,9 @@ form.addEventListener('submit', async (event) => {
         });
         form.reset();
         message.textContent = '비밀번호를 변경했습니다. 새 비밀번호로 로그인하세요.';
-        document.getElementById('returnLink').textContent = '로그인하기';
+        const returnLink = document.getElementById('returnLink');
+        returnLink.href = '../account.html';
+        returnLink.textContent = '로그인하기';
         const cleanUrl = new URL(window.location.href);
         cleanUrl.searchParams.delete('token');
         window.history.replaceState(null, '', cleanUrl);

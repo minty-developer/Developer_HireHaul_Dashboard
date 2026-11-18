@@ -12,7 +12,7 @@
         if (token) headers.Authorization = `Bearer ${token}`;
         if (options.body !== undefined && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
         try {
-            const response = await fetch(`${window.FEED_API_BASE_URL || 'http://127.0.0.1:5000'}${path}`, {
+            const response = await fetch(`${window.FEED_API_BASE_URL || 'https://developer-hirehaul-dashboard-1.onrender.com'}${path}`, {
                 ...options, headers, signal: controller.signal
             });
             if (response.status === 204) return null;
