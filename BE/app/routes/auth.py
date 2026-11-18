@@ -24,10 +24,11 @@ from ..auth import (
 from ..deps import BearerToken, Config, CurrentUser
 from ..errors import ApiError
 from ..logging_config import logger
-from ..mailer import send_email
+from ..mailer import email_enabled, send_email
 from ..schemas import (
     DisplayNameRequest,
     EmailRequest,
+    ErrorResponse,
     LoginRequest,
     LoginResponse,
     MessageResponse,
@@ -44,8 +45,18 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 PUBLIC_USER_FIELDS = ("id", "email", "display_name", "email_verified", "created_at")
 
+MAIL_UNAVAILABLE = {503: {"model": ErrorResponse, "description": "메일 발송 설정 없음"}}
+
+
+def _require_email(config: dict) -> None:
+    # 메일을 못 보내는데 "보냈다"(202)고 답하면 사용자가 오지 않을 메일을 기다리게 된다.
+    if not email_enabled(config):
+        raise ApiError(503, "지금은 메일을 보낼 수 없습니다. 메일 발송 설정이 필요합니다.")
+
 
 def _send_action_email(config: dict, user: dict, purpose: str) -> bool:
+    if not email_enabled(config):
+        return False
     ttl_key = (
         "EMAIL_VERIFICATION_TTL_SECONDS"
         if purpose == "verify_email"
@@ -59,8 +70,6 @@ def _send_action_email(config: dict, user: dict, purpose: str) -> bool:
     else:
         subject, path = "비밀번호 재설정 안내", "reset-password"
     url = f"{config['PUBLIC_BASE_URL']}/{path}?token={token}"
-    if config.get("TESTING") and not config.get("SMTP_HOST"):
-        return True
     try:
         send_email(config, user["email"], subject, f"다음 링크를 열어주세요:\n{url}")
     except Exception:
@@ -151,8 +160,9 @@ def logout(_user: CurrentUser, token: BearerToken, config: Config):
     return Response(status_code=204)
 
 
-@router.post("/email/verification/request", status_code=202, response_model=MessageResponse, summary="이메일 인증 메일 재요청")
+@router.post("/email/verification/request", status_code=202, response_model=MessageResponse, responses=MAIL_UNAVAILABLE, summary="이메일 인증 메일 재요청")
 def request_email_verification(config: Config, body: EmailRequest | None = None):
+    _require_email(config)
     user = find_user_by_email(config["DATABASE_PATH"], body.email if body else "")
     if user and not user["email_verified"]:
         _send_action_email(config, user, "verify_email")
@@ -170,8 +180,9 @@ def confirm_email_verification(config: Config, body: TokenRequest | None = None)
     return Response(status_code=204)
 
 
-@router.post("/password/reset/request", status_code=202, response_model=MessageResponse, summary="비밀번호 재설정 메일 요청")
+@router.post("/password/reset/request", status_code=202, response_model=MessageResponse, responses=MAIL_UNAVAILABLE, summary="비밀번호 재설정 메일 요청")
 def request_password_reset(config: Config, body: EmailRequest | None = None):
+    _require_email(config)
     user = find_user_by_email(config["DATABASE_PATH"], body.email if body else "")
     if user:
         _send_action_email(config, user, "reset_password")
