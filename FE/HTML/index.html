@@ -16,7 +16,7 @@
         </div>
         <div class="searchBox" role="search">
             <label class="srOnly" for="searchInput">기술 글 검색</label>
-            <input type="search" id="searchInput" maxlength="200" autocomplete="off" placeholder="글 제목, 기술, 기업 검색…">
+            <input type="search" id="searchInput" maxlength="200" autocomplete="off" placeholder="글 제목, 요약, 본문, 작성자 검색…">
         </div>
         <div class="authHeader"><span id="apiStatus" class="apiStatus" data-state="checking" role="status"><span class="apiStatusDot" aria-hidden="true"></span><span id="apiStatusText">API 연결 확인 중</span></span><span id="userLabel" class="userLabel"></span><a id="accountLink" class="textButton" href="account.html">로그인</a><button id="logoutButton" class="textButton hide" type="button">로그아웃</button></div>
     </header>
@@ -78,8 +78,10 @@
         </aside>
     </main>
     <dialog id="articleDialog" aria-labelledby="dialogTitle">
-        <p class="eyebrow">ARTICLE</p><h3 id="dialogTitle"></h3><p id="dialogMeta"></p><p id="dialogText"></p>
-        <div class="dialogActions"><a id="dialogLink" class="dialogLink hide" href="#" target="_blank" rel="noopener noreferrer">원문 읽기 ↗</a><button type="button" id="dialogClose">닫기</button></div>
+        <p class="eyebrow">ARTICLE</p><h3 id="dialogTitle"></h3><p id="dialogMeta"></p>
+        <a id="dialogLink" class="dialogLink hide" href="#" target="_blank" rel="noopener noreferrer">원문 보기 ↗</a>
+        <p id="dialogText"></p>
+        <div class="dialogActions"><button type="button" id="dialogClose">닫기</button></div>
     </dialog>
     <script src="../JS/config.js"></script>
     <script src="../JS/api-client.js"></script>

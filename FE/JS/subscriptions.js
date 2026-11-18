@@ -12,8 +12,7 @@ async function api(path, options) {
     catch (error) {
         if (error.status === 401) {
             window.feedApi.clearToken();
-            setSignedIn(false);
-            ui.promptMessage.textContent = '로그인 세션이 만료되었습니다. 다시 로그인해 주세요.';
+            window.location.replace('account.html?expired=1&next=subscriptions.html');
         }
         throw error;
     }
@@ -71,7 +70,7 @@ function renderSubscriptions(subscriptions) {
         title.textContent = subscription.keyword;
         const status = document.createElement('p');
         status.className = 'flowHint';
-        status.textContent = `${isActive ? '구독 중' : '일시정지'} · ${subscription.discord_webhook_url ? 'Discord 알림 연결됨' : '웹훅 미설정'}`;
+        status.textContent = `${isActive ? '구독 중' : '일시정지'} · ${subscription.discord_webhook_url ? '웹훅 등록됨 · 실제 알림 발송 대기 중' : '웹훅 미설정'}`;
         details.append(title, status);
 
         const actions = document.createElement('div');

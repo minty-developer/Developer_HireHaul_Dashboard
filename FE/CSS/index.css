@@ -131,7 +131,8 @@ aside { padding: 39px 0 48px; }
 #dialogMeta { margin: 9px 0 22px; color: var(--muted); font-size: 13px; }
 #dialogText { max-height: 40vh; overflow-y: auto; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
 .dialogActions { margin-top: 28px; display: flex; justify-content: flex-end; align-items: center; gap: 20px; }
-.dialogLink, #dialogClose { border: 0; border-bottom: 1px solid var(--text); background: transparent; color: var(--text); font: inherit; font-size: 13px; text-decoration: none; cursor: pointer; }
+.dialogLink { width: fit-content; margin: 20px 0 14px; padding: 8px 12px; display: inline-flex; align-items: center; border: 1px solid var(--accent); background: #fff7ed; color: var(--accent); font: inherit; font-size: 13px; font-weight: 650; text-decoration: none; cursor: pointer; }
+#dialogClose { border: 0; border-bottom: 1px solid var(--text); background: transparent; color: var(--text); font: inherit; font-size: 13px; text-decoration: none; cursor: pointer; }
 .dialogLink:hover, #dialogClose:hover { color: var(--accent); border-color: var(--accent); }
 @media (max-width: 1200px) {
     main { grid-template-columns: minmax(0, 1fr); gap: 0; }

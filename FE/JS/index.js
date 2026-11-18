@@ -208,7 +208,7 @@ function openArticle(article) {
     state.activeArticleId = article.id;
     ui.dialogTitle.textContent = article.title || '제목 없음';
     ui.dialogMeta.textContent = [article.blog_name, article.company, article.author, safeDate(article.published_at || article.fetched_at)].filter(Boolean).join(' · ');
-    ui.dialogText.textContent = article.content || article.summary || '본문을 불러오고 있습니다.';
+    ui.dialogText.textContent = article.content || article.summary || '본문을 확인할 수 없습니다. 원문에서 확인해 주세요.';
     ui.dialogLink.href = article.url || '#';
     ui.dialogLink.classList.toggle('hide', !article.url);
     ui.articleDialog.showModal();
@@ -216,11 +216,11 @@ function openArticle(article) {
         api(`/api/articles/${encodeURIComponent(article.id)}`).then((payload) => {
             const detail = payload?.article;
             if (detail && ui.articleDialog.open && state.activeArticleId === article.id) {
-                ui.dialogText.textContent = detail.content || detail.summary || '본문이 제공되지 않습니다.';
+                ui.dialogText.textContent = detail.content || detail.summary || '본문을 확인할 수 없습니다. 원문에서 확인해 주세요.';
                 if (detail.url) ui.dialogLink.href = detail.url;
             }
         }).catch((error) => {
-            if (state.activeArticleId === article.id) ui.dialogText.textContent = article.summary || '본문을 불러오지 못했습니다.';
+            if (state.activeArticleId === article.id) ui.dialogText.textContent = article.summary || '본문을 불러오지 못했습니다. 원문에서 확인해 주세요.';
             console.error('게시글 상세 조회 실패:', error);
         });
     }

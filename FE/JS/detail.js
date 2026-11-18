@@ -87,20 +87,10 @@ function makeArticle(article) {
     const item = document.createElement('article');
     item.className = 'articleItem';
     const titleText = article.title || '제목 없음';
-    if (article.url) {
-        const title = document.createElement('a');
-        title.className = 'articleTitle';
-        title.href = article.url;
-        title.target = '_blank';
-        title.rel = 'noopener noreferrer';
-        title.textContent = titleText;
-        item.append(title);
-    } else {
-        const title = document.createElement('h3');
-        title.className = 'articleTitle';
-        title.textContent = titleText;
-        item.append(title);
-    }
+    const title = document.createElement('h3');
+    title.className = 'articleTitle';
+    title.textContent = titleText;
+    item.append(title);
     if (article.summary) {
         const summary = document.createElement('p');
         summary.className = 'articleSummary';
@@ -113,6 +103,15 @@ function makeArticle(article) {
         meta.className = 'articleMeta';
         meta.textContent = metadata;
         item.append(meta);
+    }
+    if (article.url) {
+        const source = document.createElement('a');
+        source.className = 'articleSource';
+        source.href = article.url;
+        source.target = '_blank';
+        source.rel = 'noopener noreferrer';
+        source.textContent = '원문 보기 ↗';
+        item.append(source);
     }
     const arrow = document.createElement('span');
     arrow.className = 'articleArrow';

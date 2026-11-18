@@ -55,6 +55,8 @@ main { width: min(1120px, 100%); margin: 0 auto; padding: 0 clamp(22px, 5vw, 64p
 .articleItem:focus-visible { position: relative; z-index: 1; }
 .articleTitle { grid-column: 1; font-size: 19px; font-weight: 650; letter-spacing: -.025em; line-height: 1.45; }
 .articleSummary { grid-column: 1; max-width: 690px; color: var(--muted); font-size: 13px; line-height: 1.75; }
+.articleSource { grid-column: 1; justify-self: start; margin-top: 5px; padding: 5px 0; border-bottom: 1px solid var(--accent); color: var(--accent); font-size: 12px; font-weight: 650; text-decoration: none; transition: color var(--ease), border-color var(--ease); }
+.articleSource:hover { border-color: var(--text); color: var(--text); }
 .articleMeta { grid-column: 1; color: var(--quiet); font-size: 11px; }
 .articleArrow { grid-column: 2; grid-row: 1 / span 3; align-self: center; color: var(--quiet); font-size: 17px; transition: color var(--ease), transform var(--ease); }
 .articleItem:hover .articleArrow { color: var(--accent); transform: translate(2px, -2px); }

@@ -4,13 +4,13 @@ const $ = (id) => document.getElementById(id);
 const ui = {
     authPanel: $('authPanel'), userPanel: $('userPanel'), authForm: $('authForm'), authEmail: $('authEmail'),
     authPassword: $('authPassword'), displayNameField: $('displayNameField'), displayName: $('displayName'),
-    authMessage: $('authMessage'), authSubmit: $('authSubmit'), recoveryMessage: $('recoveryMessage'),
+    authMessage: $('authMessage'), authSubmit: $('authSubmit'),
     accountIdentity: $('accountIdentity'), accountNotice: $('accountNotice'), profileForm: $('profileForm'),
     profileName: $('profileDisplayName'), profileMessage: $('profileMessage'), passwordForm: $('passwordForm'),
     currentPassword: $('currentPassword'), newPassword: $('newPassword'), passwordMessage: $('passwordMessage'),
     deleteForm: $('deleteAccountForm'), deletePassword: $('deleteAccountPassword'), deleteMessage: $('deleteAccountMessage')
 };
-const state = { mode: 'login', user: null, throttleTimer: null, verificationPending: false, verificationEmail: '' };
+const state = { mode: 'login', user: null, throttleTimer: null };
 const nextPage = new URLSearchParams(window.location.search).get('next');
 
 function setMode(mode) {
@@ -25,9 +25,7 @@ function setMode(mode) {
         tab.classList.toggle('active', active);
         tab.setAttribute('aria-selected', String(active));
     });
-    ui.authPanel.classList.toggle('verificationPending', mode === 'login' && state.verificationPending);
     ui.authMessage.textContent = '';
-    ui.recoveryMessage.textContent = '';
 }
 
 function showAuth(message = '') {
@@ -44,6 +42,16 @@ function showAccount(user) {
     ui.profileName.value = user.display_name || '';
 }
 
+function handleUnauthorized(error) {
+    if (error.status !== 401) return false;
+    window.feedApi.clearToken();
+    state.user = null;
+    setMode('login');
+    showAuth('로그인 세션이 만료되었습니다. 다시 로그인해 주세요.');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return true;
+}
+
 async function restoreAccount() {
     if (!window.feedApi.getToken()) {
         showAuth(new URLSearchParams(window.location.search).has('expired') ? '로그인 세션이 만료되었습니다. 다시 로그인해 주세요.' : '');
@@ -53,8 +61,7 @@ async function restoreAccount() {
         const payload = await window.feedApi.request('/api/auth/me');
         showAccount(payload?.user ?? payload);
     } catch (error) {
-        if (error.status === 401) window.feedApi.clearToken();
-        showAuth(error.status === 401 ? '로그인 세션이 만료되었습니다. 다시 로그인해 주세요.' : error.message);
+        if (!handleUnauthorized(error)) showAuth(error.message);
     }
 }
 
@@ -86,13 +93,14 @@ async function submitAuth(event) {
                 method: 'POST', body: JSON.stringify({ email, password, display_name: ui.displayName.value.trim() })
             });
             ui.authForm.reset();
-            state.verificationPending = true;
-            state.verificationEmail = email;
             setMode('login');
             ui.authEmail.value = email;
-            ui.authMessage.textContent = payload?.verification_sent
-                ? '가입을 완료했습니다. 이메일 인증 링크를 확인한 뒤 로그인하세요.'
-                : '가입을 완료했습니다. 인증 메일을 받지 못했다면 다시 요청하세요.';
+            if (payload?.verification_sent) {
+                ui.authMessage.textContent = '가입을 완료했습니다. 이메일 인증 링크를 확인한 뒤 로그인하세요.';
+            } else {
+                ui.authMessage.textContent = '';
+                ui.authPassword.focus();
+            }
             return;
         }
         const payload = await window.feedApi.request('/api/auth/login', {
@@ -103,32 +111,13 @@ async function submitAuth(event) {
         const destination = nextPage === 'subscriptions.html' ? 'subscriptions.html' : 'index.html';
         window.location.replace(destination);
     } catch (error) {
-        if (error.status === 403) {
-            state.verificationPending = true;
-            state.verificationEmail = email;
-            ui.authPanel.classList.add('verificationPending');
-        }
         ui.authMessage.textContent = error.status === 403
-            ? '이메일 인증이 필요합니다. 인증 메일을 확인하거나 다시 요청하세요.'
+            ? '서버가 이메일 인증을 요구해 로그인할 수 없습니다. 인증 메일 발송은 현재 사용할 수 없으므로 서버 설정 확인이 필요합니다.'
             : error.message;
         if (error.status === 429 && error.retryAfterSeconds > 0) throttleLogin(error.retryAfterSeconds);
     } finally {
         if (!state.throttleTimer) ui.authSubmit.disabled = false;
     }
-}
-
-async function requestEmailAction(path, successMessage) {
-    ui.recoveryMessage.textContent = '';
-    if (!ui.authEmail.value.trim() || !ui.authEmail.checkValidity()) {
-        ui.authEmail.reportValidity();
-        return;
-    }
-    try {
-        const payload = await window.feedApi.request(path, {
-            method: 'POST', body: JSON.stringify({ email: ui.authEmail.value.trim() })
-        });
-        ui.recoveryMessage.textContent = payload?.message || successMessage;
-    } catch (error) { ui.recoveryMessage.textContent = error.message; }
 }
 
 async function updateProfile(event) {
@@ -145,7 +134,7 @@ async function updateProfile(event) {
         });
         showAccount(payload?.user ?? payload);
         ui.profileMessage.textContent = '표시 이름을 저장했습니다.';
-    } catch (error) { ui.profileMessage.textContent = error.message; }
+    } catch (error) { if (!handleUnauthorized(error)) ui.profileMessage.textContent = error.message; }
 }
 
 async function changePassword(event) {
@@ -166,7 +155,7 @@ async function changePassword(event) {
         ui.authEmail.value = email;
         showAuth('비밀번호가 변경되었습니다. 새 비밀번호로 다시 로그인하세요.');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) { ui.passwordMessage.textContent = error.message; }
+    } catch (error) { if (!handleUnauthorized(error)) ui.passwordMessage.textContent = error.message; }
 }
 
 async function deleteAccount(event) {
@@ -179,27 +168,25 @@ async function deleteAccount(event) {
         });
         window.feedApi.clearToken();
         window.location.replace('index.html');
-    } catch (error) { ui.deleteMessage.textContent = error.message; }
+    } catch (error) { if (!handleUnauthorized(error)) ui.deleteMessage.textContent = error.message; }
 }
 
 async function logout() {
     try { await window.feedApi.request('/api/auth/logout', { method: 'POST' }); }
-    catch (error) { if (error.status !== 401) console.warn('로그아웃 요청 실패:', error); }
+    catch (error) {
+        if (error.status === 401) {
+            window.feedApi.clearToken();
+            window.location.replace('account.html?expired=1');
+            return;
+        }
+        console.warn('로그아웃 요청 실패:', error);
+    }
     window.feedApi.clearToken();
     window.location.replace('index.html');
 }
 
 document.querySelectorAll('.authTab').forEach((tab) => tab.addEventListener('click', () => setMode(tab.dataset.mode)));
 ui.authForm.addEventListener('submit', submitAuth);
-ui.authEmail.addEventListener('input', () => {
-    if (state.verificationPending && ui.authEmail.value.trim() !== state.verificationEmail) {
-        state.verificationPending = false;
-        state.verificationEmail = '';
-        ui.authPanel.classList.remove('verificationPending');
-    }
-});
-document.getElementById('verificationResend').addEventListener('click', () => requestEmailAction('/api/auth/email/verification/request', '인증 메일을 요청했습니다.'));
-document.getElementById('passwordResetRequest').addEventListener('click', () => requestEmailAction('/api/auth/password/reset/request', '비밀번호 재설정 메일을 요청했습니다.'));
 ui.profileForm.addEventListener('submit', updateProfile);
 ui.passwordForm.addEventListener('submit', changePassword);
 ui.deleteForm.addEventListener('submit', deleteAccount);

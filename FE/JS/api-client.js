@@ -2,7 +2,7 @@
 
 (() => {
     const TOKEN_KEY = 'techBlogAggregatorToken';
-    const API_TIMEOUT_MS = 30000;
+    const API_TIMEOUT_MS = 65000;
 
     async function request(path, options = {}) {
         const controller = new AbortController();
@@ -12,7 +12,7 @@
         if (token) headers.Authorization = `Bearer ${token}`;
         if (options.body !== undefined && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
         try {
-            const response = await fetch(`${window.FEED_API_BASE_URL || 'https://developer-hirehaul-dashboard-1.onrender.com'}${path}`, {
+            const response = await fetch(`${window.FEED_API_BASE_URL || 'https://tech-blog-aggregator.onrender.com'}${path}`, {
                 ...options, headers, signal: controller.signal
             });
             if (response.status === 204) return null;
