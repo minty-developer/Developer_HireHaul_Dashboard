@@ -36,8 +36,9 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: './FE/HTML'
+          # Keep HTML, CSS, and JS as sibling directories so the relative
+          # asset paths in FE/HTML continue to resolve after deployment.
+          path: './FE'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
