@@ -8,11 +8,16 @@
 
 | 항목 | 값 |
 | --- | --- |
+| 서버 주소 (운영, 4번 담당 배포) | `https://tech-blog-aggregator.onrender.com` |
+| 운영 API 문서 (Swagger) | `https://tech-blog-aggregator.onrender.com/api/docs` |
 | 서버 주소 (로컬) | `http://127.0.0.1:5000` |
 | API 문서 (Swagger) | `http://127.0.0.1:5000/api/docs` |
 | OpenAPI 명세 | `http://127.0.0.1:5000/api/openapi.json` |
-| 허용된 프론트 주소 (CORS) | `http://localhost:3000` (다른 주소면 백엔드에 요청) |
+| 운영 프론트 주소 (CORS) | `https://minty-developer.github.io` |
+| 로컬 프론트 주소 (개발 설정) | `http://localhost:3000` |
 
+- 프론트의 API 기본 주소는 위 운영 서버를 사용합니다. 게시글 요청 URL은 `https://tech-blog-aggregator.onrender.com/api/articles`입니다.
+- 2026-11-19 외부 응답 확인: 운영 프론트 Origin의 GET·OPTIONS는 200 및 `Access-Control-Allow-Origin` 반환, 미허용 Origin의 GET은 해당 헤더 없음. 배포된 코드 버전이나 프로세스 환경변수 자체를 확인한 것은 아닙니다.
 - Swagger에서 모든 API를 직접 호출해 볼 수 있습니다.
 - 토큰이 필요한 API는 오른쪽 위 **Authorize** 버튼에 토큰을 넣고 호출하면 됩니다.
 

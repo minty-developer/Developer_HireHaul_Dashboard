@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -46,6 +47,7 @@ def load_config(overrides: dict | None = None) -> dict:
     }
     if overrides:
         config.update(overrides)
+    config["CORS_ORIGINS"] = ",".join(cors_origins(config))
     _validate(config)
     return config
 
@@ -66,4 +68,28 @@ def _validate(config: dict) -> None:
 
 
 def cors_origins(config: dict) -> list[str]:
-    return [origin.strip() for origin in config["CORS_ORIGINS"].split(",") if origin.strip()]
+    origins = []
+    for value in config["CORS_ORIGINS"].split(","):
+        origin = value.strip().rstrip("/")
+        if not origin:
+            continue
+        if origin != "*":
+            try:
+                parsed = urlsplit(origin)
+                valid = (
+                    parsed.scheme in {"http", "https"}
+                    and parsed.hostname
+                    and parsed.username is None and parsed.password is None
+                    and not parsed.path and not parsed.query and not parsed.fragment
+                    and "?" not in origin and "#" not in origin
+                    and not any(char.isspace() or ord(char) < 32 for char in origin)
+                )
+                parsed.port  # Validate the optional port.
+            except ValueError:
+                valid = False
+            if not valid:
+                # Never include the input: it may contain credentials or tokens.
+                raise RuntimeError("CORS_ORIGINS requires http(s) origins without credentials, paths, queries or fragments.")
+        if origin not in origins:
+            origins.append(origin)
+    return origins

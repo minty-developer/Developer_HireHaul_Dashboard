@@ -18,6 +18,7 @@ class JsonFormatter(logging.Formatter):
         for field in (
             "request_id", "method", "path", "status", "duration_ms",
             "total", "failed", "saved",
+            "cors_origins", "process_id", "cors_origin_allowed",
         ):
             value = getattr(record, field, None)
             if value is not None:

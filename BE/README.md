@@ -70,6 +70,34 @@ FastAPI와 SQLite 기반 기술 블로그 서비스의 백엔드(API·검색·DB
 
 ## API
 
+### 배포 CORS 확인
+
+배포 서비스 환경변수에 `CORS_ORIGINS=https://minty-developer.github.io`를 설정하고
+앱을 재시작/재배포합니다. 여러 Origin은 쉼표로 구분합니다. 앞뒤 공백과 끝 `/`는
+제거하며, 경로(`/저장소명`), 쿼리, 인증정보가 포함된 URL은 설정 오류로 처리합니다.
+로컬 개발용 `http://localhost:3000`도 필요하면 목록에 추가합니다.
+
+`run.py`는 `.env`를 읽되 이미 설정된 프로세스 환경변수를 덮어쓰지 않습니다.
+Docker 이미지에는 `.env`를 복사하지 않으므로 배포 서비스에서 환경변수를 주입해야 합니다.
+환경변수를 바꿔도 이미 실행 중인 앱에는 반영되지 않습니다.
+
+시작 로그 `cors_configured`의 `cors_origins`에 프론트 주소가 들어 있는지 확인합니다
+(`LOG_LEVEL=INFO`). 비밀키나 전체 환경변수는 기록하지 않습니다.
+아래 `BACKEND_URL`을 실제 API 서버 주소로 바꿔 실행합니다.
+
+```sh
+curl -i 'BACKEND_URL/api/articles' -H 'Origin: https://minty-developer.github.io' -H 'X-Request-ID: cors-check'
+curl -i -X OPTIONS 'BACKEND_URL/api/articles' -H 'Origin: https://minty-developer.github.io' -H 'Access-Control-Request-Method: GET'
+curl -i 'BACKEND_URL/api/articles' -H 'Origin: https://untrusted.example'
+```
+
+앞의 두 응답에는 `Access-Control-Allow-Origin: https://minty-developer.github.io`가,
+마지막 응답에는 해당 헤더가 없어야 합니다. 일반 GET의 `request_completed` 로그에서
+`request_id=cors-check`, `cors_origin_allowed=true`와 시작 로그의 `process_id`를 대조합니다.
+프리플라이트는 CORS 미들웨어에서 바로 처리하므로 이 요청 로그에는 남지 않습니다.
+GET 요청 로그가 없다면 요청이 이 앱에 도달했는지 배포 대상·프록시를 확인하고,
+허용 판정이 true인데 외부 응답에 헤더가 없다면 프록시/캐시의 응답도 확인합니다.
+
 - `GET /`: 서비스 안내
 - `GET /api/health`: 서버 및 데이터베이스 상태
 - `GET /api/docs`: Swagger UI (Authorize 버튼으로 Bearer 토큰·관리자 키 입력)

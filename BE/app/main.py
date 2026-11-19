@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import time
 import uuid
 from pathlib import Path
@@ -24,6 +25,8 @@ def create_app(test_config: dict | None = None) -> FastAPI:
     Path(config["DATABASE_PATH"]).parent.mkdir(parents=True, exist_ok=True)
     init_db(config["DATABASE_PATH"])
     configure_logging(config)
+    allowed_origins = cors_origins(config)
+    logger.info("cors_configured", extra={"cors_origins": allowed_origins, "process_id": os.getpid()})
 
     app = FastAPI(
         title="Tech Blog Aggregator API",
@@ -60,14 +63,19 @@ def create_app(test_config: dict | None = None) -> FastAPI:
                 "path": request.url.path,
                 "status": response.status_code,
                 "duration_ms": round((time.perf_counter() - started) * 1000, 2),
+                "process_id": os.getpid(),
+                "cors_origin_allowed": bool(request.headers.get("origin")) and (
+                    "*" in allowed_origins or request.headers.get("origin") in allowed_origins
+                ),
             },
         )
         return response
 
-    # 나중에 추가한 미들웨어가 바깥쪽에서 실행되므로 CORS 응답에도 위 헤더가 붙는다.
+    # CORS wraps request_context, including its early responses (e.g. 413).
+    # Preflight is handled here and does not reach request_context.
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=cors_origins(config),
+        allow_origins=allowed_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )
