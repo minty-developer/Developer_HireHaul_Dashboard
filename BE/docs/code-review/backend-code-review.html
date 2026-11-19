@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>백엔드 코드 리뷰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16213A; --ink2:#2B3754; --muted:#5D6880; --line:#E3E7EF; --paper:#FFFFFF; --tint:#F3F5FA;
+  --accent:#FF6B4A; --accent-soft:#FFE7E1; --ok:#14A38B; --ok-soft:#DDF5EF; --warn:#C98A00; --warn-soft:#FFF3D6;
+  --code-bg:#121A2E; --code-fg:#E6EAF2; --k:#FF9C7F; --s:#9BE3C9; --c:#7E8AA6; --f:#9CC3FF; --n:#FFD37A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0B1020;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;color:var(--ink)}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--paper);padding:56px 72px 64px;display:none;flex-direction:column;overflow:hidden}
+.slide.active{display:flex}
+.slide.dark{background:var(--ink);color:#fff}
+.eyebrow{font-size:15px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+h1{font-size:40px;font-weight:900;line-height:1.25;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:700;margin-bottom:10px}
+p,li{font-size:18px;line-height:1.6}
+.sub{color:var(--muted);font-size:18px;margin-top:10px}
+.dark .sub{color:#B9C2D8}
+.content{flex:1;display:flex;gap:32px;margin-top:28px;min-height:0}
+.col{flex:1;display:flex;flex-direction:column;gap:16px;min-width:0}
+.col.w2{flex:1.35}
+ul.pts{list-style:none;display:flex;flex-direction:column;gap:12px}
+ul.pts li{position:relative;padding-left:26px}
+ul.pts li::before{content:"";position:absolute;left:4px;top:11px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+ul.pts li b{color:var(--ink)}
+.card{background:var(--tint);border-radius:14px;padding:20px 22px}
+.card h2{font-size:19px;margin-bottom:6px}
+.card p{font-size:16px;color:var(--ink2)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.stat{background:var(--tint);border-radius:14px;padding:22px 22px 18px}
+.stat .num{font-size:56px;font-weight:900;line-height:1;color:var(--ink)}
+.stat .num small{font-size:24px;font-weight:700;margin-left:4px}
+.stat .lbl{font-size:16px;color:var(--muted);margin-top:10px}
+.badge{display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:3px 10px;margin-right:6px;vertical-align:middle}
+.b-ok{background:var(--ok-soft);color:var(--ok)} .b-acc{background:var(--accent-soft);color:#D2482A} .b-warn{background:var(--warn-soft);color:var(--warn)} .b-gray{background:#E8EBF2;color:var(--muted)}
+pre{background:var(--code-bg);color:var(--code-fg);border-radius:14px;padding:18px 20px;font-family:"JetBrains Mono",Consolas,monospace;font-size:14.5px;line-height:1.6;overflow:hidden;white-space:pre}
+pre .k{color:var(--k)} pre .s{color:var(--s)} pre .c{color:var(--c)} pre .f{color:var(--f)} pre .n{color:var(--n)}
+pre .hl{background:rgba(255,107,74,.18);display:inline-block;width:100%;margin:0 -20px;padding:0 20px}
+.file{font-family:"JetBrains Mono",Consolas,monospace;font-size:14px;color:var(--muted);margin-bottom:-8px}
+code{font-family:"JetBrains Mono",Consolas,monospace;font-size:.88em;background:var(--tint);border-radius:6px;padding:1px 6px;color:var(--ink2)}
+.dark code{background:rgba(255,255,255,.1);color:#fff}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th{font-size:14px;color:var(--muted);text-align:left;font-weight:700;padding:8px 12px;border-bottom:2px solid var(--line)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+td code{font-size:13.5px}
+.flow{display:flex;align-items:stretch;gap:0;margin-top:8px}
+.node{flex:1;background:var(--tint);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.node.me{background:var(--ink);color:#fff}
+.node.me .who{color:#FFB3A1}
+.node .who{font-size:13px;font-weight:700;color:var(--muted)}
+.node .ttl{font-size:19px;font-weight:700}
+.node .dsc{font-size:14.5px;line-height:1.5;opacity:.85}
+.arrow{width:42px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:26px;font-weight:900;flex:none}
+.callout{border-radius:14px;padding:16px 20px;font-size:16.5px;line-height:1.55}
+.callout.acc{background:var(--accent-soft)} .callout.ok{background:var(--ok-soft)} .callout.warn{background:var(--warn-soft)}
+.foot{position:absolute;left:72px;right:72px;bottom:22px;display:flex;justify-content:space-between;font-size:13px;color:#9AA3B8}
+.dark .foot{color:#6F7A96}
+.big-title{font-size:60px;font-weight:900;line-height:1.15;letter-spacing:-.02em}
+.title-meta{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap}
+.chip{border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 16px;font-size:16px;color:#DDE3F0}
+.num-dot{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+.row{display:flex;gap:14px;align-items:flex-start}
+.row p{font-size:16.5px}
+.row b{display:block;font-size:18px;margin-bottom:2px}
+#nav{position:fixed;right:18px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:5;font-size:13px;color:#8B95AD}
+#nav button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#DDE3F0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit}
+#nav button:hover{background:rgba(255,255,255,.16)}
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--accent);transition:width .2s;z-index:5}
+@media print{
+  html,body{background:#fff} #nav,#progress{display:none}
+  #viewport{position:static;display:block} #stage{transform:none!important;width:auto;height:auto}
+  .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always}
+  @page{size:1280px 720px;margin:0}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="viewport"><div id="stage">
+
+<!-- 1. 표지 -->
+<section class="slide dark" style="justify-content:center">
+  <div class="eyebrow">Code Review · Backend</div>
+  <div class="big-title">기술블로그 수집기<br>백엔드 코드 리뷰</div>
+  <p class="sub" style="font-size:22px;margin-top:18px">FastAPI · 게시글 검색 · DB 연결</p>
+  <div class="title-meta">
+    <span class="chip">2번 백엔드 담당</span>
+    <span class="chip">2026-11-18 기준 main</span>
+    <span class="chip">Python 3.13 · FastAPI 0.162 · SQLite</span>
+  </div>
+  <div class="foot"><span>Tech Blog Aggregator</span><span>← → 키로 넘기기</span></div>
+</section>
+
+<!-- 2. 한눈에 보기 -->
+<section class="slide">
+  <div class="eyebrow">Overview</div>
+  <h1>백엔드는 API·검색·DB만 맡고, 수집과 알림은 분리했습니다</h1>
+  <div class="content" style="flex-direction:column;gap:22px">
+    <div class="grid g4">
+      <div class="stat"><div class="num">25</div><div class="lbl">API 엔드포인트</div></div>
+      <div class="stat"><div class="num">66</div><div class="lbl">자동 테스트 (전부 통과)</div></div>
+      <div class="stat"><div class="num">2.3<small>k</small></div><div class="lbl">앱 코드 줄 수</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">DB 마이그레이션 단계</div></div>
+    </div>
+    <table>
+      <tr><th style="width:18%">담당</th><th style="width:42%">맡은 일</th><th>백엔드와 만나는 곳</th></tr>
+      <tr><td><b>2번 · 백엔드</b></td><td>FastAPI 서버, 검색, DB 스키마·연결, 인증·구독 API</td><td><code>BE/app/</code></td></tr>
+      <tr><td>3번 · RSS 수집</td><td>RSS 수집·파싱·중복 제거 → JSON 생성</td><td><code>rss-collector/</code> → <code>import-rss</code> 명령</td></tr>
+      <tr><td>4번 · 알림/배포</td><td>Discord 웹훅, 스케줄링, Docker</td><td>구독 테이블 <code>subscriptions</code></td></tr>
+      <tr><td>1번 · 프론트</td><td>화면, 검색·블로그·구독 UI</td><td>REST API + Swagger 문서</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>2</span></div>
+</section>
+
+<!-- 3. 데이터 흐름 -->
+<section class="slide">
+  <div class="eyebrow">Architecture</div>
+  <h1>데이터는 JSON → SQLite → API 순서로 흐릅니다</h1>
+  <div class="content" style="flex-direction:column;gap:26px">
+    <div class="flow">
+      <div class="node"><span class="who">3번 · rss-collector</span><span class="ttl">RSS 수집</span><span class="dsc">blogs.json<br>posts.json 생성</span></div>
+      <div class="arrow">→</div>
+      <div class="node me"><span class="who">2번 · rss_import.py</span><span class="ttl">import-rss</span><span class="dsc">날짜 정규화<br>중복 없이 upsert</span></div>
+      <div class="arrow">→</div>
+      <div class="node me"><span class="who">2번 · db.py</span><span class="ttl">SQLite + FTS5</span><span class="dsc">트리거로 검색 색인<br>자동 동기화</span></div>
+      <div class="arrow">→</div>
+      <div class="node me"><span class="who">2번 · FastAPI</span><span class="ttl">REST API</span><span class="dsc">검색·블로그<br>인증·구독·관리자</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="who">1번 · FE</span><span class="ttl">웹 화면</span><span class="dsc">fetch + Bearer 토큰</span></div>
+    </div>
+    <div class="grid g3">
+      <div class="card"><h2>왜 JSON으로 나눴나</h2><p>수집기가 DB 구조를 몰라도 됩니다. 수집 방식이 바뀌어도 백엔드는 JSON 형식만 맞으면 됩니다.</p></div>
+      <div class="card"><h2>왜 SQLite인가</h2><p>파일 하나라 설치가 필요 없고, FTS5로 별도 검색엔진 없이 한국어 부분 검색이 됩니다.</p></div>
+      <div class="card"><h2>4번과의 경계</h2><p>알림은 <code>subscriptions</code> 테이블을 읽어서 보냅니다. 백엔드는 구독 CRUD까지만 책임집니다.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>3</span></div>
+</section>
+
+<!-- 4. 폴더 구조 -->
+<section class="slide">
+  <div class="eyebrow">Structure</div>
+  <h1>파일마다 한 가지 역할만 맡깁니다</h1>
+  <div class="content">
+    <div class="col">
+      <table>
+        <tr><th style="width:38%">파일</th><th>역할</th></tr>
+        <tr><td><code>main.py</code></td><td>앱 생성, 미들웨어, CORS, 문서 보정</td></tr>
+        <tr><td><code>config.py</code></td><td>환경변수 읽기, 운영 모드 필수값 검사</td></tr>
+        <tr><td><code>db.py</code></td><td>연결, 스키마, 마이그레이션</td></tr>
+        <tr><td><code>search.py</code></td><td>게시글 검색 쿼리 생성</td></tr>
+        <tr><td><code>rss_import.py</code></td><td>수집기 JSON → DB</td></tr>
+        <tr><td><code>auth.py</code> · <code>security.py</code></td><td>회원·토큰 / 비밀번호 해시</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <table>
+        <tr><th style="width:38%">파일</th><th>역할</th></tr>
+        <tr><td><code>deps.py</code></td><td>의존성 주입: DB 경로, 로그인 사용자, 관리자</td></tr>
+        <tr><td><code>schemas.py</code></td><td>요청 검증·응답 형식 (Pydantic)</td></tr>
+        <tr><td><code>errors.py</code></td><td>에러를 한국어 JSON으로 통일</td></tr>
+        <tr><td><code>routes/*.py</code></td><td>URL별 라우터 8개</td></tr>
+        <tr><td><code>cli.py</code></td><td>import-rss, 백업·복원, 토큰 정리</td></tr>
+        <tr><td><code>tests/</code></td><td>테스트 파일 9개, 66개 케이스</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>4</span></div>
+</section>
+
+<!-- 5. 앱 생성 -->
+<section class="slide">
+  <div class="eyebrow">main.py</div>
+  <h1>앱 공장 함수 하나로 설정·DB·라우터를 묶습니다</h1>
+  <div class="content">
+    <div class="col w2">
+      <div class="file">BE/app/main.py</div>
+<pre><span class="k">def</span> <span class="f">create_app</span>(test_config=<span class="k">None</span>) -&gt; FastAPI:
+    config = load_config(test_config)
+    init_db(config[<span class="s">"DATABASE_PATH"</span>])   <span class="c"># 마이그레이션 자동 적용</span>
+    app = FastAPI(docs_url=<span class="s">"/api/docs"</span>, ...)
+    app.state.config = config
+
+    <span class="n">@app.middleware</span>(<span class="s">"http"</span>)
+    <span class="k">async def</span> <span class="f">request_context</span>(request, call_next):
+        <span class="c"># 요청 ID · 본문 크기 제한(413) · 보안 헤더</span>
+        <span class="c"># 인증/관리자 응답은 Cache-Control: no-store</span>
+        <span class="c"># 요청마다 JSON 한 줄 로그 (처리 시간 포함)</span>
+        ...
+
+    app.add_middleware(CORSMiddleware, ...)
+    register_error_handlers(app)
+    app.include_router(router)
+    app.openapi = <span class="k">lambda</span>: _openapi(app)
+    <span class="k">return</span> app</pre>
+    </div>
+    <div class="col">
+      <ul class="pts">
+        <li><b>테스트마다 새 앱</b><br>임시 DB 경로를 넘겨 서로 영향 없이 실행합니다.</li>
+        <li><b>설정은 한 곳에서</b><br>운영 모드에서 키가 기본값이면 시작을 막습니다.</li>
+        <li><b>요청 추적</b><br><code>X-Request-ID</code>를 응답과 로그에 같이 남깁니다.</li>
+        <li><b>문서 보정</b><br>Swagger가 실제 응답(400·401)과 같게 나오도록 고쳤습니다.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>5</span></div>
+</section>
+
+<!-- 6. DB 연결 -->
+<section class="slide">
+  <div class="eyebrow">db.py · DB 연결</div>
+  <h1>버전 번호로 스키마를 한 단계씩 올립니다</h1>
+  <div class="content">
+    <div class="col w2">
+      <div class="file">BE/app/db.py</div>
+<pre>MIGRATIONS = (
+    (<span class="n">1</span>, <span class="s">"initial_schema"</span>, SCHEMA),
+    (<span class="n">2</span>, <span class="s">"login_attempts"</span>, LOGIN_ATTEMPTS_SCHEMA),
+    (<span class="n">3</span>, <span class="s">"email_auth"</span>, EMAIL_AUTH_SCHEMA),
+    <span class="c"># 4, 6, 7번은 삭제된 Discord 기능 번호라 비워 둔다</span>
+    (<span class="n">5</span>, <span class="s">"subscription_webhooks"</span>, WEBHOOK_SCHEMA),
+    (<span class="n">8</span>, <span class="s">"article_full_text_search"</span>, ARTICLE_SEARCH_SCHEMA),
+)
+
+<span class="n">@contextmanager</span>
+<span class="k">def</span> <span class="f">connect</span>(path):
+    connection = sqlite3.connect(path, timeout=<span class="n">10</span>)
+    connection.execute(<span class="s">"PRAGMA foreign_keys = ON"</span>)
+    connection.execute(<span class="s">"PRAGMA busy_timeout = 10000"</span>)
+    ...  <span class="c"># 성공하면 commit, 예외면 rollback</span></pre>
+    </div>
+    <div class="col">
+      <div class="card"><h2>적용 이력 테이블</h2><p><code>schema_migrations</code>에 적용한 번호를 기록합니다. 서버를 켤 때 아직 안 된 번호만 실행합니다.</p></div>
+      <div class="card"><h2>WAL 모드</h2><p>읽기와 쓰기가 서로를 막지 않습니다. API 서버와 수집 작업이 동시에 DB를 써도 됩니다.</p></div>
+      <div class="card"><h2>번호를 재사용하지 않는 이유</h2><p>이미 4·6·7번이 적용된 DB가 있어서, 같은 번호를 다른 내용으로 쓰면 건너뛰게 됩니다.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>6</span></div>
+</section>
+
+<!-- 7. 검색 색인 -->
+<section class="slide">
+  <div class="eyebrow">검색 ① · 색인</div>
+  <h1>FTS5 trigram 색인으로 한국어 부분 검색을 합니다</h1>
+  <div class="content">
+    <div class="col w2">
+      <div class="file">BE/app/db.py · ARTICLE_SEARCH_SCHEMA</div>
+<pre><span class="k">CREATE VIRTUAL TABLE</span> articles_fts <span class="k">USING</span> fts5(
+    title, summary, content, author,
+    content=<span class="s">'articles'</span>, content_rowid=<span class="s">'id'</span>,
+<span class="hl">    tokenize=<span class="s">'trigram'</span></span>
+);
+
+<span class="c">-- 글이 추가·수정·삭제되면 색인도 같이 바뀐다</span>
+<span class="k">CREATE TRIGGER</span> articles_fts_insert
+<span class="k">AFTER INSERT ON</span> articles <span class="k">BEGIN</span>
+    <span class="k">INSERT INTO</span> articles_fts (rowid, title, summary, content, author)
+    <span class="k">VALUES</span> (new.id, new.title, new.summary, new.content, new.author);
+<span class="k">END</span>;
+<span class="c">-- ... UPDATE, DELETE 트리거도 같은 방식</span>
+
+<span class="c">-- 기존 글도 마이그레이션 시점에 한 번에 색인</span>
+<span class="k">INSERT INTO</span> articles_fts (articles_fts) <span class="k">VALUES</span> (<span class="s">'rebuild'</span>);</pre>
+    </div>
+    <div class="col">
+      <div class="callout acc"><b>trigram이란?</b><br>글자를 3개씩 잘라 색인합니다. "쿠버네티스" → 쿠버네 · 버네티 · 네티스. 그래서 <b>"버네티"</b>로도 찾힙니다.</div>
+      <ul class="pts">
+        <li>형태소 분석기 없이 한국어·영어 모두 동작</li>
+        <li>대소문자 구분 없음 (<code>kafka</code> = <code>Kafka</code>)</li>
+        <li>원본은 <code>articles</code>에 두고 색인만 따로 (external content)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>7</span></div>
+</section>
+
+<!-- 8. 검색 쿼리 -->
+<section class="slide">
+  <div class="eyebrow">검색 ② · search.py</div>
+  <h1>단어 길이에 따라 색인과 LIKE를 나눠 씁니다</h1>
+  <div class="content">
+    <div class="col w2">
+      <div class="file">BE/app/search.py</div>
+<pre>terms = split_terms(query.q)   <span class="c"># 공백 분리·중복 제거·최대 10개</span>
+fts_terms  = [t <span class="k">for</span> t <span class="k">in</span> terms <span class="k">if</span> len(t) &gt;= <span class="n">3</span>]
+like_terms = [t <span class="k">for</span> t <span class="k">in</span> terms <span class="k">if</span> len(t) &lt; <span class="n">3</span>]
+
+<span class="k">if</span> fts_terms:   <span class="c"># 모든 단어 AND</span>
+    <span class="c"># bm25 가중치: 제목 10 · 요약 3 · 본문 1 · 작성자 2</span>
+    joins.append(<span class="s">"... bm25(articles_fts, 10.0, 3.0, 1.0, 2.0)"</span>
+                 <span class="s">" ... WHERE articles_fts MATCH ?"</span>)
+    values.append(<span class="s">" AND "</span>.join(
+        _fts_phrase(t) <span class="k">for</span> t <span class="k">in</span> fts_terms))
+
+<span class="k">for</span> term <span class="k">in</span> like_terms:   <span class="c"># 1~2글자는 trigram 불가</span>
+    clauses.append(<span class="s">"(a.title LIKE ? ESCAPE '\\' OR ...)"</span>)
+
+<span class="k">def</span> <span class="f">_fts_phrase</span>(term):   <span class="c"># AND, *, - 를 글자로 취급</span>
+    <span class="k">return</span> <span class="s">'"'</span> + term.replace(<span class="s">'"'</span>, <span class="s">'""'</span>) + <span class="s">'"'</span></pre>
+    </div>
+    <div class="col">
+      <table>
+        <tr><th>검색어</th><th>처리</th></tr>
+        <tr><td><code>버네티</code></td><td>색인 검색</td></tr>
+        <tr><td><code>쿠버네티스 Kafka</code></td><td>두 단어 모두 포함</td></tr>
+        <tr><td><code>검색</code></td><td>2글자 → LIKE</td></tr>
+        <tr><td><code>100%</code></td><td><code>%</code>를 글자로 이스케이프</td></tr>
+        <tr><td><code>NOT OR</code></td><td>FTS 문법이 아닌 단어로</td></tr>
+      </table>
+      <div class="callout ok"><b>SQL 주입 방지</b><br>사용자 입력은 모두 <code>?</code> 바인딩으로만 들어갑니다.</div>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>8</span></div>
+</section>
+
+<!-- 9. 검색 API -->
+<section class="slide">
+  <div class="eyebrow">검색 ③ · GET /api/articles</div>
+  <h1>검색·필터·정렬·페이지를 한 API로 제공합니다</h1>
+  <div class="content">
+    <div class="col">
+      <table>
+        <tr><th style="width:30%">파라미터</th><th>설명</th></tr>
+        <tr><td><code>q</code></td><td>검색어, 최대 200자</td></tr>
+        <tr><td><code>blog_id</code> · <code>company</code></td><td>블로그 / 회사 필터</td></tr>
+        <tr><td><code>from</code> · <code>to</code></td><td>게시일 범위 <code>YYYY-MM-DD</code></td></tr>
+        <tr><td><code>sort</code></td><td><code>latest</code>(기본) · <code>relevance</code></td></tr>
+        <tr><td><code>limit</code> · <code>offset</code></td><td>1~100개 · 건너뛸 개수</td></tr>
+      </table>
+      <div class="callout warn">잘못된 값(<code>limit=0</code>, <code>sort=random</code>, <code>from &gt; to</code>)은 한국어 메시지와 함께 <b>400</b>을 돌려줍니다.</div>
+    </div>
+    <div class="col">
+      <div class="file">응답 예시</div>
+<pre>{
+  <span class="s">"count"</span>: <span class="n">20</span>,  <span class="s">"total"</span>: <span class="n">48</span>,
+  <span class="s">"limit"</span>: <span class="n">20</span>,  <span class="s">"offset"</span>: <span class="n">0</span>,
+  <span class="s">"articles"</span>: [{
+    <span class="s">"id"</span>: <span class="n">12</span>,
+    <span class="s">"title"</span>: <span class="s">"쿠버네티스 운영 가이드"</span>,
+    <span class="s">"url"</span>: <span class="s">"https://..."</span>,
+    <span class="s">"summary"</span>: <span class="s">"..."</span>,
+    <span class="s">"published_at"</span>: <span class="s">"2026-10-05T01:00:00+00:00"</span>,
+    <span class="s">"blog_name"</span>: <span class="s">"NAVER D2"</span>,
+    <span class="s">"company"</span>: <span class="s">"네이버"</span>
+  }]
+}</pre>
+      <p style="font-size:15.5px;color:var(--muted)"><code>total</code>로 전체 페이지 수를 계산합니다. 검색 결과 수와 목록을 같은 조건으로 구합니다.</p>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>9</span></div>
+</section>
+
+<!-- 10. RSS import -->
+<section class="slide">
+  <div class="eyebrow">rss_import.py</div>
+  <h1>같은 파일을 여러 번 넣어도 글이 중복되지 않습니다</h1>
+  <div class="content">
+    <div class="col w2">
+      <div class="file">BE/app/rss_import.py · import_posts()</div>
+<pre><span class="k">INSERT INTO</span> articles (blog_id, entry_key, title, url, ...)
+<span class="k">VALUES</span> (:blog_id, :entry_key, :title, :url, ...)
+<span class="hl"><span class="k">ON CONFLICT</span>(blog_id, entry_key) <span class="k">DO UPDATE SET</span></span>
+    title = excluded.title,
+    published_at = <span class="f">COALESCE</span>(excluded.published_at,
+                            articles.published_at),
+    summary = <span class="f">COALESCE</span>(<span class="f">NULLIF</span>(excluded.summary, <span class="s">''</span>),
+                       articles.summary),
+    <span class="c">-- author, content도 같은 방식</span>
+    updated_at = CURRENT_TIMESTAMP</pre>
+      <div class="file">실행 (BE 폴더에서)</div>
+<pre>python -m app.cli import-rss \
+    ../rss-collector/blogs.json ../rss-collector/posts.json</pre>
+    </div>
+    <div class="col">
+      <div class="row"><div class="num-dot">1</div><p><b>중복 키</b>글 주소(<code>link</code>)를 블로그별 고유 키로 씁니다.</p></div>
+      <div class="row"><div class="num-dot">2</div><p><b>빈 값으로 덮어쓰지 않기</b>새 JSON에 요약이 비어 있으면 기존 요약을 유지합니다.</p></div>
+      <div class="row"><div class="num-dot">3</div><p><b>날짜 통일</b>RFC 2822·ISO 날짜를 모두 UTC ISO 문자열로 바꿔 정렬·기간 검색이 맞게 합니다.</p></div>
+      <div class="row"><div class="num-dot">4</div><p><b>결과 보고</b>새 글·기존 글·잘못된 글·모르는 블로그 수를 출력합니다.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>10</span></div>
+</section>
+
+<!-- 11. 인증 -->
+<section class="slide">
+  <div class="eyebrow">auth.py · security.py</div>
+  <h1>비밀번호와 토큰은 원문을 저장하지 않습니다</h1>
+  <div class="content">
+    <div class="col w2">
+<pre><span class="c"># 비밀번호: scrypt + 랜덤 salt</span>
+<span class="c"># (Flask 시절 werkzeug 해시와 호환)</span>
+<span class="k">def</span> <span class="f">hash_password</span>(password):
+    salt = <span class="s">""</span>.join(secrets.choice(SALT_CHARS)
+                   <span class="k">for</span> _ <span class="k">in</span> range(<span class="n">16</span>))
+    digest = _scrypt(password, salt, N, R, P)
+    <span class="k">return</span> <span class="s">f"scrypt:{N}:{R}:{P}${salt}${digest}"</span>
+
+<span class="c"># 토큰: 사용자에겐 원문, DB엔 SHA-256 해시만</span>
+<span class="k">def</span> <span class="f">issue_token</span>(database_path, user_id, ttl):
+    token = secrets.token_urlsafe(<span class="n">32</span>)
+    db.execute(<span class="s">"INSERT INTO auth_tokens"</span>
+               <span class="s">" (user_id, token_hash, expires_at) ..."</span>,
+               (user_id, _token_hash(token), expires_at))
+    <span class="k">return</span> token, expires_at</pre>
+    </div>
+    <div class="col">
+      <div class="grid g2">
+        <div class="stat"><div class="num" style="font-size:44px">7<small>일</small></div><div class="lbl">토큰 유효 기간</div></div>
+        <div class="stat"><div class="num" style="font-size:44px">5<small>회</small></div><div class="lbl">5분 내 실패 허용</div></div>
+      </div>
+      <ul class="pts">
+        <li>로그인 실패가 넘치면 <b>429 + Retry-After</b></li>
+        <li>실패 횟수 키는 <code>sha256(이메일+IP)</code> → 개인정보 원문 미저장</li>
+        <li>비밀번호를 바꾸면 <b>기존 토큰 전부 폐기</b></li>
+        <li>비밀번호 찾기·이메일 인증 토큰은 1회용</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>11</span></div>
+</section>
+
+<!-- 12. 에러·문서 -->
+<section class="slide">
+  <div class="eyebrow">errors.py · deps.py</div>
+  <h1>에러는 모두 같은 모양의 한국어 JSON으로 돌려줍니다</h1>
+  <div class="content">
+    <div class="col">
+      <div class="file">BE/app/errors.py</div>
+<pre><span class="n">@app.exception_handler</span>(RequestValidationError)
+<span class="k">async def</span> <span class="f">handle_validation_error</span>(_request, exc):
+    <span class="k">return</span> JSONResponse(
+        {<span class="s">"ok"</span>: <span class="k">False</span>,
+         <span class="s">"error"</span>: validation_message(exc.errors())},
+        status_code=<span class="n">400</span>,   <span class="c"># FastAPI 기본값 422 대신</span>
+    )</pre>
+      <div class="file">BE/app/deps.py</div>
+<pre><span class="k">def</span> <span class="f">get_current_user</span>(token: BearerToken, db: DatabasePath):
+    <span class="k">if</span> token <span class="k">is None</span>:
+        <span class="k">raise</span> ApiError(<span class="n">401</span>, <span class="s">"인증 토큰이 필요합니다."</span>)
+    ...
+CurrentUser = Annotated[dict, Depends(get_current_user)]</pre>
+    </div>
+    <div class="col">
+      <div class="card"><h2>프론트는 <code>error</code>만 보여주면 됩니다</h2><p>입력 오류, 인증 실패, 없는 데이터 모두 <code>{"error": "..."}</code> 형식입니다.</p></div>
+      <div class="card"><h2>로그인 확인은 한 줄</h2><p>라우터 인자에 <code>user: CurrentUser</code>만 쓰면 토큰 검사가 끝납니다. 관리자는 <code>X-Admin-Key</code>로 확인합니다.</p></div>
+      <div class="card"><h2>Swagger와 실제 응답 일치</h2><p><code>/api/docs</code>에 422 대신 400, 토큰 필요한 API엔 401과 응답 형식을 표시합니다.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>12</span></div>
+</section>
+
+<!-- 13. 테스트 -->
+<section class="slide">
+  <div class="eyebrow">Tests</div>
+  <h1>테스트 66개가 핵심 동작을 지킵니다</h1>
+  <div class="content">
+    <div class="col w2">
+      <table>
+        <tr><th style="width:36%">파일</th><th style="width:12%">개수</th><th>확인하는 것</th></tr>
+        <tr><td><code>test_auth.py</code></td><td>16</td><td>가입·로그인·429·토큰 해시 저장·비밀번호 재설정</td></tr>
+        <tr><td><code>test_search.py</code></td><td>15</td><td>부분 검색, AND, LIKE 이스케이프, 정렬, 색인 갱신</td></tr>
+        <tr><td><code>test_app.py</code></td><td>8</td><td>보안 헤더, 스키마 생성, 운영 설정 검사</td></tr>
+        <tr><td><code>test_public_api.py</code></td><td>7</td><td>게시글·블로그 조회, 필터, 잘못된 값, 404</td></tr>
+        <tr><td><code>test_rss_import.py</code></td><td>6</td><td>JSON 가져오기, 중복 방지, 날짜 변환</td></tr>
+        <tr><td><code>test_subscriptions.py</code></td><td>6</td><td>구독 CRUD, 남의 구독 접근 차단</td></tr>
+        <tr><td><code>test_admin_blogs.py</code> 외</td><td>8</td><td>관리자 키, 백업·복원, CLI</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <div class="callout ok"><b>실행 방법</b><br><code>python -m unittest discover -s tests</code><br>약 40초, 전부 통과</div>
+      <div class="card"><h2>기존 DB 호환 테스트</h2><p>Flask 시절 DB(7번까지 적용)를 만들어 올렸을 때 기존 글이 검색되고, 기존 회원이 로그인되는지 확인합니다.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>13</span></div>
+</section>
+
+<!-- 14. 논의할 점 -->
+<section class="slide">
+  <div class="eyebrow">Discussion</div>
+  <h1>리뷰에서 같이 정하고 싶은 점</h1>
+  <div class="content" style="flex-direction:column">
+    <div class="grid g2">
+      <div class="card"><span class="badge b-acc">확장성</span><h2 style="margin-top:8px">SQLite로 충분한가</h2><p>파일 하나라 서버 여러 대로 늘리기 어렵습니다. 지금 규모에선 충분하지만, PostgreSQL로 옮기면 FTS5 검색 부분은 다시 짜야 합니다.</p></div>
+      <div class="card"><span class="badge b-warn">검색 품질</span><h2 style="margin-top:8px">trigram의 한계</h2><p>오타나 유의어("k8s" ↔ "쿠버네티스")는 못 찾습니다. 색인 크기가 본문보다 커질 수 있습니다.</p></div>
+      <div class="card"><span class="badge b-gray">API 형식</span><h2 style="margin-top:8px"><code>active</code>·<code>email_verified</code>가 1/0</h2><p>요청은 <code>true/false</code>, 응답은 1/0입니다. 프론트와 맞추려면 응답도 boolean으로 바꿀지 정해야 합니다.</p></div>
+      <div class="card"><span class="badge b-gray">연동</span><h2 style="margin-top:8px">회사명 정확히 일치</h2><p><code>company</code> 필터는 정확히 같아야 합니다. 3번이 회사명을 안 주면 블로그 이름으로 대신 저장됩니다.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>백엔드 코드 리뷰</span><span>14</span></div>
+</section>
+
+<!-- 15. 마무리 -->
+<section class="slide dark" style="justify-content:center">
+  <div class="eyebrow">Summary</div>
+  <h1 style="font-size:46px">API·검색·DB는 완료,<br>이제 연동을 확인할 차례입니다</h1>
+  <div class="grid g3" style="margin-top:40px">
+    <div class="row"><div class="num-dot">1</div><p style="color:#DDE3F0"><b style="color:#fff">프론트 연동</b><code>front</code> 브랜치를 main에 합친 뒤 실제 화면으로 확인</p></div>
+    <div class="row"><div class="num-dot">2</div><p style="color:#DDE3F0"><b style="color:#fff">수집 자동화</b>3번 수집 결과를 정기적으로 <code>import-rss</code></p></div>
+    <div class="row"><div class="num-dot">3</div><p style="color:#DDE3F0"><b style="color:#fff">배포</b>4번 Docker 환경에서 운영용 <code>.env</code>로 실행</p></div>
+  </div>
+  <p class="sub" style="margin-top:44px">API 문서: <code>/api/docs</code> · 연동 가이드: <code>BE/docs/frontend-handoff/</code></p>
+  <div class="foot"><span>Tech Blog Aggregator</span><span>15</span></div>
+</section>
+
+</div></div>
+
+<div id="nav"><button id="prev" aria-label="이전 슬라이드">←</button><span id="count"></span><button id="next" aria-label="다음 슬라이드">→</button><button id="fs" aria-label="전체 화면">⛶</button></div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage');
+  var count = document.getElementById('count');
+  var bar = document.getElementById('progress');
+  var i = 0;
+  try { var h = parseInt(location.hash.slice(1), 10); if (h >= 1 && h <= slides.length) i = h - 1; } catch (e) {}
+  function fit(){
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  function show(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(el, k){ el.classList.toggle('active', k === i); });
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) {}
+  }
+  document.addEventListener('keydown', function(e){
+    if (['ArrowRight','PageDown',' ','Enter'].indexOf(e.key) >= 0) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft','PageUp','Backspace'].indexOf(e.key) >= 0) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f') toggleFs();
+  });
+  function toggleFs(){
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+    else document.exitFullscreen && document.exitFullscreen();
+  }
+  document.getElementById('prev').onclick = function(){ show(i - 1); };
+  document.getElementById('next').onclick = function(){ show(i + 1); };
+  document.getElementById('fs').onclick = toggleFs;
+  document.getElementById('viewport').addEventListener('click', function(e){
+    if (e.target.closest('#nav')) return;
+    show(e.clientX > window.innerWidth / 2 ? i + 1 : i - 1);
+  });
+  window.addEventListener('resize', fit);
+  fit(); show(i);
+})();
+</script>
+</body>
+</html>
