@@ -12,7 +12,7 @@
         if (token) headers.Authorization = `Bearer ${token}`;
         if (options.body !== undefined && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
         try {
-            const response = await fetch(`${window.FEED_API_BASE_URL || 'https://tech-blog-aggregator.onrender.com'}${path}`, {
+            const response = await fetch(`${window.FEED_API_BASE_URL || 'https://tech-blog-aggregator.onrender.xn--com-db3mme233k'}${path}`, {
                 ...options, headers, signal: controller.signal
             });
             if (response.status === 204) return null;
